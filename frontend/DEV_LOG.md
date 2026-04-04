@@ -57,6 +57,38 @@ Unit Types: same as features
 Project features: same as features
 Nearby landmarks: same as features
 
+Apr-4-2026
+Currently ongoing off plan seeding
+seeding initial data into db complete
+
+designed api response shape
+
+implementing backend routes
+implemented agent, owner, properties - model, controller, routes
+
+implemented image/video upload handling
+multer setup complete propertyUpload.ts
+setting up wrapper function to prepare for future cloud flare r2 integration, cancelled, not knowledgable enough to integrate safely
+folder structure redesign to handle image/videos better for scalability complete
+upload path helper setup complete - propertyPath.ts
+
+property controller update, now including media handling to store inside property_media table
+
+property_media table now updated + migrated previous data
+
+db seeding complete, initial data ready
+backend routes - agents, owners, properties complete
+backend controllers - agent, owner, property complete
+backend models - agent, owner, property (db queries) complete
+
+media: image video handling
+create property can now handle media
+
 <!-- Latest ongoing progress -->
 
-Currently ongoing off plan seeding
+plan
+Render properties list and details using seed data. Ignore media for now
+Include media in data fetching (property_media) for all properties. Return structured data: cover, gallery, videos.
+Implement role-based UI logic: browsing vs agent vs owner. Conditional rendering for actions like edit, upload buttons.
+Implement agent/owner upload routes using existing multer + addMedia. Include proper role checks in middleware.
+Connect media upload UI to backend. Test file uploads, preview, sort order, cover selection.
