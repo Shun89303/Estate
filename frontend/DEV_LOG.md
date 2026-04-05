@@ -95,7 +95,7 @@ backend models - agent, owner, property (db queries) complete
 media: image video handling
 create property can now handle media
 
-<!-- Latest To do -->
+<!-- To do -->
 
 plan
 Render frontend pages Buy/Sell, Off-Plan, Owner Direct
@@ -110,6 +110,15 @@ Rendering Buy/Sell
 didn't have features data, created model and connected to property data for frontend
 didn't have agents data, created model and connected to property data for frontend
 implemented map
+
+<!-- Latest to do -->
+
+Render the entire app's skeleton
+Data shape check
+fix layout
+styling
+UX
+animation
 
 <!--  -->
 
@@ -129,6 +138,12 @@ basic ui(unstyled)
 
 rendered saved page skeleton
 navigation working
+basic ui(unstyled)
+
+rendered bookings page skeleton
+navigation working
+pages connected
+minimal data renders
 basic ui(unstyled)
 
 <!-- Latest ongoing progress -->

@@ -11,3 +11,10 @@ export const darkColors = {
 };
 
 export type ThemeColors = typeof lightColors;
+
+const themes = {
+	light: lightColors,
+	dark: darkColors,
+};
+
+export default themes;

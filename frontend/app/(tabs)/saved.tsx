@@ -70,52 +70,55 @@ function PropertyCard({
 	onDelete: () => void;
 	onShare: () => void;
 }) {
+	const router = useRouter();
 	return (
-		<View style={cardStyles.container}>
-			{/* Cover Image */}
-			<Image
-				source={{
-					uri: property.media?.[0]?.url ?? "https://via.placeholder.com/100",
-				}}
-				style={cardStyles.image}
-			/>
+		<TouchableOpacity onPress={() => router.push(`/buySell/${property.id}`)}>
+			<View style={cardStyles.container}>
+				{/* Cover Image */}
+				<Image
+					source={{
+						uri: property.media?.[0]?.url ?? "https://via.placeholder.com/100",
+					}}
+					style={cardStyles.image}
+				/>
 
-			{/* Info Container */}
-			<View style={cardStyles.infoContainer}>
-				{/* Share button */}
-				<TouchableOpacity style={cardStyles.shareBtn} onPress={onShare}>
-					<Ionicons name="share-social-outline" size={20} color="#333" />
-				</TouchableOpacity>
+				{/* Info Container */}
+				<View style={cardStyles.infoContainer}>
+					{/* Share button */}
+					<TouchableOpacity style={cardStyles.shareBtn} onPress={onShare}>
+						<Ionicons name="share-social-outline" size={20} color="#333" />
+					</TouchableOpacity>
 
-				{/* Type */}
-				<Text style={cardStyles.typeLabel}>{property.typeLabel}</Text>
+					{/* Type */}
+					<Text style={cardStyles.typeLabel}>{property.typeLabel}</Text>
 
-				{/* Name */}
-				<Text style={cardStyles.name}>{property.name}</Text>
+					{/* Name */}
+					<Text style={cardStyles.name}>{property.name}</Text>
 
-				{/* Location */}
-				<Text style={cardStyles.location}>{property.location_text}</Text>
+					{/* Location */}
+					<Text style={cardStyles.location}>{property.location_text}</Text>
 
-				{/* Price, Bedrooms/Bathrooms */}
-				<View style={cardStyles.bottomRow}>
-					{/* Price */}
-					<Text style={cardStyles.price}>
-						฿{(property.price ?? 0).toLocaleString()}
-					</Text>
-					<View style={cardStyles.bedBathRow}>
-						{property.bedrooms && (
-							<Text style={cardStyles.bedBath}>{property.bedrooms} 🛏</Text>
-						)}
-						{property.bathrooms && (
-							<Text style={cardStyles.bedBath}>{property.bathrooms} 🛁</Text>
-						)}
-						<TouchableOpacity onPress={onDelete}>
-							<Ionicons name="trash-outline" size={20} color="#f33" />
-						</TouchableOpacity>
+					{/* Price, Bedrooms/Bathrooms */}
+					<View style={cardStyles.bottomRow}>
+						{/* Price */}
+						<Text style={cardStyles.price}>
+							฿{(property.price ?? 0).toLocaleString()}
+						</Text>
+						<View style={cardStyles.bedBathRow}>
+							{property.bedrooms && (
+								<Text style={cardStyles.bedBath}>{property.bedrooms} 🛏</Text>
+							)}
+							{property.bathrooms && (
+								<Text style={cardStyles.bedBath}>{property.bathrooms} 🛁</Text>
+							)}
+							<TouchableOpacity onPress={onDelete}>
+								<Ionicons name="trash-outline" size={20} color="#f33" />
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 }
 
