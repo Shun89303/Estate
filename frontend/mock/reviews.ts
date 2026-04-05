@@ -5,6 +5,7 @@ export interface Review {
 	profile_image: string;
 	title: string;
 	name: string;
+	property_name: string;
 	rating: number;
 }
 
@@ -17,6 +18,7 @@ export const MOCK_REVIEWS: Review[] = [
 		profile_image: "https://randomuser.me/api/portraits/men/10.jpg",
 		title: "Very smooth condo purchase!",
 		name: "Somchai",
+		property_name: "Sukhumvit 24 Condo",
 		rating: 5,
 	},
 	{
@@ -27,6 +29,7 @@ export const MOCK_REVIEWS: Review[] = [
 		profile_image: "https://randomuser.me/api/portraits/women/12.jpg",
 		title: "Agent was extremely helpful",
 		name: "Nok",
+		property_name: "Bangna House",
 		rating: 4,
 	},
 	{
@@ -37,6 +40,7 @@ export const MOCK_REVIEWS: Review[] = [
 		profile_image: "https://randomuser.me/api/portraits/men/15.jpg",
 		title: "Fast process and great support",
 		name: "Arthit",
+		property_name: "Sathorn Penthouse",
 		rating: 5,
 	},
 ];

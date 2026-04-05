@@ -170,3 +170,6 @@ rendered booking success page skeleton
 <!-- Latest ongoing progress -->
 
 implement nested pages skeleton
+ONLY care about data sanity after the entire app's skeleton is complete
+
+implement customer review page
