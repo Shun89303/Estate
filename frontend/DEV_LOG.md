@@ -1,3 +1,12 @@
+<!-- Things to consider -->
+
+Language
+Role based
+
+<!--  -->
+
+฿
+
 Apr-3-2026
 Initial project setup.
 
@@ -57,6 +66,8 @@ Unit Types: same as features
 Project features: same as features
 Nearby landmarks: same as features
 
+<!--  -->
+
 Apr-4-2026
 Currently ongoing off plan seeding
 seeding initial data into db complete
@@ -84,11 +95,30 @@ backend models - agent, owner, property (db queries) complete
 media: image video handling
 create property can now handle media
 
-<!-- Latest ongoing progress -->
+<!-- Latest To do -->
 
 plan
-Render properties list and details using seed data. Ignore media for now
-Include media in data fetching (property_media) for all properties. Return structured data: cover, gallery, videos.
+Render frontend pages Buy/Sell, Off-Plan, Owner Direct
+
 Implement role-based UI logic: browsing vs agent vs owner. Conditional rendering for actions like edit, upload buttons.
+
 Implement agent/owner upload routes using existing multer + addMedia. Include proper role checks in middleware.
+
 Connect media upload UI to backend. Test file uploads, preview, sort order, cover selection.
+
+Rendering Buy/Sell
+didn't have features data, created model and connected to property data for frontend
+didn't have agents data, created model and connected to property data for frontend
+implemented map
+
+<!-- Latest ongoing progress -->
+
+<!--  -->
+
+Apr-5-2026
+
+Rendered home page skeleton
+navigation working
+pages connected
+minimal data renders
+basic ui(unstyled)

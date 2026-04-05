@@ -63,6 +63,63 @@ export const PropertyModel = {
 		return rows as Property[];
 	},
 
+	async getAllWithMediaFeaturesAndAgents() {
+		// 1. Fetch all properties
+		const [properties] = await db.query("SELECT * FROM properties");
+
+		// 2. Fetch all media
+		const [mediaRows] = await db.query("SELECT * FROM property_media");
+		const mediaMap: Record<number, any[]> = {};
+		(mediaRows as any[]).forEach((m) => {
+			if (!mediaMap[m.property_id]) mediaMap[m.property_id] = [];
+			mediaMap[m.property_id].push({
+				type: m.type,
+				url: m.url.replace(/\\/g, "/"),
+				sort_order: m.sort_order,
+			});
+		});
+
+		// 3. Fetch all features
+		const [featureRows] = await db.query(`
+    SELECT pf.property_id, f.id, f.name
+    FROM property_features pf
+    JOIN features f ON f.id = pf.feature_id
+`);
+		const featureMap: Record<number, any[]> = {};
+		(featureRows as any[]).forEach((f) => {
+			if (!featureMap[f.property_id]) featureMap[f.property_id] = [];
+			featureMap[f.property_id].push({ id: f.id, name: f.name });
+		});
+
+		// 4. Fetch all agents
+		const [agentRows] = await db.query("SELECT * FROM agents");
+		const agentMap: Record<number, any> = {};
+		(agentRows as any[]).forEach((a) => {
+			agentMap[a.id] = {
+				id: a.id,
+				profile_image: a.profile_image,
+				name: a.name,
+				phone: a.phone,
+				email: a.email,
+				experience: a.experience,
+				languages: a.languages,
+				bio: a.bio,
+				rating: a.rating,
+				reviews_count: a.reviews_count,
+				created_at: a.created_at,
+				updated_at: a.updated_at,
+			};
+		});
+
+		// 5. Combine all data for each property
+		return (properties as any[]).map((p) => ({
+			...p,
+			media: mediaMap[p.id!] || [],
+			features: featureMap[p.id!] || [],
+			agent: p.agent_id ? agentMap[p.agent_id] : undefined,
+		}));
+	},
+
 	async getById(id: number): Promise<Property | null> {
 		const [rows] = await db.query("SELECT * FROM properties WHERE id = ?", [
 			id,

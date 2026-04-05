@@ -4,10 +4,12 @@ import path from "path";
 import agentRoutes from "./routes/agents";
 import ownerRoutes from "./routes/owners";
 import propertyRoutes from "./routes/properties";
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.get("/", (req, res) => {
 	res.send("Server running");

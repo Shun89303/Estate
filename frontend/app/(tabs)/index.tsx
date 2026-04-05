@@ -1,16 +1,34 @@
-import { Text, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
-export default function Index() {
+import Header from "@/components/home/Header";
+import SearchBar from "@/components/home/SearchBar";
+import TypeFilter from "@/components/home/TypeFilter";
+import PurposeFilter from "@/components/home/PurposeFilter";
+import FeaturedSection from "@/components/home/FeaturedSection";
+import ReviewsSection from "@/components/home/ReviewsSection";
+import ContentsSection from "@/components/home/ContentsSection";
+import ConsultationCTA from "@/components/home/ConsultationCTA";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+export default function Home() {
 	return (
-		<View
-			style={{
-				flex: 1,
-				justifyContent: "center",
-				alignItems: "center",
-			}}
-		>
-			<Text>Edit app/index.tsx to edit this screen.</Text>
-			<Text>Hello World</Text>
-		</View>
+		<SafeAreaView style={{ flex: 1 }}>
+			<ScrollView style={styles.container}>
+				<Header />
+				<SearchBar />
+				<TypeFilter />
+				<PurposeFilter />
+
+				<FeaturedSection />
+				<ReviewsSection />
+				<ContentsSection />
+
+				<ConsultationCTA />
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: { flex: 1, backgroundColor: "#fff", marginBottom: 50 },
+});

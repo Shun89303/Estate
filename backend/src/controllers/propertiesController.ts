@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import { PropertyModel } from "../models/propertiesModel";
 import db from "../config/db";
-import { slugify } from "../utils/slugify";
 
 export const getAllProperties = async (req: Request, res: Response) => {
 	try {
-		const properties = await PropertyModel.getAll();
+		const properties = await PropertyModel.getAllWithMediaFeaturesAndAgents();
 		res.json(properties);
 	} catch (err) {
 		console.error(err);
