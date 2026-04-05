@@ -12,6 +12,7 @@ export default function ContentsSection() {
 		<View style={styles.container}>
 			<SectionHeader
 				title="Contents"
+				subtitle="Guides, tips & videos for buyers"
 				onPress={() => router.push("/contents")}
 			/>
 

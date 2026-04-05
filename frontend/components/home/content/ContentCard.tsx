@@ -1,23 +1,20 @@
-import {
-	View,
-	Text,
-	Image,
-	StyleSheet,
-	Dimensions,
-	Pressable,
-} from "react-native";
+import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { Content } from "@/mock/contents";
 import { useRouter } from "expo-router";
 
-const { width } = Dimensions.get("window");
-
-export default function ContentCard({ content }: { content: Content }) {
+export default function ContentCard({
+	content,
+	showReadTime = false,
+}: {
+	content: Content;
+	showReadTime?: boolean;
+}) {
 	const router = useRouter();
 
 	return (
 		<Pressable onPress={() => router.push("/contents")}>
 			<View style={styles.card}>
-				{/* MEDIA */}
+				{/* MEDIA (LEFT) */}
 				<View style={styles.mediaWrapper}>
 					<Image
 						source={{
@@ -26,14 +23,14 @@ export default function ContentCard({ content }: { content: Content }) {
 						style={styles.media}
 					/>
 
-					{/* ARTICLE / VIDEO BADGE */}
+					{/* ARTICLE ICON */}
 					{content.type === "article" && (
 						<View style={styles.badge}>
 							<Text style={styles.badgeText}>📄</Text>
 						</View>
 					)}
 
-					{/* PLAY INDICATOR FOR VIDEO */}
+					{/* VIDEO OVERLAY */}
 					{content.type === "video" && (
 						<View style={styles.playOverlay}>
 							<Text style={styles.playIcon}>▶</Text>
@@ -41,64 +38,58 @@ export default function ContentCard({ content }: { content: Content }) {
 					)}
 				</View>
 
-				{/* INFO */}
+				{/* INFO (RIGHT) */}
 				<View style={styles.info}>
-					<Text style={styles.type}>
-						{content.type === "article" ? "Article" : "Video"}
-					</Text>
+					{/* CATEGORY */}
+					<Text style={styles.category}>{content.category}</Text>
 
+					{/* TITLE */}
 					<Text style={styles.title} numberOfLines={2}>
 						{content.title}
 					</Text>
 
-					<Text style={styles.meta}>
-						{content.posted_by} • {formatDate(content.date)}
-					</Text>
+					{/* META ROW */}
+					<View style={styles.metaRow}>
+						<Text style={styles.meta}>{content.posted_by}</Text>
+						<Text style={styles.meta}>•</Text>
+						<Text style={styles.meta}>{content.date}</Text>
+					</View>
+
+					{/* OPTIONAL READ TIME */}
+					{showReadTime && content.read_time && (
+						<Text style={styles.readTime}>{content.read_time}</Text>
+					)}
 				</View>
 			</View>
 		</Pressable>
 	);
 }
 
-/* ---------------- UTIL ---------------- */
-
-function formatDate(dateStr: string) {
-	const date = new Date(dateStr);
-	return date.toLocaleDateString("en-GB", {
-		day: "2-digit",
-		month: "short",
-		year: "numeric",
-	});
-}
-
-/* ---------------- STYLES ---------------- */
-
 const styles = StyleSheet.create({
 	card: {
+		flexDirection: "row",
 		marginBottom: 16,
 		backgroundColor: "#fff",
 		borderRadius: 12,
 		overflow: "hidden",
-		elevation: 2,
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
 	},
 
+	/* MEDIA */
 	mediaWrapper: {
+		width: 120,
+		height: 100,
 		position: "relative",
 	},
 
 	media: {
 		width: "100%",
-		height: width * 0.5,
+		height: "100%",
 	},
 
 	badge: {
 		position: "absolute",
-		top: 8,
-		left: 8,
+		top: 6,
+		left: 6,
 		backgroundColor: "rgba(0,0,0,0.6)",
 		paddingHorizontal: 6,
 		paddingVertical: 2,
@@ -107,7 +98,7 @@ const styles = StyleSheet.create({
 
 	badgeText: {
 		color: "#fff",
-		fontSize: 12,
+		fontSize: 10,
 	},
 
 	playOverlay: {
@@ -123,28 +114,44 @@ const styles = StyleSheet.create({
 
 	playIcon: {
 		color: "#fff",
-		fontSize: 36,
+		fontSize: 24,
 		fontWeight: "bold",
 	},
 
+	/* INFO */
 	info: {
-		padding: 12,
+		flex: 1,
+		padding: 10,
+		justifyContent: "space-between",
 	},
 
-	type: {
-		fontSize: 11,
+	category: {
+		fontSize: 10,
 		color: "#888",
+		fontWeight: "600",
 		marginBottom: 4,
 	},
 
 	title: {
-		fontSize: 14,
-		fontWeight: "bold",
+		fontSize: 13,
+		fontWeight: "600",
 		marginBottom: 6,
 	},
 
+	metaRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+
 	meta: {
-		fontSize: 12,
+		fontSize: 11,
 		color: "#666",
+	},
+
+	readTime: {
+		fontSize: 11,
+		color: "#999",
+		marginTop: 2,
 	},
 });

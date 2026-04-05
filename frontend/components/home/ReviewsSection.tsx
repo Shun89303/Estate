@@ -11,6 +11,7 @@ export default function ReviewsSection() {
 		<View style={styles.container}>
 			<SectionHeader
 				title="Customer Reviews"
+				subtitle="Real stories from Myanmar buyers"
 				onPress={() => router.push("/reviews")}
 			/>
 
