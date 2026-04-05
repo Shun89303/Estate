@@ -34,7 +34,9 @@ export default function Saved() {
 					<Text>{"<"}</Text>
 				</TouchableOpacity>
 				<Text style={styles.title}>Saved Properties</Text>
-				<Text style={{ width: 24 }} />
+				<Text style={{ fontSize: 14, color: "#666" }}>
+					{savedProperties.length} saved
+				</Text>
 			</View>
 
 			{/* CONTENT */}
