@@ -1,33 +1,52 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
 	View,
 	Text,
 	TouchableOpacity,
 	TextInput,
 	FlatList,
-	ActivityIndicator,
 	StyleSheet,
+	ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { usePropertyStore } from "@/stores/usePropertyStore";
-import { useFetchProperties } from "@/hooks/useFetchProperties";
+import { Ionicons } from "@expo/vector-icons";
+import MapView, { Marker } from "react-native-maps"; // react-native-maps
 import PropertyCard from "@/components/home/property/PropertyCard";
 import { useRouter } from "expo-router";
+import { MOCK_PROPERTIES } from "@/mock/properties";
+
+const CATEGORY_OPTIONS = [
+	"Buy/Sell",
+	"Room Rent",
+	"Owner-Direct",
+	"Off-Plan",
+	"Business",
+];
+
+const PURPOSES = [
+	"All",
+	"For Investment",
+	"For Living",
+	"For Rent",
+	"For Long Stay Visa",
+];
+const TYPES = ["All", "Condo", "House", "Townhouse", "Penthouse"];
+const LOCATIONS = [
+	"All",
+	"Sukhumvit",
+	"Thonglor",
+	"Sathorn",
+	"Bangna",
+	"Rama 9",
+	"Pattaya",
+];
+const PRICES = ["Any", "<฿5M", "฿5-10M", "฿10-20M", "฿20M+"];
+const BEDROOMS = ["Any", "1+", "2+", "3+", "4+"];
 
 export default function Search() {
-	const { properties, loading } = usePropertyStore();
-	useFetchProperties();
-
 	const router = useRouter();
-
 	const [viewMode, setViewMode] = useState<"list" | "map">("list");
-
-	const buyProperties = useMemo(() => {
-		return properties.filter((p) => p.listing_type === "buy" && p.agent_id);
-	}, [properties]);
-
-	if (loading) return <ActivityIndicator size="large" />;
-	// if (error) return <Text>{error}</Text>;
+	const [showFilters, setShowFilters] = useState(false);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -39,52 +58,117 @@ export default function Search() {
 
 				<TextInput placeholder="Search..." style={styles.searchBar} />
 
-				<TouchableOpacity>
-					<Text>Filter</Text>
+				<TouchableOpacity onPress={() => setShowFilters((prev) => !prev)}>
+					<Ionicons name="filter" size={24} color="#333" />
 				</TouchableOpacity>
 			</View>
 
-			{/* CATEGORY BUTTONS */}
-			<View style={styles.categories}>
-				{["Buy/Sell", "Room Rent", "Owner Direct", "Off-Plan", "Business"].map(
-					(item) => (
-						<TouchableOpacity key={item} style={styles.categoryBtn}>
-							<Text>{item}</Text>
-						</TouchableOpacity>
-					),
-				)}
-			</View>
+			{/* CATEGORY ROW */}
+			<ScrollView
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				style={styles.categoryRow}
+			>
+				{CATEGORY_OPTIONS.map((item) => (
+					<TouchableOpacity key={item} style={styles.categoryBtn}>
+						<Text>{item}</Text>
+					</TouchableOpacity>
+				))}
+			</ScrollView>
 
-			{/* TOGGLE */}
-			<View style={styles.toggleRow}>
-				<TouchableOpacity onPress={() => setViewMode("list")}>
-					<Text style={viewMode === "list" ? styles.active : undefined}>
-						List
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => setViewMode("map")}>
-					<Text style={viewMode === "map" ? styles.active : undefined}>
-						Map
-					</Text>
-				</TouchableOpacity>
+			{/* FILTERS */}
+			{showFilters && (
+				<View style={styles.filtersContainer}>
+					<FilterSection title="Purpose" options={PURPOSES} />
+					<FilterSection title="Type" options={TYPES} />
+					<FilterSection title="Location" options={LOCATIONS} />
+					<FilterSection title="Price" options={PRICES} />
+					<FilterSection title="Bedrooms" options={BEDROOMS} />
+				</View>
+			)}
+
+			{/* TOGGLE + TOTAL */}
+			<View style={styles.toggleRowWithCount}>
+				{/* Total Properties */}
+				<Text style={styles.totalCount}>
+					{MOCK_PROPERTIES.length} properties found
+				</Text>
+
+				{/* List/Map Toggle */}
+				<View style={styles.toggleRow}>
+					<TouchableOpacity onPress={() => setViewMode("list")}>
+						<Text style={viewMode === "list" ? styles.active : undefined}>
+							List
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => setViewMode("map")}>
+						<Text style={viewMode === "map" ? styles.active : undefined}>
+							Map
+						</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 
 			{/* CONTENT */}
 			{viewMode === "list" ? (
 				<FlatList
-					data={buyProperties}
+					data={MOCK_PROPERTIES}
 					keyExtractor={(item) => item.id!.toString()}
 					renderItem={({ item }) => <PropertyCard property={item} />}
 				/>
 			) : (
-				<View style={styles.map}>
-					<Text>Map View (implement later)</Text>
-				</View>
+				<MapView
+					style={styles.map}
+					initialRegion={{
+						latitude: MOCK_PROPERTIES[0].latitude || 13.7563, // default Bangkok
+						longitude: MOCK_PROPERTIES[0].longitude || 100.5018,
+						latitudeDelta: 0.1,
+						longitudeDelta: 0.1,
+					}}
+				>
+					{MOCK_PROPERTIES.map((p) =>
+						p.latitude && p.longitude ? (
+							<Marker
+								key={p.id}
+								coordinate={{
+									latitude: p.latitude,
+									longitude: p.longitude,
+								}}
+								title={p.name}
+								description={p.location_text}
+								onPress={() => router.push(`/buySell/${p.id}`)}
+							/>
+						) : null,
+					)}
+				</MapView>
 			)}
 		</SafeAreaView>
 	);
 }
 
+/* ---------------- FILTER COMPONENT ---------------- */
+function FilterSection({
+	title,
+	options,
+}: {
+	title: string;
+	options: string[];
+}) {
+	return (
+		<View style={styles.filterSection}>
+			<Text style={styles.filterTitle}>{title}</Text>
+			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+				{options.map((opt) => (
+					<TouchableOpacity key={opt} style={styles.filterBtn}>
+						<Text>{opt}</Text>
+					</TouchableOpacity>
+				))}
+			</ScrollView>
+		</View>
+	);
+}
+
+/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
 	container: { flex: 1 },
 
@@ -103,23 +187,59 @@ const styles = StyleSheet.create({
 		height: 40,
 	},
 
-	categories: {
+	filtersContainer: {
+		paddingHorizontal: 16,
+		paddingBottom: 16,
+	},
+
+	filterSection: {
+		marginBottom: 12,
+	},
+
+	filterTitle: {
+		fontWeight: "bold",
+		marginBottom: 6,
+	},
+
+	filterBtn: {
+		backgroundColor: "#eee",
+		paddingVertical: 6,
+		paddingHorizontal: 12,
+		borderRadius: 6,
+		marginRight: 8,
+	},
+
+	categoryRow: {
 		flexDirection: "row",
-		justifyContent: "space-around",
+		paddingHorizontal: 16,
 		paddingVertical: 10,
+		marginBottom: 8,
 	},
 
 	categoryBtn: {
-		padding: 6,
+		paddingVertical: 6,
+		paddingHorizontal: 12,
 		backgroundColor: "#eee",
 		borderRadius: 6,
+		marginRight: 8,
+	},
+
+	toggleRowWithCount: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingHorizontal: 16,
+		paddingVertical: 10,
+	},
+
+	totalCount: {
+		fontWeight: "bold",
+		fontSize: 16,
 	},
 
 	toggleRow: {
 		flexDirection: "row",
-		justifyContent: "center",
 		gap: 20,
-		paddingVertical: 10,
 	},
 
 	active: {
@@ -127,14 +247,7 @@ const styles = StyleSheet.create({
 		textDecorationLine: "underline",
 	},
 
-	card: {
-		padding: 16,
-		borderBottomWidth: 1,
-	},
-
 	map: {
 		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
 	},
 });

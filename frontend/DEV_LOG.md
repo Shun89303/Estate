@@ -111,8 +111,6 @@ didn't have features data, created model and connected to property data for fron
 didn't have agents data, created model and connected to property data for frontend
 implemented map
 
-<!-- Latest ongoing progress -->
-
 <!--  -->
 
 Apr-5-2026
@@ -122,3 +120,15 @@ navigation working
 pages connected
 minimal data renders
 basic ui(unstyled)
+
+rendered search page skeleton
+navigation working
+pages connected
+minimal data renders
+basic ui(unstyled)
+
+rendered saved page skeleton
+navigation working
+basic ui(unstyled)
+
+<!-- Latest ongoing progress -->

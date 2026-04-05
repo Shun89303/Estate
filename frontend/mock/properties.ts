@@ -1,4 +1,3 @@
-// mock/properties.ts
 import { Property } from "@/stores/usePropertyStore";
 
 export const MOCK_PROPERTIES: Property[] = [
@@ -6,6 +5,8 @@ export const MOCK_PROPERTIES: Property[] = [
 		id: 1,
 		name: "Luxury Condo near BTS",
 		location_text: "Bangkok, Sukhumvit",
+		latitude: 13.7373,
+		longitude: 100.5683,
 		price: 8500000,
 		price_type: "total",
 		type: "condo",
@@ -30,6 +31,8 @@ export const MOCK_PROPERTIES: Property[] = [
 		id: 2,
 		name: "Modern Pool Villa",
 		location_text: "Phuket, Patong",
+		latitude: 7.896,
+		longitude: 98.296,
 		price: 12500000,
 		price_type: "total",
 		type: "house",
@@ -54,6 +57,8 @@ export const MOCK_PROPERTIES: Property[] = [
 		id: 3,
 		name: "Cozy Studio in City Center",
 		location_text: "Chiang Mai, Nimmanhaemin",
+		latitude: 18.7953,
+		longitude: 98.962,
 		price: 4200000,
 		price_type: "total",
 		type: "condo",
@@ -78,6 +83,8 @@ export const MOCK_PROPERTIES: Property[] = [
 		id: 4,
 		name: "Elegant Townhouse",
 		location_text: "Bangkok, Ari",
+		latitude: 13.7941,
+		longitude: 100.5565,
 		price: 9800000,
 		price_type: "total",
 		type: "townhouse",
@@ -97,6 +104,8 @@ export const MOCK_PROPERTIES: Property[] = [
 		id: 5,
 		name: "Seaside Condo",
 		location_text: "Pattaya, Jomtien",
+		latitude: 12.8966,
+		longitude: 100.8727,
 		price: 5600000,
 		price_type: "total",
 		type: "condo",
