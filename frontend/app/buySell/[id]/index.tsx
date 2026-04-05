@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, Text, StyleSheet, Pressable } from "react-native";
-import { usePropertyStore, Property } from "@/stores/usePropertyStore";
+import { Property } from "@/stores/usePropertyStore";
 
 import ActionButtons from "@/components/buySellDetails/ActionButtons";
 import PropertyMediaCarousel from "@/components/buySellDetails/PropertyMediaCarousel";
@@ -12,18 +12,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ConsultationFee from "@/components/buySellDetails/ConsultationFee";
 import ConsultationButtons from "@/components/buySellDetails/ConsultationButtons";
 import PropertyMap from "@/components/buySellDetails/PropertyMap";
+import { MOCK_PROPERTIES } from "@/mock/properties";
 
 export default function BuySellDetails() {
 	const { id } = useLocalSearchParams();
-	const { properties } = usePropertyStore();
 	const [property, setProperty] = useState<Property | null>(null);
 	const router = useRouter();
 
 	useEffect(() => {
 		if (!id) return;
-		const found = properties.find((p) => p.id?.toString() === id.toString());
+		const found = MOCK_PROPERTIES.find(
+			(p) => p.id?.toString() === id.toString(),
+		);
 		setProperty(found || null);
-	}, [id, properties]);
+	}, [id]);
 
 	if (!property)
 		return (
@@ -59,7 +61,7 @@ export default function BuySellDetails() {
 				{/* Consultation & Reserve */}
 				<ConsultationFee property={property} />
 			</ScrollView>
-			<ConsultationButtons />
+			<ConsultationButtons property={property} />
 		</SafeAreaView>
 	);
 }

@@ -6,7 +6,7 @@ export default function Header() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>Home</Text>
+			<Text style={styles.title}>Pandora Property</Text>
 			<Pressable onPress={() => router.push("/notifications")}>
 				<Text>🔔</Text>
 			</Pressable>

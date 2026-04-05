@@ -146,6 +146,12 @@ pages connected
 minimal data renders
 basic ui(unstyled)
 
+rendered profile page skeleton
+navigation working
+pages connected
+minimal data renders
+basic ui(unstyled)
+
 removed tab title
 rendered noti page skeleton
 navigation working
@@ -153,4 +159,14 @@ pages connected
 minimal data renders
 basic ui(unstyled)
 
+rendered 7 booking steps page skeleton
+navigation working
+pages connected
+minimal data renders
+basic ui(unstyled)
+
+rendered booking success page skeleton
+
 <!-- Latest ongoing progress -->
+
+implement nested pages skeleton

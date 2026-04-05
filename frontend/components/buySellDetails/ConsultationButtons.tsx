@@ -1,9 +1,20 @@
+import { Property } from "@/stores/usePropertyStore";
+import { useRouter } from "expo-router";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-export default function ConsultationButtons() {
+export default function ConsultationButtons({
+	property,
+}: {
+	property: Property;
+}) {
+	const router = useRouter();
+
 	return (
 		<View style={styles.container}>
-			<TouchableOpacity style={styles.button}>
+			<TouchableOpacity
+				style={styles.button}
+				onPress={() => router.push(`/booking/${property.id}`)}
+			>
 				<Text style={styles.buttonText}>Consultation</Text>
 			</TouchableOpacity>
 
