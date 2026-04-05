@@ -1,7 +1,7 @@
-import { mainTabs, TabKey } from "@/navigation/mainTabs";
+import { TabKey } from "@/navigation/mainTabs";
 import { iconMap } from "@/navigation/tabIcons";
 import React from "react";
-import { Text, TouchableWithoutFeedback } from "react-native";
+import { TouchableWithoutFeedback } from "react-native";
 import Animated from "react-native-reanimated";
 import { tabUI } from "@/constants/ui/tab";
 
@@ -19,7 +19,7 @@ export default function TabButton({
 	index,
 }: TabButtonProps) {
 	const IconComponent = iconMap[tabKey];
-	const title = mainTabs[tabKey].title;
+	// const title = mainTabs[tabKey].title;
 
 	return (
 		<TouchableWithoutFeedback onPress={onPress}>
@@ -32,7 +32,7 @@ export default function TabButton({
 				}}
 			>
 				<IconComponent size={tabUI.icon.size} color={"black"} />
-				<Text
+				{/* <Text
 					style={{
 						fontSize: tabUI.label.fontSize, // Simplified, config can override if needed
 						fontWeight: isActive ? "bold" : ("500" as const),
@@ -42,7 +42,7 @@ export default function TabButton({
 					}}
 				>
 					{title}
-				</Text>
+				</Text> */}
 			</Animated.View>
 		</TouchableWithoutFeedback>
 	);

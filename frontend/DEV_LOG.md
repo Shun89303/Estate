@@ -146,4 +146,11 @@ pages connected
 minimal data renders
 basic ui(unstyled)
 
+removed tab title
+rendered noti page skeleton
+navigation working
+pages connected
+minimal data renders
+basic ui(unstyled)
+
 <!-- Latest ongoing progress -->
