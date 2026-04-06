@@ -169,9 +169,15 @@ rendered booking success page skeleton
 
 <!-- Latest ongoing progress -->
 
+<!--  -->
+
+Apr-6-2026
+
 implement nested pages skeleton
 ONLY care about data sanity after the entire app's skeleton is complete
 
 implement customer review page
 
 implemented profile nested pages: logout, settings, help & support, edit profile, history, top up, login
+
+implemented booking nested pages: consultation and reserves details pages
