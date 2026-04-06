@@ -18,7 +18,7 @@ export default function TypeFilter() {
 				<Text style={styles.item}>Room Rent</Text>
 			</Pressable>
 
-			<Pressable onPress={() => router.push("/ownerDirect")}>
+			<Pressable onPress={() => router.push("/ownerDirect/ownerDirect")}>
 				<Text style={styles.item}>Owner Direct</Text>
 			</Pressable>
 

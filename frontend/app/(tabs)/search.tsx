@@ -91,7 +91,7 @@ export default function Search() {
 
 				<TouchableOpacity
 					style={styles.categoryBtn}
-					onPress={() => router.push("/ownerDirect")}
+					onPress={() => router.push("/ownerDirect/ownerDirect")}
 				>
 					<Text
 						style={{
