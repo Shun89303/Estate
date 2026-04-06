@@ -1,119 +1,129 @@
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
-import { formatPrice } from "@/utils/formatPrice";
 import { Property } from "@/mock/buySell";
 
 export default function PropertyCard({ property }: { property: Property }) {
 	const router = useRouter();
-	const cover = property.media.cover;
 
 	return (
 		<TouchableOpacity
 			onPress={() => router.push(`/buySell/${property.id}`)}
 			activeOpacity={0.8}
+			style={styles.cardContainer}
 		>
-			<View style={styles.card}>
-				{/* LEFT: IMAGE */}
-				{cover && (
-					<Image
-						// source={{ uri: `${API_BASE_URL}/${cover.url}` }}
-						source={{ uri: cover }}
-						style={styles.image}
-					/>
-				)}
+			{/* ---------------- UPPER SIDE ---------------- */}
+			<View style={styles.upperSide}>
+				<Image
+					source={{ uri: property.media.cover }}
+					style={styles.coverImage}
+				/>
+				{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
 
-				{/* RIGHT: INFO */}
-				<View style={styles.info}>
-					{/* TYPE + BADGE */}
-					<View style={styles.rowTop}>
-						<Text style={styles.type}>{property.type}</Text>
-						{property.isNew && <Text style={styles.badge}>NEW</Text>}
-					</View>
+				{/* PRICE overlay at bottom-left */}
+				<View style={styles.priceContainer}>
+					<Text style={styles.price}>฿{property.price.toLocaleString()}</Text>
+				</View>
+			</View>
 
-					{/* NAME */}
-					<Text style={styles.name} numberOfLines={1}>
-						{property.title}
-					</Text>
+			{/* ---------------- BOTTOM SIDE ---------------- */}
+			<View style={styles.bottomSide}>
+				<Text style={styles.title} numberOfLines={1}>
+					{property.title}
+				</Text>
+				<Text style={styles.address} numberOfLines={1}>
+					{property.location.address}
+				</Text>
 
-					{/* LOCATION */}
-					<Text style={styles.location} numberOfLines={1}>
-						{property.locationText}
-					</Text>
+				<View style={styles.divider} />
 
-					<View
-						style={{
-							flexDirection: "row",
-							justifyContent: "space-between",
-						}}
-					>
-						{/* DETAILS */}
-						<Text style={styles.details}>
-							{property.bedrooms} bd • {property.bathrooms} ba •{" "}
-							{property.areaSqm} m²
-						</Text>
-
-						{/* PRICE */}
-						<Text style={styles.price}>฿{formatPrice(property.price)}</Text>
-					</View>
+				{/* Specs row */}
+				<View style={styles.specsRow}>
+					<Text style={styles.spec}>{property.bedrooms} bd</Text>
+					<Text style={styles.spec}>{property.bathrooms} ba</Text>
+					<Text style={styles.spec}>{property.areaSqm} sqm</Text>
 				</View>
 			</View>
 		</TouchableOpacity>
 	);
 }
+
 const styles = StyleSheet.create({
-	card: {
-		flexDirection: "row", // 🔥 horizontal
+	cardContainer: {
 		backgroundColor: "#fff",
 		borderRadius: 12,
-		marginBottom: 12,
+		marginBottom: 16,
 		overflow: "hidden",
 	},
 
-	image: {
-		width: 120, // fixed width
-		height: 120, // same → 1:1 square
+	upperSide: {
+		position: "relative",
+		height: 180,
 	},
 
-	info: {
-		flex: 1,
-		padding: 10,
-		justifyContent: "space-between",
+	coverImage: {
+		width: "100%",
+		height: "100%",
 	},
 
-	rowTop: {
-		flexDirection: "row",
-	},
-
-	type: {
-		fontSize: 11,
-		color: "#666",
-	},
-
-	badge: {
-		fontSize: 11,
+	newBadge: {
+		position: "absolute",
+		top: 10,
+		left: 10,
 		backgroundColor: "#007bff",
 		color: "#fff",
-		paddingHorizontal: 6,
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		borderRadius: 4,
+		fontSize: 12,
+		fontWeight: "bold",
+	},
+
+	priceContainer: {
+		position: "absolute",
+		bottom: 10,
+		left: 10,
+		backgroundColor: "rgba(0,0,0,0.6)",
+		paddingHorizontal: 8,
+		paddingVertical: 4,
 		borderRadius: 4,
 	},
 
-	name: {
+	price: {
+		color: "#fff",
 		fontSize: 14,
 		fontWeight: "bold",
 	},
 
-	location: {
-		fontSize: 12,
-		color: "#777",
+	bottomSide: {
+		padding: 12,
 	},
 
-	details: {
+	title: {
+		fontSize: 14,
+		fontWeight: "bold",
+		marginBottom: 4,
+	},
+
+	address: {
+		fontSize: 12,
+		color: "#666",
+		marginBottom: 8,
+	},
+
+	divider: {
+		height: 1,
+		backgroundColor: "#eee",
+		marginVertical: 8,
+	},
+
+	specsRow: {
+		flexDirection: "row",
+		justifyContent: "flex-start",
+		gap: 10,
+	},
+
+	spec: {
 		fontSize: 12,
 		color: "#555",
-	},
-
-	price: {
-		fontSize: 14,
-		fontWeight: "bold",
 	},
 });

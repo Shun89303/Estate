@@ -11,7 +11,7 @@ export interface PropertyFeatures {
 }
 
 export interface PropertyLocation {
-	address?: string;
+	address: string;
 	latitude: number;
 	longitude: number;
 }
@@ -40,7 +40,6 @@ export interface Property {
 
 	// Basic Info
 	title: string;
-	locationText: string;
 
 	// Specs
 	bedrooms: number;
@@ -75,7 +74,6 @@ export const MOCK_BUYSELL: Property[] = [
 		type: "CONDO",
 		isNew: true,
 		title: "Luxury Condo at Sukhumvit 24",
-		locationText: "Sukhumvit 24, Phrom Phong",
 		bedrooms: 2,
 		bathrooms: 2,
 		areaSqm: 65,
@@ -90,7 +88,11 @@ export const MOCK_BUYSELL: Property[] = [
 		},
 		description:
 			"Modern luxury condo with stunning city views, steps from BTS Phrom Phong. Fully furnished with premium finishes.",
-		location: { latitude: 13.73, longitude: 100.567 },
+		location: {
+			address: "Sukhumvit 24, Phrom Phong",
+			latitude: 13.73,
+			longitude: 100.567,
+		},
 		agent: {
 			name: "Aye Thandar",
 			experienceYears: 6,
@@ -112,7 +114,7 @@ export const MOCK_BUYSELL: Property[] = [
 		type: "HOUSE",
 		isNew: false,
 		title: "Modern Family House",
-		locationText: "Bangkok, Sukhumvit 50",
+
 		bedrooms: 4,
 		bathrooms: 3,
 		areaSqm: 180,
@@ -127,7 +129,11 @@ export const MOCK_BUYSELL: Property[] = [
 		},
 		description:
 			"Spacious family home with private pool, garage, and modern amenities. Great for families looking for comfort and security.",
-		location: { latitude: 13.71, longitude: 100.59 },
+		location: {
+			address: "Bangkok, Sukhumvit 50",
+			latitude: 13.71,
+			longitude: 100.59,
+		},
 		agent: {
 			name: "Ko Min",
 			experienceYears: 8,
@@ -149,7 +155,6 @@ export const MOCK_BUYSELL: Property[] = [
 		type: "TOWNHOUSE",
 		isNew: true,
 		title: "Cozy Townhouse Near BTS",
-		locationText: "Bangkok, Ekkamai",
 		bedrooms: 3,
 		bathrooms: 2,
 		areaSqm: 120,
@@ -164,7 +169,11 @@ export const MOCK_BUYSELL: Property[] = [
 		},
 		description:
 			"Comfortable townhouse with modern interior, near public transport and shopping areas. Ideal for small families.",
-		location: { latitude: 13.731, longitude: 100.58 },
+		location: {
+			address: "Bangkok, Ekkamai",
+			latitude: 13.731,
+			longitude: 100.58,
+		},
 		agent: {
 			name: "U Kyaw Zin",
 			experienceYears: 5,
