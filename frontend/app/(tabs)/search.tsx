@@ -56,7 +56,6 @@ export default function Search() {
 			</View>
 
 			{/* CATEGORY ROW */}
-			{/* CATEGORY ROW */}
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
@@ -66,35 +65,70 @@ export default function Search() {
 					style={styles.categoryBtn}
 					onPress={() => router.push("/(tabs)/search")}
 				>
-					<Text>Buy/Sell</Text>
+					<Text
+						style={{
+							fontSize: 15,
+							fontWeight: "500",
+						}}
+					>
+						Buy/Sell
+					</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity
 					style={styles.categoryBtn}
-					onPress={() => router.push("/roomRent")}
+					onPress={() => router.push("/roomRent/roomRent")}
 				>
-					<Text>Room Rent</Text>
+					<Text
+						style={{
+							fontSize: 15,
+							fontWeight: "500",
+						}}
+					>
+						Room Rent
+					</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity
 					style={styles.categoryBtn}
 					onPress={() => router.push("/ownerDirect")}
 				>
-					<Text>Owner-Direct</Text>
+					<Text
+						style={{
+							fontSize: 15,
+							fontWeight: "500",
+						}}
+					>
+						Owner-Direct
+					</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity
 					style={styles.categoryBtn}
-					onPress={() => router.push("/offPlan")}
+					onPress={() => router.push("/offPlan/offPlan")}
 				>
-					<Text>Off-Plan</Text>
+					<Text
+						style={{
+							fontSize: 15,
+							fontWeight: "500",
+						}}
+					>
+						Off-Plan
+					</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity
 					style={styles.categoryBtn}
 					onPress={() => router.push("/business")}
 				>
-					<Text>Business</Text>
+					<Text
+						style={{
+							fontSize: 15,
+							fontWeight: "500",
+						}}
+					>
+						Business
+					</Text>
 				</TouchableOpacity>
 			</ScrollView>
 
@@ -192,7 +226,7 @@ function FilterSection({
 
 /* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
-	container: {},
+	container: { flex: 1 },
 
 	header: {
 		flexDirection: "row",
@@ -232,6 +266,7 @@ const styles = StyleSheet.create({
 	},
 
 	categoryRow: {
+		flexGrow: 0,
 		flexDirection: "row",
 		paddingHorizontal: 16,
 		paddingVertical: 10,

@@ -180,8 +180,6 @@ implemented profile nested pages: logout, settings, help & support, edit profile
 
 implemented booking nested pages: consultation and reserves details pages
 
-<!-- Latest ongoing progress -->
-
 implement search page's navigations to all 5 property types
 
 buySell:
@@ -195,3 +193,13 @@ created type
 created 3 mock data
 
 implemented roomRent page + details page
+
+implemented off-plan page + details page
+
+<!--  -->
+
+Apr-7-2026
+
+<!-- Latest ongoing progress -->
+
+Implement owner direct
