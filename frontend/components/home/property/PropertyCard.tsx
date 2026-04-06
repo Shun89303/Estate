@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
-import { Property } from "@/stores/usePropertyStore";
 import { formatPrice } from "@/utils/formatPrice";
+import { Property } from "@/mock/buySell";
 
 export default function PropertyCard({ property }: { property: Property }) {
 	const router = useRouter();
-	const cover = property.media?.find((m: any) => m.type === "cover");
+	const cover = property.media.cover;
 
 	return (
 		<TouchableOpacity
@@ -17,7 +17,7 @@ export default function PropertyCard({ property }: { property: Property }) {
 				{cover && (
 					<Image
 						// source={{ uri: `${API_BASE_URL}/${cover.url}` }}
-						source={{ uri: cover.url }}
+						source={{ uri: cover }}
 						style={styles.image}
 					/>
 				)}
@@ -27,17 +27,17 @@ export default function PropertyCard({ property }: { property: Property }) {
 					{/* TYPE + BADGE */}
 					<View style={styles.rowTop}>
 						<Text style={styles.type}>{property.type}</Text>
-						{property.is_new && <Text style={styles.badge}>NEW</Text>}
+						{property.isNew && <Text style={styles.badge}>NEW</Text>}
 					</View>
 
 					{/* NAME */}
 					<Text style={styles.name} numberOfLines={1}>
-						{property.name}
+						{property.title}
 					</Text>
 
 					{/* LOCATION */}
 					<Text style={styles.location} numberOfLines={1}>
-						{property.location_text}
+						{property.locationText}
 					</Text>
 
 					<View
@@ -48,15 +48,12 @@ export default function PropertyCard({ property }: { property: Property }) {
 					>
 						{/* DETAILS */}
 						<Text style={styles.details}>
-							{property.bedrooms} bd • {property.bathrooms} ba • {property.area}{" "}
-							m²
+							{property.bedrooms} bd • {property.bathrooms} ba •{" "}
+							{property.areaSqm} m²
 						</Text>
 
 						{/* PRICE */}
-						<Text style={styles.price}>
-							฿{formatPrice(property.price)}
-							{property.price_type === "monthly" ? "/mo" : ""}
-						</Text>
+						<Text style={styles.price}>฿{formatPrice(property.price)}</Text>
 					</View>
 				</View>
 			</View>

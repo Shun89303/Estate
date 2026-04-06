@@ -13,15 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps"; // react-native-maps
 import PropertyCard from "@/components/home/property/PropertyCard";
 import { useRouter } from "expo-router";
-import { MOCK_PROPERTIES } from "@/mock/properties";
-
-const CATEGORY_OPTIONS = [
-	"Buy/Sell",
-	"Room Rent",
-	"Owner-Direct",
-	"Off-Plan",
-	"Business",
-];
+import { MOCK_BUYSELL } from "@/mock/buySell";
 
 const PURPOSES = [
 	"All",
@@ -64,16 +56,46 @@ export default function Search() {
 			</View>
 
 			{/* CATEGORY ROW */}
+			{/* CATEGORY ROW */}
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				style={styles.categoryRow}
 			>
-				{CATEGORY_OPTIONS.map((item) => (
-					<TouchableOpacity key={item} style={styles.categoryBtn}>
-						<Text>{item}</Text>
-					</TouchableOpacity>
-				))}
+				<TouchableOpacity
+					style={styles.categoryBtn}
+					onPress={() => router.push("/(tabs)/search")}
+				>
+					<Text>Buy/Sell</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={styles.categoryBtn}
+					onPress={() => router.push("/roomRent")}
+				>
+					<Text>Room Rent</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={styles.categoryBtn}
+					onPress={() => router.push("/ownerDirect")}
+				>
+					<Text>Owner-Direct</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={styles.categoryBtn}
+					onPress={() => router.push("/offPlan")}
+				>
+					<Text>Off-Plan</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={styles.categoryBtn}
+					onPress={() => router.push("/business")}
+				>
+					<Text>Business</Text>
+				</TouchableOpacity>
 			</ScrollView>
 
 			{/* FILTERS */}
@@ -91,7 +113,7 @@ export default function Search() {
 			<View style={styles.toggleRowWithCount}>
 				{/* Total Properties */}
 				<Text style={styles.totalCount}>
-					{MOCK_PROPERTIES.length} properties found
+					{MOCK_BUYSELL.length} properties found
 				</Text>
 
 				{/* List/Map Toggle */}
@@ -112,7 +134,7 @@ export default function Search() {
 			{/* CONTENT */}
 			{viewMode === "list" ? (
 				<FlatList
-					data={MOCK_PROPERTIES}
+					data={MOCK_BUYSELL}
 					keyExtractor={(item) => item.id!.toString()}
 					renderItem={({ item }) => <PropertyCard property={item} />}
 				/>
@@ -120,22 +142,22 @@ export default function Search() {
 				<MapView
 					style={styles.map}
 					initialRegion={{
-						latitude: MOCK_PROPERTIES[0].latitude || 13.7563, // default Bangkok
-						longitude: MOCK_PROPERTIES[0].longitude || 100.5018,
+						latitude: MOCK_BUYSELL[0].location.latitude || 13.7563, // default Bangkok
+						longitude: MOCK_BUYSELL[0].location.longitude || 100.5018,
 						latitudeDelta: 0.1,
 						longitudeDelta: 0.1,
 					}}
 				>
-					{MOCK_PROPERTIES.map((p) =>
-						p.latitude && p.longitude ? (
+					{MOCK_BUYSELL.map((p) =>
+						p.location.latitude && p.location.longitude ? (
 							<Marker
 								key={p.id}
 								coordinate={{
-									latitude: p.latitude,
-									longitude: p.longitude,
+									latitude: p.location.latitude,
+									longitude: p.location.longitude,
 								}}
-								title={p.name}
-								description={p.location_text}
+								title={p.title}
+								description={p.locationText}
 								onPress={() => router.push(`/buySell/${p.id}`)}
 							/>
 						) : null,
@@ -170,7 +192,7 @@ function FilterSection({
 
 /* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
-	container: { flex: 1 },
+	container: {},
 
 	header: {
 		flexDirection: "row",

@@ -167,8 +167,6 @@ basic ui(unstyled)
 
 rendered booking success page skeleton
 
-<!-- Latest ongoing progress -->
-
 <!--  -->
 
 Apr-6-2026
@@ -176,8 +174,24 @@ Apr-6-2026
 implement nested pages skeleton
 ONLY care about data sanity after the entire app's skeleton is complete
 
-implement customer review page
+implemented customer review page
 
 implemented profile nested pages: logout, settings, help & support, edit profile, history, top up, login
 
 implemented booking nested pages: consultation and reserves details pages
+
+<!-- Latest ongoing progress -->
+
+implement search page's navigations to all 5 property types
+
+buySell:
+created type
+created 3 mock data
+
+home page featured list updated
+
+roomRent:
+created type
+created 3 mock data
+
+implemented roomRent page + details page
