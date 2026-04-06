@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { Pressable, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Settings() {
+export default function ArticleDetails() {
 	const router = useRouter();
 
 	return (
@@ -23,7 +23,7 @@ export default function Settings() {
 					fontWeight: "500",
 				}}
 			>
-				Settings
+				Article Details
 			</Text>
 		</SafeAreaView>
 	);

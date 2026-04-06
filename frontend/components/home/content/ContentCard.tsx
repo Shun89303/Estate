@@ -1,18 +1,17 @@
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { Content } from "@/mock/contents";
-import { useRouter } from "expo-router";
 
 export default function ContentCard({
 	content,
 	showReadTime = false,
+	onPress,
 }: {
 	content: Content;
 	showReadTime?: boolean;
+	onPress: () => void;
 }) {
-	const router = useRouter();
-
 	return (
-		<Pressable onPress={() => router.push("/contents")}>
+		<Pressable onPress={onPress}>
 			<View style={styles.card}>
 				{/* MEDIA (LEFT) */}
 				<View style={styles.mediaWrapper}>

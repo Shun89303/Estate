@@ -18,7 +18,10 @@ export default function ContentsSection() {
 
 			{data.map((content) => (
 				<View key={content.id} style={{ paddingHorizontal: 16 }}>
-					<ContentCard content={content} />
+					<ContentCard
+						content={content}
+						onPress={() => router.push("/contents")}
+					/>
 				</View>
 			))}
 		</View>

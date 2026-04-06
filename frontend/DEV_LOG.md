@@ -173,3 +173,5 @@ implement nested pages skeleton
 ONLY care about data sanity after the entire app's skeleton is complete
 
 implement customer review page
+
+implemented profile nested pages: logout, settings, help & support, edit profile, history, top up, login

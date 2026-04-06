@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { Pressable, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function CoinHistory() {
+export default function VideoDetails() {
 	const router = useRouter();
 
 	return (
@@ -23,7 +23,7 @@ export default function CoinHistory() {
 					fontWeight: "500",
 				}}
 			>
-				Coin History
+				Video Details
 			</Text>
 		</SafeAreaView>
 	);

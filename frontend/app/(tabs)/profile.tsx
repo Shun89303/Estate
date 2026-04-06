@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRef, useMemo, useCallback } from "react";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import TopUpCoins from "@/components/profile/TopUpCoins";
 
 export default function Profile() {
 	const router = useRouter();
@@ -85,7 +86,7 @@ export default function Profile() {
 				<View style={{ flexDirection: "row" }}>
 					<TouchableOpacity
 						style={{ marginRight: 12 }}
-						onPress={() => router.push("/coinHistory")}
+						onPress={() => router.push("/profile/coinHistory")}
 					>
 						<Text>History</Text>
 					</TouchableOpacity>
@@ -106,7 +107,7 @@ export default function Profile() {
 					alignItems: "center",
 					justifyContent: "space-between",
 				}}
-				onPress={() => router.push("/login")}
+				onPress={() => router.push("/profile/appAd")}
 			>
 				<View style={{ flexDirection: "row", alignItems: "center" }}>
 					<Text style={{ marginRight: 10 }}>🏠</Text>
@@ -131,7 +132,7 @@ export default function Profile() {
 						borderBottomWidth: 1,
 						borderBottomColor: "#eee",
 					}}
-					onPress={() => router.push("/editProfile")}
+					onPress={() => router.push("/profile/editProfile")}
 				>
 					<Text>Edit Profile</Text>
 				</TouchableOpacity>
@@ -142,7 +143,7 @@ export default function Profile() {
 						borderBottomWidth: 1,
 						borderBottomColor: "#eee",
 					}}
-					onPress={() => router.push("/settings")}
+					onPress={() => router.push("/profile/settings")}
 				>
 					<Text>Settings</Text>
 				</TouchableOpacity>
@@ -153,7 +154,7 @@ export default function Profile() {
 						borderBottomWidth: 1,
 						borderBottomColor: "#eee",
 					}}
-					onPress={() => router.push("/help")}
+					onPress={() => router.push("/profile/help")}
 				>
 					<Text>Help & Support</Text>
 				</TouchableOpacity>
@@ -176,25 +177,7 @@ export default function Profile() {
 				index={-1}
 			>
 				<BottomSheetView>
-					<View style={{ padding: 16 }}>
-						<Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
-							Top Up Coins
-						</Text>
-
-						{[10, 20, 50].map((amount) => (
-							<TouchableOpacity
-								key={amount}
-								style={{
-									padding: 12,
-									borderRadius: 8,
-									backgroundColor: "#eee",
-									marginBottom: 10,
-								}}
-							>
-								<Text>{amount} Coins</Text>
-							</TouchableOpacity>
-						))}
-					</View>
+					<TopUpCoins />
 				</BottomSheetView>
 			</BottomSheet>
 			<BottomSheet
@@ -244,7 +227,7 @@ export default function Profile() {
 								}}
 								onPress={() => {
 									logoutSheetRef.current?.close();
-									router.push("/login");
+									router.push("/");
 								}}
 							>
 								<Text style={{ color: "#fff" }}>Log Out</Text>

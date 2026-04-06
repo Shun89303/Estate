@@ -101,7 +101,11 @@ export default function Contents() {
 				data={filteredContents}
 				keyExtractor={(item) => item.id}
 				renderItem={({ item }) => (
-					<ContentCard content={item} showReadTime={true} />
+					<ContentCard
+						content={item}
+						showReadTime={true}
+						onPress={() => router.push(`/content/${item.type}/${item.id}`)}
+					/>
 				)}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={styles.list}
