@@ -26,7 +26,7 @@ export default function TypeFilter() {
 				<Text style={styles.item}>Off-Plan</Text>
 			</Pressable>
 
-			<Pressable onPress={() => router.push("/business")}>
+			<Pressable onPress={() => router.push("/business/business")}>
 				<Text style={styles.item}>Business</Text>
 			</Pressable>
 		</ScrollView>

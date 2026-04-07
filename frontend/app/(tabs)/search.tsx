@@ -119,7 +119,7 @@ export default function Search() {
 
 				<TouchableOpacity
 					style={styles.categoryBtn}
-					onPress={() => router.push("/business")}
+					onPress={() => router.push("/business/business")}
 				>
 					<Text
 						style={{
