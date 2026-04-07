@@ -111,8 +111,6 @@ didn't have features data, created model and connected to property data for fron
 didn't have agents data, created model and connected to property data for frontend
 implemented map
 
-<!-- Latest to do -->
-
 Render the entire app's skeleton
 Data shape check
 fix layout
@@ -196,10 +194,19 @@ implemented roomRent page + details page
 
 implemented off-plan page + details page
 
+<!-- Latest to do -->
+
+implement unique code for each listing
+purpose filter not concrete just yet
+
 <!--  -->
 
 Apr-7-2026
 
+implemented owner direct page + details page
+
+implemented business page + details page
+
 <!-- Latest ongoing progress -->
 
-Implement owner direct
+contents skeleton

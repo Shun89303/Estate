@@ -1,106 +1,176 @@
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
-import { Content } from "@/mock/contents";
+import { ContentItem } from "@/mock/contents";
+import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function ContentCard({
-	content,
-	showReadTime = false,
+	item,
 	onPress,
 }: {
-	content: Content;
-	showReadTime?: boolean;
-	onPress: () => void;
+	item: ContentItem;
+	onPress?: () => void;
 }) {
+	const isArticle = item.type === "article";
+
 	return (
-		<Pressable onPress={onPress}>
-			<View style={styles.card}>
-				{/* MEDIA (LEFT) */}
-				<View style={styles.mediaWrapper}>
-					<Image
-						source={{
-							uri: content.type === "video" ? content.thumbnail : content.media,
-						}}
-						style={styles.media}
-					/>
-
-					{/* ARTICLE ICON */}
-					{content.type === "article" && (
-						<View style={styles.badge}>
-							<Text style={styles.badgeText}>📄</Text>
+		<TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={onPress}>
+			{/* Left: Media */}
+			<View style={styles.cardLeft}>
+				{isArticle ? (
+					<View style={styles.imageContainer}>
+						<Image source={{ uri: item.imageUrl }} style={styles.image} />
+						<View style={styles.fileIconOverlay}>
+							<Ionicons name="document-text-outline" size={20} color="#fff" />
 						</View>
-					)}
-
-					{/* VIDEO OVERLAY */}
-					{content.type === "video" && (
-						<View style={styles.playOverlay}>
-							<Text style={styles.playIcon}>▶</Text>
+					</View>
+				) : (
+					<View style={styles.imageContainer}>
+						<Image source={{ uri: item.thumbnailUrl }} style={styles.image} />
+						<View style={styles.videoOverlay}>
+							<Ionicons name="play-circle" size={40} color="#fff" />
 						</View>
-					)}
+						{/* Video duration placeholder – you can add a duration field to mock data */}
+						<View style={styles.durationBadge}>
+							<Text style={styles.durationText}>5:32</Text>
+						</View>
+					</View>
+				)}
+			</View>
+
+			{/* Right: Content Info */}
+			<View style={styles.cardRight}>
+				<View style={styles.titleRow}>
+					<View>
+						<Text style={styles.typeText}>
+							{isArticle ? "ARTICLE" : "VIDEO"}
+						</Text>
+						<Text style={styles.cardTitle} numberOfLines={2}>
+							{item.title}
+						</Text>
+					</View>
+					<TouchableOpacity>
+						<Ionicons
+							name={item.saved ? "bookmark" : "bookmark-outline"}
+							size={22}
+							color="#333"
+						/>
+					</TouchableOpacity>
 				</View>
 
-				{/* INFO (RIGHT) */}
-				<View style={styles.info}>
-					{/* CATEGORY */}
-					<Text style={styles.category}>{content.category}</Text>
-
-					{/* TITLE */}
-					<Text style={styles.title} numberOfLines={2}>
-						{content.title}
-					</Text>
-
-					{/* META ROW */}
-					<View style={styles.metaRow}>
-						<Text style={styles.meta}>{content.posted_by}</Text>
-						<Text style={styles.meta}>•</Text>
-						<Text style={styles.meta}>{content.date}</Text>
-					</View>
-
-					{/* OPTIONAL READ TIME */}
-					{showReadTime && content.read_time && (
-						<Text style={styles.readTime}>{content.read_time}</Text>
+				<View style={styles.metaRow}>
+					<Text style={styles.metaText}>{item.postedBy}</Text>
+					<Text style={styles.metaDot}>•</Text>
+					<Text style={styles.metaText}>{item.date}</Text>
+					{isArticle && (
+						<>
+							<Text style={styles.metaDot}>•</Text>
+							<Text style={styles.metaText}>
+								{item.readTimeMinutes} min read
+							</Text>
+						</>
 					)}
 				</View>
 			</View>
-		</Pressable>
+		</TouchableOpacity>
 	);
 }
-
 const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		backgroundColor: "#fff",
+	},
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: "#f0f0f0",
+	},
+	backButton: {
+		padding: 4,
+	},
+	titleContainer: {
+		flex: 1,
+		alignItems: "center",
+	},
+	title: {
+		fontSize: 18,
+		fontWeight: "600",
+	},
+	subtitle: {
+		fontSize: 12,
+		color: "#888",
+		marginTop: 2,
+	},
+	filterScroll: {
+		flexGrow: 0,
+		borderBottomWidth: 1,
+		borderBottomColor: "#f0f0f0",
+	},
+	filterContainer: {
+		paddingHorizontal: 12,
+		paddingVertical: 10,
+		gap: 8,
+	},
+	filterChip: {
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+		borderRadius: 20,
+		backgroundColor: "#f2f2f2",
+		marginRight: 8,
+	},
+	filterChipActive: {
+		backgroundColor: "#2c6e9e",
+	},
+	filterChipText: {
+		fontSize: 14,
+		color: "#333",
+	},
+	filterChipTextActive: {
+		color: "#fff",
+		fontWeight: "500",
+	},
+	listContainer: {
+		paddingHorizontal: 16,
+		paddingTop: 8,
+		paddingBottom: 20,
+	},
 	card: {
 		flexDirection: "row",
 		marginBottom: 16,
 		backgroundColor: "#fff",
 		borderRadius: 12,
 		overflow: "hidden",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.05,
+		shadowRadius: 2,
+		elevation: 1,
 	},
-
-	/* MEDIA */
-	mediaWrapper: {
-		width: 120,
-		height: 100,
-		position: "relative",
+	cardLeft: {
+		width: 110,
+		height: 110,
 	},
-
-	media: {
+	imageContainer: {
 		width: "100%",
 		height: "100%",
+		position: "relative",
 	},
-
-	badge: {
+	image: {
+		width: "100%",
+		height: "100%",
+		resizeMode: "cover",
+	},
+	fileIconOverlay: {
 		position: "absolute",
-		top: 6,
-		left: 6,
+		top: 8,
+		left: 8,
 		backgroundColor: "rgba(0,0,0,0.6)",
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		borderRadius: 4,
+		padding: 4,
+		borderRadius: 6,
 	},
-
-	badgeText: {
-		color: "#fff",
-		fontSize: 10,
-	},
-
-	playOverlay: {
+	videoOverlay: {
 		position: "absolute",
 		top: 0,
 		left: 0,
@@ -110,47 +180,63 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-
-	playIcon: {
-		color: "#fff",
-		fontSize: 24,
-		fontWeight: "bold",
+	durationBadge: {
+		position: "absolute",
+		bottom: 6,
+		right: 6,
+		backgroundColor: "rgba(0,0,0,0.7)",
+		paddingHorizontal: 6,
+		paddingVertical: 2,
+		borderRadius: 4,
 	},
-
-	/* INFO */
-	info: {
+	durationText: {
+		color: "#fff",
+		fontSize: 10,
+		fontWeight: "500",
+	},
+	cardRight: {
 		flex: 1,
 		padding: 10,
 		justifyContent: "space-between",
 	},
-
-	category: {
-		fontSize: 10,
-		color: "#888",
+	titleRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "flex-start",
+		marginBottom: 8,
+	},
+	typeText: {
+		fontSize: 11,
 		fontWeight: "600",
+		color: "#2c6e9e",
+		letterSpacing: 0.5,
 		marginBottom: 4,
 	},
-
-	title: {
-		fontSize: 13,
+	cardTitle: {
+		fontSize: 15,
 		fontWeight: "600",
-		marginBottom: 6,
+		lineHeight: 20,
+		flex: 1,
+		marginRight: 8,
 	},
-
 	metaRow: {
 		flexDirection: "row",
+		flexWrap: "wrap",
 		alignItems: "center",
-		gap: 4,
 	},
-
-	meta: {
+	metaText: {
 		fontSize: 11,
-		color: "#666",
+		color: "#888",
 	},
-
-	readTime: {
+	metaDot: {
 		fontSize: 11,
-		color: "#999",
-		marginTop: 2,
+		color: "#888",
+		marginHorizontal: 4,
+	},
+	emptyText: {
+		textAlign: "center",
+		marginTop: 50,
+		fontSize: 14,
+		color: "#888",
 	},
 });

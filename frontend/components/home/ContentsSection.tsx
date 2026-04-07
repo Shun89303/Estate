@@ -13,14 +13,14 @@ export default function ContentsSection() {
 			<SectionHeader
 				title="Contents"
 				subtitle="Guides, tips & videos for buyers"
-				onPress={() => router.push("/contents")}
+				onPress={() => router.push("/content/contents")}
 			/>
 
 			{data.map((content) => (
 				<View key={content.id} style={{ paddingHorizontal: 16 }}>
 					<ContentCard
-						content={content}
-						onPress={() => router.push("/contents")}
+						item={content}
+						onPress={() => router.push("/content/contents")}
 					/>
 				</View>
 			))}
