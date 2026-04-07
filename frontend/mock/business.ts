@@ -42,6 +42,7 @@ export interface BusinessFeatures {
 
 export interface BusinessProperty {
 	id: number;
+	uniqueCode: string;
 
 	// Media
 	media: BusinessMedia;
@@ -79,6 +80,7 @@ export interface BusinessProperty {
 export const MOCK_BUSINESS: BusinessProperty[] = [
 	{
 		id: 1,
+		uniqueCode: "PP-B2401",
 		media: {
 			cover: "http://localhost:3000/uploads/business/one/oneCover.jpg",
 			photos: ["http://localhost:3000/uploads/business/one/oneGallery1.jpg"],
@@ -114,6 +116,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 	},
 	{
 		id: 2,
+		uniqueCode: "PP-B2402",
 		media: {
 			cover: "http://localhost:3000/uploads/business/two/twoCover.jpg",
 			photos: ["http://localhost:3000/uploads/business/two/twoGallery1.jpg"],
@@ -142,6 +145,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 	},
 	{
 		id: 3,
+		uniqueCode: "PP-B2403",
 		media: {
 			cover: "http://localhost:3000/uploads/business/three/threeCover.jpg",
 			photos: [
@@ -172,6 +176,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 	},
 	{
 		id: 4,
+		uniqueCode: "PP-B2404",
 		media: {
 			cover: "http://localhost:3000/uploads/business/four/fourCover.jpg",
 			photos: ["http://localhost:3000/uploads/business/four/fourGallery1.jpg"],
@@ -199,6 +204,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 	},
 	{
 		id: 5,
+		uniqueCode: "PP-B2405",
 		media: {
 			cover: "http://localhost:3000/uploads/business/five/fiveCover.jpg",
 			photos: ["http://localhost:3000/uploads/business/five/fiveGallery1.jpg"],
@@ -232,6 +238,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 	},
 	{
 		id: 6,
+		uniqueCode: "PP-B2406",
 		media: {
 			cover: "http://localhost:3000/uploads/business/six/sixCover.jpg",
 			photos: ["http://localhost:3000/uploads/business/six/sixGallery1.jpg"],

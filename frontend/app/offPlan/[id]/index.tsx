@@ -87,6 +87,7 @@ export default function OffPlanDetails() {
 					{/* OVERLAY */}
 					<View style={styles.overlay}>
 						<Text style={styles.badge}>OFF-PLAN</Text>
+						<Text>{property.uniqueCode}</Text>
 						<Text style={styles.overlayTitle}>{property.title}</Text>
 						<Text style={styles.overlaySub}>{property.developerName}</Text>
 					</View>

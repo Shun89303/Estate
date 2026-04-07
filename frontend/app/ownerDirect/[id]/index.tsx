@@ -137,6 +137,7 @@ export default function OwnerDetails() {
 					<View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
 						<Text>{property.type}</Text>
 						<Text style={styles.ownerBadge}>OWNER</Text>
+						<Text>{property.uniqueCode}</Text>
 					</View>
 
 					<Text style={styles.title}>{property.title}</Text>

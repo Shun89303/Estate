@@ -196,8 +196,9 @@ implemented off-plan page + details page
 
 <!-- Latest to do -->
 
-implement unique code for each listing
 purpose filter not concrete just yet
+implement login navigation for user in case user clicks on ui that requires to collect user's data
+wait for boss's design update about color
 
 <!--  -->
 
@@ -207,6 +208,19 @@ implemented owner direct page + details page
 
 implemented business page + details page
 
-<!-- Latest ongoing progress -->
+implemented contents page + details page + home page display
 
-contents skeleton
+implemented filter system in search page
+
+implemented unique code for each listing
+
+<!-- Check list -->
+
+initial skeleton completed pages:
+Home page
+Search page
+Saved page
+Bookings page
+Profile page
+
+<!-- Latest ongoing progress -->

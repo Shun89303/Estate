@@ -112,6 +112,8 @@ export default function BusinessDetails() {
 						{property.type.replace("_", " ")}
 					</Text>
 
+					<Text>{property.uniqueCode}</Text>
+
 					{/* Title */}
 					<Text style={styles.title}>{property.title}</Text>
 

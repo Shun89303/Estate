@@ -135,6 +135,7 @@ export default function BuySellDetails() {
 					<View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
 						<Text>{property.type}</Text>
 						{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
+						<Text>{property.uniqueCode}</Text>
 					</View>
 
 					<Text style={styles.title}>{property.title}</Text>

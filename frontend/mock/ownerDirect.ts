@@ -26,6 +26,8 @@ export interface PropertyOwner {
 export interface Property {
 	id: number;
 
+	uniqueCode: string;
+
 	// Media (updated structure)
 	media: PropertyMedia;
 
@@ -63,6 +65,7 @@ export interface Property {
 export const MOCK_OWNERDIRECT: Property[] = [
 	{
 		id: 1,
+		uniqueCode: "PP-C2401",
 		media: {
 			cover: "http://localhost:3000/uploads/buySell/three/threeCover.jpg",
 			images: ["http://localhost:3000/uploads/buySell/three/threeGallery1.jpg"],
@@ -101,6 +104,7 @@ export const MOCK_OWNERDIRECT: Property[] = [
 	},
 	{
 		id: 2,
+		uniqueCode: "PP-H2402",
 		media: {
 			cover: "http://localhost:3000/uploads/buySell/one/oneCover.jpg",
 			images: ["http://localhost:3000/uploads/buySell/one/oneGallery1.jpg"],
@@ -139,6 +143,7 @@ export const MOCK_OWNERDIRECT: Property[] = [
 	},
 	{
 		id: 3,
+		uniqueCode: "PP-T2405",
 		media: {
 			cover: "http://localhost:3000/uploads/buySell/two/twoCover.jpg",
 			images: ["http://localhost:3000/uploads/buySell/two/twoGallery1.jpg"],

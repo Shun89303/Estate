@@ -100,6 +100,7 @@ export default function RoomRentDetails() {
 					<View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
 						<Text style={styles.propertyType}>{property.propertyType}</Text>
 						{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
+						<Text>{property.uniqueCode}</Text>
 					</View>
 
 					<Text style={styles.title}>{property.title}</Text>

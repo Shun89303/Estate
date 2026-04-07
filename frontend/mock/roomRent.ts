@@ -16,6 +16,7 @@ export interface PropertyExtra {
 
 export type RoomRentProperty = {
 	id: string | number;
+	uniqueCode: string;
 	title: string;
 	propertyType: "SINGLE ROOM" | "SHARED ROOM" | "MASTER ROOM" | "STUDIO";
 	isNew: boolean;
@@ -53,6 +54,7 @@ export type RoomRentProperty = {
 export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 	{
 		id: 1,
+		uniqueCode: "PP-R2401",
 		title: "Cozy Single Room near BTS Thonglor",
 		propertyType: "SINGLE ROOM",
 		isNew: true,
@@ -100,6 +102,7 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 	},
 	{
 		id: 2,
+		uniqueCode: "PP-R2404",
 		title: "Modern Studio in Central Sukhumvit",
 		propertyType: "STUDIO",
 		isNew: false,
@@ -140,6 +143,7 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 	},
 	{
 		id: 3,
+		uniqueCode: "PP-R2402",
 		title: "Shared Master Room near Rama 9",
 		propertyType: "MASTER ROOM",
 		isNew: true,

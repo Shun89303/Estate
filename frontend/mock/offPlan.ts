@@ -50,6 +50,7 @@ export interface ProjectFeatures {
 
 export interface OffPlanProperty {
 	id: number;
+	uniqueCode: string;
 
 	// Media
 	media: {
@@ -90,6 +91,7 @@ export interface OffPlanProperty {
 export const MOCK_OFFPLAN: OffPlanProperty[] = [
 	{
 		id: 1,
+		uniqueCode: "PP-O2401",
 
 		media: {
 			cover: "http://localhost:3000/uploads/offPlan/one/oneCover.jpg",
@@ -196,6 +198,7 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 
 	{
 		id: 2,
+		uniqueCode: "PP-O2402",
 
 		media: {
 			cover: "http://localhost:3000/uploads/offPlan/two/twoCover.jpg",
@@ -294,6 +297,7 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 	},
 	{
 		id: 3,
+		uniqueCode: "PP-O2403",
 
 		media: {
 			cover: "http://localhost:3000/uploads/offPlan/three/threeCover.jpg",
