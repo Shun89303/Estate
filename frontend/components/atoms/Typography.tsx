@@ -36,10 +36,10 @@ export function NormalTitle({
 		<Text
 			style={[
 				styles.normalTitle,
-				style,
 				{
 					color: color.textPrimary,
 				},
+				style,
 			]}
 			numberOfLines={numberOfLines}
 		>
@@ -58,10 +58,10 @@ export function SmallTitle({
 		<Text
 			style={[
 				styles.smallTitle,
-				style,
 				{
 					color: color.textPrimary,
 				},
+				style,
 			]}
 			numberOfLines={numberOfLines}
 		>
@@ -76,10 +76,10 @@ export function BodyText({ children, style, numberOfLines }: TypographyProps) {
 		<Text
 			style={[
 				styles.bodyText,
-				style,
 				{
 					color: color.textSecondary,
 				},
+				style,
 			]}
 			numberOfLines={numberOfLines}
 		>

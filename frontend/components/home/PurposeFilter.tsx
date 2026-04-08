@@ -1,4 +1,4 @@
-import { ScrollView, Text, StyleSheet, Pressable } from "react-native";
+import { ScrollView, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { NormalTitle } from "../atoms/Typography";
@@ -26,7 +26,7 @@ export default function PurposeFilter() {
 			>
 				<NormalTitle
 					style={{
-						color: colors.primary,
+						color: colors.primaryGold,
 					}}
 				>
 					📈 For Investment
@@ -45,7 +45,7 @@ export default function PurposeFilter() {
 			>
 				<NormalTitle
 					style={{
-						color: colors.primary,
+						color: colors.primaryGold,
 					}}
 				>
 					🏠 For Living
@@ -64,7 +64,7 @@ export default function PurposeFilter() {
 			>
 				<NormalTitle
 					style={{
-						color: colors.primary,
+						color: colors.primaryGold,
 					}}
 				>
 					🔑 For Rent
@@ -83,7 +83,7 @@ export default function PurposeFilter() {
 			>
 				<NormalTitle
 					style={{
-						color: colors.primary,
+						color: colors.primaryGold,
 					}}
 				>
 					🛂 For Long Stay Visa

@@ -253,3 +253,5 @@ created buy sell page display card and home page display card
 home page completed applying reusable texts
 
 search page completed applying reusable components
+
+saved page coompleted applying reusable components

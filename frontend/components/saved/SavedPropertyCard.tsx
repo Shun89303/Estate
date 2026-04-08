@@ -1,56 +1,108 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Property } from "@/stores/usePropertyStore";
+import { TouchableOpacity, View, Image, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import { MapPin, Bed, Bath, Trash2, Share2 } from "lucide-react-native";
+import {
+	BodyText,
+	NormalTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import globalStyles from "@/styles/styles";
+import { Property } from "@/mock/savedProperties";
 
 interface SavedPropertyCardProps {
-	property: Property & { typeLabel?: string }; // typeLabel = Buy/Sell, Room Rent, etc
-	onShare?: () => void;
-	onDelete?: () => void;
+	property: Property;
+	onDelete: () => void;
+	onShare: () => void;
 }
 
 export default function SavedPropertyCard({
 	property,
-	onShare,
 	onDelete,
+	onShare,
 }: SavedPropertyCardProps) {
+	const router = useRouter();
+	const colors = useTheme();
+
 	return (
-		<View style={styles.card}>
-			{/* Cover Image */}
-			<Image source={{ uri: property.media?.[0]?.url }} style={styles.image} />
-
-			{/* Info Container */}
-			<View style={styles.infoContainer}>
-				{/* Share Button */}
-				<TouchableOpacity style={styles.shareBtn} onPress={onShare}>
-					<Ionicons name="share-social-outline" size={20} color="#333" />
-				</TouchableOpacity>
-
-				{/* Type, Name, Location */}
-				<View style={styles.textStack}>
-					{property.typeLabel && (
-						<Text style={styles.type}>{property.typeLabel}</Text>
-					)}
-					<Text style={styles.name}>{property.name}</Text>
-					<Text style={styles.location}>{property.location_text}</Text>
+		<TouchableOpacity
+			onPress={() => router.push(`/buySell/${property.id}`)}
+			activeOpacity={0.8}
+			style={globalStyles.shadows}
+		>
+			<View style={styles.card}>
+				<View style={styles.imageContainer}>
+					<Image
+						source={{
+							uri:
+								property.media?.[0]?.url ?? "https://via.placeholder.com/100",
+						}}
+						style={styles.image}
+					/>
 				</View>
 
-				{/* Price and Bedroom/Bathroom */}
-				<View style={styles.bottomRow}>
-					<Text style={styles.price}>฿{property.price?.toLocaleString()}</Text>
-					<View style={styles.bedBath}>
-						{property.bedrooms && (
-							<Text style={styles.bedBathText}>{property.bedrooms} bd</Text>
-						)}
-						{property.bathrooms && (
-							<Text style={styles.bedBathText}>{property.bathrooms} ba</Text>
-						)}
-						<TouchableOpacity onPress={onDelete} style={styles.deleteBtn}>
-							<MaterialIcons name="delete-outline" size={20} color="#333" />
+				<View style={styles.infoContainer}>
+					{/* Top row: type label + share button */}
+					<View style={styles.topRow}>
+						<View
+							style={[
+								styles.typeBadge,
+								{ backgroundColor: colors.secondaryGold },
+							]}
+						>
+							<SmallTitle
+								style={{ color: colors.primaryGold, fontWeight: "600" }}
+							>
+								{property.typeLabel}
+							</SmallTitle>
+						</View>
+						<TouchableOpacity onPress={onShare}>
+							<Share2 size={18} color="#666" />
 						</TouchableOpacity>
+					</View>
+
+					{/* Property name */}
+					<NormalTitle numberOfLines={1} style={styles.name}>
+						{property.name}
+					</NormalTitle>
+
+					{/* Location */}
+					<View style={styles.locationRow}>
+						<MapPin size={12} color={colors.textSecondary} />
+						<BodyText style={styles.locationText} numberOfLines={1}>
+							{property.location_text}
+						</BodyText>
+					</View>
+
+					{/* Bottom row: price + bed/bath + delete */}
+					<View style={styles.bottomRow}>
+						<NormalTitle
+							style={{ color: colors.primaryGold, fontWeight: "bold" }}
+						>
+							฿{(property.price ?? 0).toLocaleString()}
+						</NormalTitle>
+
+						<View style={styles.iconsRow}>
+							{property.bedrooms && property.bedrooms > 0 && (
+								<View style={styles.iconItem}>
+									<Bed size={14} color="#555" />
+									<BodyText>{property.bedrooms}</BodyText>
+								</View>
+							)}
+							{property.bathrooms && property.bathrooms > 0 && (
+								<View style={styles.iconItem}>
+									<Bath size={14} color="#555" />
+									<BodyText>{property.bathrooms}</BodyText>
+								</View>
+							)}
+							<TouchableOpacity onPress={onDelete}>
+								<Trash2 size={18} color="#f33" />
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 }
 
@@ -58,75 +110,64 @@ const styles = StyleSheet.create({
 	card: {
 		flexDirection: "row",
 		backgroundColor: "#fff",
-		borderRadius: 8,
-		marginVertical: 8,
+		borderRadius: 12,
 		marginHorizontal: 16,
+		marginVertical: 8,
 		overflow: "hidden",
-		elevation: 2, // shadow for android
+		padding: 15,
 	},
-
+	imageContainer: {
+		width: 110,
+		alignSelf: "stretch",
+	},
 	image: {
-		width: 100,
-		height: 100,
+		flex: 1,
+		width: "100%",
+		borderRadius: 8,
+		resizeMode: "cover",
 	},
-
 	infoContainer: {
 		flex: 1,
-		padding: 8,
+		padding: 10,
 		justifyContent: "space-between",
 	},
-
-	shareBtn: {
-		position: "absolute",
-		top: 8,
-		right: 8,
-		zIndex: 1,
+	topRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 4,
 	},
-
-	textStack: {
-		marginRight: 32, // leave space for share button
+	typeBadge: {
+		paddingHorizontal: 8,
+		paddingVertical: 2,
+		borderRadius: 99,
 	},
-
-	type: {
-		fontSize: 12,
-		fontWeight: "bold",
-		color: "#555",
-	},
-
 	name: {
-		fontSize: 14,
-		fontWeight: "600",
+		marginBottom: 4,
+		lineHeight: 20,
 	},
-
-	location: {
-		fontSize: 12,
-		color: "#888",
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 8,
+		gap: 4,
 	},
-
+	locationText: {
+		flexShrink: 1,
+	},
 	bottomRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
 	},
-
-	price: {
-		fontSize: 14,
-		fontWeight: "bold",
-		color: "#222",
-	},
-
-	bedBath: {
+	iconsRow: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 8,
 	},
-
-	bedBathText: {
-		fontSize: 12,
-		color: "#555",
-	},
-
-	deleteBtn: {
-		marginLeft: 8,
+	iconItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
 	},
 });

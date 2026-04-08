@@ -19,6 +19,7 @@ import { useTheme } from "@/hooks/useTheme";
 import ClearFiltersButton from "@/components/common/ClearFiltersButton";
 import SearchBar from "@/components/common/SearchBar";
 import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
+import { BodyText } from "@/components/atoms/Typography";
 
 // Filter options
 const PURPOSES = [
@@ -220,18 +221,20 @@ export default function Search() {
 					<View style={{ position: "relative" }}>
 						<SlidersHorizontal
 							size={24}
-							color={showFilters ? colors.primary : "#000"} // black when closed, primary when open
+							color={showFilters ? colors.primaryGold : "#000"}
 						/>
 						{activeFilterCount > 0 && (
 							<View
 								style={[
 									styles.badge,
 									{
-										backgroundColor: colors.primary,
+										backgroundColor: colors.primaryGold,
 									},
 								]}
 							>
-								<Text style={styles.badgeText}>{activeFilterCount}</Text>
+								<BodyText style={styles.badgeText}>
+									{activeFilterCount}
+								</BodyText>
 							</View>
 						)}
 					</View>

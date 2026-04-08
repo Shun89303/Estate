@@ -29,7 +29,7 @@ export default function FilterSection({
 						style={[
 							styles.filterBtn,
 							selected === opt && {
-								backgroundColor: colors.primary,
+								backgroundColor: colors.primaryGold,
 							},
 						]}
 						onPress={() => onSelect(opt)}
