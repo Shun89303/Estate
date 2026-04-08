@@ -255,3 +255,5 @@ home page completed applying reusable texts
 search page completed applying reusable components
 
 saved page coompleted applying reusable components
+
+bookings page coompleted applying reusable components

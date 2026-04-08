@@ -4,8 +4,10 @@ export const lightColors = {
 	text: "#000000",
 	primaryGold: "#BF8F5B", // buttons, links, icons
 	primaryGray: "#727683",
+	primaryGreen: "#4CA154",
 	secondaryGold: "#FEF3E8",
 	secondaryGray: "#ABADB5",
+	secondaryGreen: "#EFF9F0",
 	primaryBlack: "#131620",
 	primaryRed: "#DA4138",
 	primaryBackground: "#FDF6EB", // main screen background
@@ -25,8 +27,10 @@ export const darkColors = {
 	text: "#ffffff",
 	primaryGold: "#BF8F5B", // buttons, links, icons
 	primaryGray: "#727683",
+	primaryGreen: "#4CA154",
 	secondaryGold: "#FEF3E8",
 	secondaryGray: "#ABADB5",
+	secondaryGreen: "#EFF9F0",
 	primaryBlack: "#131620",
 	primaryRed: "#DA4138",
 	primaryBackground: "#FDF6EB", // main screen background
