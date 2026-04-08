@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRef, useMemo, useState } from "react";
+import TopUpCoins from "@/components/profile/TopUpCoins";
 
 export default function OwnerDirect() {
 	const router = useRouter();
@@ -21,6 +22,7 @@ export default function OwnerDirect() {
 	);
 	const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
 	const bottomSheetRef = useRef<BottomSheet>(null);
+	const topupSheetRef = useRef<BottomSheet>(null);
 
 	const snapPoints = useMemo(() => ["40%"], []);
 
@@ -33,6 +35,10 @@ export default function OwnerDirect() {
 			setSelectedProperty(item);
 			bottomSheetRef.current?.expand();
 		}
+	};
+
+	const handleTopUpSheet = () => {
+		topupSheetRef.current?.expand();
 	};
 
 	const handleUnlock = () => {
@@ -52,10 +58,10 @@ export default function OwnerDirect() {
 
 				<Text style={styles.title}>Owner Direct</Text>
 
-				<View style={styles.coins}>
+				<Pressable style={styles.coins} onPress={handleTopUpSheet}>
 					<Text>🪙</Text>
 					<Text style={{ marginLeft: 4 }}>20</Text>
-				</View>
+				</Pressable>
 			</View>
 
 			<ScrollView contentContainerStyle={{ padding: 16 }}>
@@ -185,6 +191,16 @@ export default function OwnerDirect() {
 						</Pressable>
 					</BottomSheetView>
 				)}
+			</BottomSheet>
+			<BottomSheet
+				ref={topupSheetRef}
+				index={-1}
+				snapPoints={snapPoints}
+				enablePanDownToClose
+			>
+				<BottomSheetView>
+					<TopUpCoins />
+				</BottomSheetView>
 			</BottomSheet>
 		</SafeAreaView>
 	);

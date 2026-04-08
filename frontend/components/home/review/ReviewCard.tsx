@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Video } from "expo-av";
 import { Review } from "@/mock/reviews";
+import { BodyText, SmallTitle } from "@/components/atoms/Typography";
 
 const { width } = Dimensions.get("window");
 
@@ -33,11 +34,7 @@ export default function ReviewCard({ review }: { review: Review }) {
 							source={{ uri: review.thumbnail }}
 							style={styles.thumbnail}
 						/>
-
-						{/* DARK OVERLAY */}
 						<View style={styles.overlay} />
-
-						{/* PLAY ICON */}
 						<Pressable
 							style={styles.playIndicator}
 							onPress={() => setIsPlaying(true)}
@@ -48,20 +45,22 @@ export default function ReviewCard({ review }: { review: Review }) {
 				)}
 			</View>
 
-			{/* INFO */}
+			{/* INFO: profile image + title + name & rating */}
 			<View style={styles.info}>
-				<Text style={styles.title} numberOfLines={2}>
-					{review.title}
-				</Text>
-
-				<View style={styles.bottomRow}>
+				<View style={styles.row}>
 					<Image source={{ uri: review.profile_image }} style={styles.avatar} />
-					<View style={{ flex: 1 }}>
-						<Text style={styles.name}>{review.name}</Text>
-						<Text style={styles.stars}>
-							{"★".repeat(review.rating)}
-							{"☆".repeat(5 - review.rating)}
-						</Text>
+					<View style={styles.textColumn}>
+						<SmallTitle numberOfLines={1} style={styles.title}>
+							{review.title}
+						</SmallTitle>
+						<View style={styles.nameRatingRow}>
+							<BodyText>{review.name}</BodyText>
+							<BodyText style={styles.dot}>•</BodyText>
+							<BodyText style={styles.stars}>
+								{"★".repeat(review.rating)}
+								{"☆".repeat(5 - review.rating)}
+							</BodyText>
+						</View>
 					</View>
 				</View>
 			</View>
@@ -69,7 +68,6 @@ export default function ReviewCard({ review }: { review: Review }) {
 	);
 }
 
-/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
 	card: {
 		width: width * 0.7,
@@ -78,18 +76,15 @@ const styles = StyleSheet.create({
 		backgroundColor: "#fff",
 		marginRight: 16,
 	},
-
 	thumbnailWrapper: {
 		position: "relative",
 		width: "100%",
 		height: 200,
 	},
-
 	thumbnail: {
 		width: "100%",
 		height: "100%",
 	},
-
 	overlay: {
 		position: "absolute",
 		top: 0,
@@ -98,7 +93,6 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		backgroundColor: "rgba(0,0,0,0.3)",
 	},
-
 	playIndicator: {
 		position: "absolute",
 		top: "50%",
@@ -111,40 +105,46 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-
 	playText: {
 		color: "#fff",
 		fontSize: 14,
 		fontWeight: "bold",
 	},
-
 	info: {
 		padding: 12,
 	},
-
-	title: {
-		fontSize: 14,
-		fontWeight: "bold",
-		marginBottom: 8,
+	row: {
+		flexDirection: "row",
+		alignItems: "flex-start",
 	},
-
-	bottomRow: {
+	avatar: {
+		width: 40,
+		height: 40,
+		borderRadius: 20,
+		marginRight: 12,
+	},
+	textColumn: {
+		flex: 1,
+	},
+	title: {
+		marginBottom: 4,
+		lineHeight: 18,
+	},
+	nameRatingRow: {
 		flexDirection: "row",
 		alignItems: "center",
+		flexWrap: "wrap",
 	},
-
-	avatar: {
-		width: 32,
-		height: 32,
-		borderRadius: 16,
-		marginRight: 8,
-	},
-
 	name: {
 		fontSize: 12,
 		color: "#333",
+		fontWeight: "500",
 	},
-
+	dot: {
+		marginHorizontal: 6,
+		color: "#999",
+		fontSize: 12,
+	},
 	stars: {
 		color: "#FFD700",
 		fontSize: 12,

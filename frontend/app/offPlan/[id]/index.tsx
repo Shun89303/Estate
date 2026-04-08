@@ -11,9 +11,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
 import { Video } from "expo-av";
 import { MOCK_OFFPLAN, OffPlanProperty, UnitType } from "@/mock/offPlan";
+import { PropertyMap } from "@/components/common/PropertyMap";
 
 export default function OffPlanDetails() {
 	const router = useRouter();
@@ -317,22 +317,18 @@ export default function OffPlanDetails() {
 
 				{/* MAP */}
 				<View style={{ height: 200, margin: 16 }}>
-					<MapView
-						style={{ flex: 1 }}
-						initialRegion={{
-							latitude: property.latitude,
-							longitude: property.longitude,
-							latitudeDelta: 0.01,
-							longitudeDelta: 0.01,
-						}}
-					>
-						<Marker
-							coordinate={{
+					<PropertyMap
+						markers={[
+							{
+								id: property.id,
 								latitude: property.latitude,
 								longitude: property.longitude,
-							}}
-						/>
-					</MapView>
+								title: property.title,
+								description: property.locationAddress,
+							},
+						]}
+						style={{ height: 200 }}
+					/>
 				</View>
 			</ScrollView>
 

@@ -1,9 +1,9 @@
+// components/common/HorizontalTypeFilter.tsx
 import { ScrollView, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import globalStyles from "@/styles/styles";
 import { SmallTitle } from "../atoms/Typography";
 
-export default function TypeFilter() {
+export default function HorizontalTypeFilter() {
 	const router = useRouter();
 
 	const filters = [
@@ -45,11 +45,7 @@ export default function TypeFilter() {
 				<Pressable
 					key={filter.id}
 					onPress={() => router.push(filter.route as any)}
-					style={({ pressed }) => [
-						styles.item,
-						pressed && styles.itemPressed,
-						globalStyles.shadows,
-					]}
+					style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
 				>
 					<SmallTitle style={styles.emoji}>{filter.emoji}</SmallTitle>
 					<SmallTitle style={styles.label}>{filter.label}</SmallTitle>
@@ -68,28 +64,24 @@ const styles = StyleSheet.create({
 		gap: 12,
 	},
 	item: {
-		backgroundColor: "#fff",
-		paddingVertical: 10,
-		paddingHorizontal: 12,
-		borderRadius: 12,
+		flexDirection: "row", // horizontal layout
 		alignItems: "center",
-		justifyContent: "center",
-		minWidth: 70,
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-		elevation: 1,
+		backgroundColor: "#E5E5E5", // gray background
+		paddingVertical: 8,
+		paddingHorizontal: 14,
+		borderRadius: 30, // pill shape
+		gap: 8,
 	},
 	itemPressed: {
 		opacity: 0.7,
-		backgroundColor: "#f9f9f9",
+		backgroundColor: "#D1D1D1", // darker gray on press
 	},
 	emoji: {
-		fontSize: 24,
-		marginBottom: 6,
+		fontSize: 18,
 	},
 	label: {
-		textAlign: "center",
+		fontSize: 14,
+		fontWeight: "500",
+		color: "#333",
 	},
 });

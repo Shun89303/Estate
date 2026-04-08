@@ -11,9 +11,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
 import { Video } from "expo-av";
 import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
+import { PropertyMap } from "@/components/common/PropertyMap";
 
 export default function RoomRentDetails() {
 	const router = useRouter();
@@ -167,24 +167,18 @@ export default function RoomRentDetails() {
 
 					{/* Map */}
 					<View style={{ height: 200, marginVertical: 8 }}>
-						<MapView
-							style={{ flex: 1 }}
-							initialRegion={{
-								latitude: property.location.latitude,
-								longitude: property.location.longitude,
-								latitudeDelta: 0.01,
-								longitudeDelta: 0.01,
-							}}
-						>
-							<Marker
-								coordinate={{
+						<PropertyMap
+							markers={[
+								{
+									id: property.id,
 									latitude: property.location.latitude,
 									longitude: property.location.longitude,
-								}}
-								title={property.title}
-								description={property.location.address}
-							/>
-						</MapView>
+									title: property.title,
+									description: property.location.address,
+								},
+							]}
+							style={{ height: 200 }}
+						/>
 					</View>
 
 					{/* Agent */}

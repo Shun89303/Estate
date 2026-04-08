@@ -6,13 +6,12 @@ import {
 	FlatList,
 	Image,
 	TextInput,
-	ScrollView,
-	TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import MapView, { Marker } from "react-native-maps";
 import { BusinessPropertyType, MOCK_BUSINESS } from "@/mock/business";
+import { PropertyMap } from "@/components/common/PropertyMap";
+import FilterSection from "@/components/common/FilterSection";
 
 const LOCATIONS = [
 	"All",
@@ -41,9 +40,7 @@ export default function Business() {
 	// Filter states
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedLocation, setSelectedLocation] = useState("All");
-	const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(
-		"All",
-	);
+	const [selectedPriceRange, setSelectedPriceRange] = useState<string>("All");
 	const [selectedType, setSelectedType] = useState<string>("All");
 
 	// Helper: check if price matches selected range
@@ -66,21 +63,17 @@ export default function Business() {
 	// Filtered data based on all criteria
 	const filteredData = useMemo(() => {
 		return MOCK_BUSINESS.filter((item) => {
-			// Search filter (title or address)
 			const matchesSearch =
 				searchQuery === "" ||
 				item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				item.location.address.toLowerCase().includes(searchQuery.toLowerCase());
 
-			// Location filter
 			const matchesLocation =
 				selectedLocation === "All" ||
 				item.location.address.includes(selectedLocation);
 
-			// Price filter (using monthly amount – adjust if needed for daily)
 			const matchesPrice = matchesPriceRange(item.pricing.amount);
 
-			// Type filter
 			const matchesType = selectedType === "All" || item.type === selectedType;
 
 			return matchesSearch && matchesLocation && matchesPrice && matchesType;
@@ -133,83 +126,39 @@ export default function Business() {
 						paddingHorizontal: 8,
 					}}
 				>
-					<Text style={{ marginBottom: 4 }}>Location:</Text>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						style={{ marginBottom: 8 }}
-					>
-						{LOCATIONS.map((loc) => (
-							<TouchableOpacity
-								key={loc}
-								onPress={() => setSelectedLocation(loc)}
-								style={{
-									padding: 6,
-									backgroundColor:
-										selectedLocation === loc ? "#2c6e9e" : "#ddd",
-									marginRight: 6,
-									borderRadius: 6,
-								}}
-							>
-								<Text
-									style={{ color: selectedLocation === loc ? "#fff" : "#000" }}
-								>
-									{loc}
-								</Text>
-							</TouchableOpacity>
-						))}
-					</ScrollView>
-
-					<Text style={{ marginBottom: 4 }}>Price range:</Text>
-					<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-						{PRICE_RANGES.map((price) => (
-							<TouchableOpacity
-								key={price}
-								onPress={() => setSelectedPriceRange(price)}
-								style={{
-									padding: 6,
-									backgroundColor:
-										selectedPriceRange === price ? "#2c6e9e" : "#ddd",
-									marginRight: 6,
-									borderRadius: 6,
-								}}
-							>
-								<Text
-									style={{
-										color: selectedPriceRange === price ? "#fff" : "#000",
-									}}
-								>
-									{price}
-								</Text>
-							</TouchableOpacity>
-						))}
-					</ScrollView>
+					<FilterSection
+						title="Location"
+						options={LOCATIONS}
+						selected={selectedLocation}
+						onSelect={setSelectedLocation}
+					/>
+					<FilterSection
+						title="Price range"
+						options={PRICE_RANGES}
+						selected={selectedPriceRange}
+						onSelect={setSelectedPriceRange}
+					/>
 				</View>
 			)}
 
 			{/* Type Filters (always visible) */}
-			<ScrollView
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={{ marginTop: 8, flexGrow: 0 }}
-			>
-				{["All", ...TYPE_FILTERS].map((type) => (
-					<TouchableOpacity
-						key={type}
-						onPress={() => setSelectedType(type)}
-						style={{
-							padding: 6,
-							backgroundColor: selectedType === type ? "#2c6e9e" : "#ddd",
-							marginRight: 6,
-							borderRadius: 6,
-						}}
-					>
-						<Text style={{ color: selectedType === type ? "#fff" : "#000" }}>
-							{type.replace("_", " ")}
-						</Text>
-					</TouchableOpacity>
-				))}
-			</ScrollView>
+			<View style={{ marginTop: 8 }}>
+				<FilterSection
+					options={["All", ...TYPE_FILTERS].map((t) => t.replace("_", " "))}
+					selected={
+						selectedType === "All" ? "All" : selectedType.replace("_", " ")
+					}
+					onSelect={(value) => {
+						if (value === "All") setSelectedType("All");
+						else {
+							const original = TYPE_FILTERS.find(
+								(t) => t.replace("_", " ") === value,
+							);
+							if (original) setSelectedType(original);
+						}
+					}}
+				/>
+			</View>
 
 			{/* Total spaces found + View toggle */}
 			<View
@@ -238,7 +187,7 @@ export default function Business() {
 				</View>
 			</View>
 
-			{/* List or Map View (using filtered data) */}
+			{/* List or Map View */}
 			{viewMode === "LIST" ? (
 				<FlatList
 					data={filteredData}
@@ -312,28 +261,17 @@ export default function Business() {
 					}
 				/>
 			) : (
-				<MapView
+				<PropertyMap
+					markers={filteredData.map((p) => ({
+						id: p.id,
+						latitude: p.location.latitude,
+						longitude: p.location.longitude,
+						title: p.title,
+						description: p.location.address,
+						onPress: () => router.push(`/business/${p.id}`),
+					}))}
 					style={{ flex: 1 }}
-					initialRegion={{
-						latitude: 13.736,
-						longitude: 100.568,
-						latitudeDelta: 0.1,
-						longitudeDelta: 0.1,
-					}}
-				>
-					{filteredData.map((item) => (
-						<Marker
-							key={item.id}
-							coordinate={{
-								latitude: item.location.latitude,
-								longitude: item.location.longitude,
-							}}
-							title={item.title}
-							description={`${item.type.replace("_", " ")} • ฿${item.pricing.amount}`}
-							onPress={() => router.push(`/business/${item.id}`)}
-						/>
-					))}
-				</MapView>
+				/>
 			)}
 		</SafeAreaView>
 	);

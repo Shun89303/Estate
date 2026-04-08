@@ -5,7 +5,7 @@ import {
 } from "@/components/atoms/Typography";
 import { ContentItem } from "@/mock/contents";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function ContentCard({
 	item,
@@ -33,10 +33,6 @@ export default function ContentCard({
 						<View style={styles.videoOverlay}>
 							<Ionicons name="play-circle" size={40} color="#fff" />
 						</View>
-						{/* Video duration placeholder – you can add a duration field to mock data */}
-						<View style={styles.durationBadge}>
-							<Text style={styles.durationText}>5:32</Text>
-						</View>
 					</View>
 				)}
 			</View>
@@ -53,25 +49,12 @@ export default function ContentCard({
 							{item.title}
 						</NormalTitle>
 					</View>
-					<TouchableOpacity>
-						<Ionicons
-							name={item.saved ? "bookmark" : "bookmark-outline"}
-							size={22}
-							color="#333"
-						/>
-					</TouchableOpacity>
 				</View>
 
 				<View style={styles.metaRow}>
 					<BodyText>{item.postedBy}</BodyText>
 					<BodyText>•</BodyText>
 					<BodyText>{item.date}</BodyText>
-					{isArticle && (
-						<>
-							<BodyText>•</BodyText>
-							<BodyText>{item.readTimeMinutes} min read</BodyText>
-						</>
-					)}
 				</View>
 			</View>
 		</TouchableOpacity>
@@ -145,7 +128,7 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 		backgroundColor: "#fff",
 		borderRadius: 12,
-		// overflow: "hidden",
+		overflow: "hidden",
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.05,
@@ -201,7 +184,6 @@ const styles = StyleSheet.create({
 	cardRight: {
 		flex: 1,
 		padding: 10,
-		// paddingRight: 22,
 		justifyContent: "space-between",
 	},
 	titleRow: {

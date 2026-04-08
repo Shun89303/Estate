@@ -4,9 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRef, useMemo, useCallback } from "react";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import TopUpCoins from "@/components/profile/TopUpCoins";
+import { requireAuth } from "@/utils/requireAuth";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function Profile() {
 	const router = useRouter();
+	const logout = useAuthStore((s) => s.logout);
 	const bottomSheetRef = useRef<BottomSheet>(null);
 	const logoutSheetRef = useRef<BottomSheet>(null);
 	const snapPoints = useMemo(() => ["50%", "70%"], []);
@@ -46,19 +49,19 @@ export default function Profile() {
 			<View style={{ alignItems: "center", marginBottom: 24 }}>
 				<Image
 					source={{
-						uri: "http://localhost:3000/uploads/owners/owner1.jpg",
+						uri: "abc",
 					}}
 					style={{
 						width: 100,
 						height: 100,
-						borderRadius: 50,
+						borderRadius: 20,
 						marginBottom: 10,
 						backgroundColor: "black",
 					}}
 				/>
 
-				<Text style={{ fontSize: 18, fontWeight: "600" }}>John Doe</Text>
-				<Text style={{ color: "gray" }}>+1 234 567 890</Text>
+				<Text style={{ fontSize: 18, fontWeight: "600" }}>Myanmar User</Text>
+				<Text style={{ color: "gray" }}>+95 9 xxx xxx xxx</Text>
 			</View>
 
 			{/* COIN CONTAINER */}
@@ -132,7 +135,7 @@ export default function Profile() {
 						borderBottomWidth: 1,
 						borderBottomColor: "#eee",
 					}}
-					onPress={() => router.push("/profile/editProfile")}
+					onPress={() => requireAuth(() => router.push("/profile/editProfile"))}
 				>
 					<Text>Edit Profile</Text>
 				</TouchableOpacity>
@@ -227,7 +230,8 @@ export default function Profile() {
 								}}
 								onPress={() => {
 									logoutSheetRef.current?.close();
-									router.push("/");
+									logout();
+									router.push("/auth/login");
 								}}
 							>
 								<Text style={{ color: "#fff" }}>Log Out</Text>

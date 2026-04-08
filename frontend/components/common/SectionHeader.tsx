@@ -1,4 +1,6 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
+import { ChevronRight } from "lucide-react-native";
+import { BodyText, NormalTitle, SmallTitle } from "../atoms/Typography";
 
 export default function SectionHeader({
 	title,
@@ -13,13 +15,14 @@ export default function SectionHeader({
 		<View style={styles.container}>
 			{/* LEFT: Title + Subtitle */}
 			<View style={styles.left}>
-				<Text style={styles.title}>{title}</Text>
-				{subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+				<NormalTitle>{title}</NormalTitle>
+				{subtitle && <BodyText style={styles.subtitle}>{subtitle}</BodyText>}
 			</View>
 
-			{/* RIGHT: See All */}
-			<Pressable onPress={onPress}>
-				<Text style={styles.seeAll}>See All</Text>
+			{/* RIGHT: See All + Chevron */}
+			<Pressable onPress={onPress} style={styles.right}>
+				<SmallTitle style={styles.seeAllText}>See All</SmallTitle>
+				<ChevronRight size={16} color="#D4AF37" />
 			</Pressable>
 		</View>
 	);
@@ -33,25 +36,20 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		marginBottom: 8,
 	},
-
 	left: {
 		flex: 1,
 	},
-
-	title: {
-		fontWeight: "600",
-		fontSize: 16,
-	},
-
 	subtitle: {
 		fontSize: 12,
 		color: "#666",
 		marginTop: 2,
 	},
-
-	seeAll: {
-		color: "#007bff",
-		fontSize: 12,
-		fontWeight: "500",
+	right: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	seeAllText: {
+		color: "#D4AF37", // dark gold
 	},
 });

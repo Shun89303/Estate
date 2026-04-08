@@ -1,46 +1,78 @@
+// components/PropertyCard.tsx
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import { BedDouble, Bath, Maximize, MapPin } from "lucide-react-native";
 import { Property } from "@/mock/buySell";
+import {
+	BodyText,
+	NormalTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import globalStyles from "@/styles/styles";
 
-export default function PropertyCard({ property }: { property: Property }) {
+interface PropertyCardProps {
+	property: Property;
+	style?: object;
+}
+
+export default function PropertyCard({ property, style }: PropertyCardProps) {
 	const router = useRouter();
 
 	return (
 		<TouchableOpacity
 			onPress={() => router.push(`/buySell/${property.id}`)}
 			activeOpacity={0.8}
-			style={styles.cardContainer}
+			style={[styles.card, style]}
 		>
-			{/* ---------------- UPPER SIDE ---------------- */}
-			<View style={styles.upperSide}>
-				<Image
-					source={{ uri: property.media.cover }}
-					style={styles.coverImage}
-				/>
-				{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
-
-				{/* PRICE overlay at bottom-left */}
-				<View style={styles.priceContainer}>
-					<Text style={styles.price}>฿{property.price.toLocaleString()}</Text>
-				</View>
+			{/* Left: Square Image */}
+			<View style={styles.imageContainer}>
+				<Image source={{ uri: property.media.cover }} style={styles.image} />
 			</View>
 
-			{/* ---------------- BOTTOM SIDE ---------------- */}
-			<View style={styles.bottomSide}>
-				<Text style={styles.title} numberOfLines={1}>
+			{/* Right: Info */}
+			<View style={styles.infoContainer}>
+				{/* Top row: type + new badge */}
+				<View style={styles.headerRow}>
+					<SmallTitle style={styles.typeText}>{property.type}</SmallTitle>
+					{property.isNew && (
+						<View style={styles.newBadge}>
+							<Text style={styles.newText}>NEW</Text>
+						</View>
+					)}
+				</View>
+
+				{/* Title */}
+				<NormalTitle numberOfLines={2} style={styles.title}>
 					{property.title}
-				</Text>
-				<Text style={styles.address} numberOfLines={1}>
-					{property.location.address}
-				</Text>
+				</NormalTitle>
 
-				<View style={styles.divider} />
+				{/* Address with icon */}
+				<View style={styles.locationRow}>
+					<MapPin size={12} color="#da9a0fff" />
+					<BodyText style={styles.address} numberOfLines={1}>
+						{property.location.address}
+					</BodyText>
+				</View>
 
-				{/* Specs row */}
-				<View style={styles.specsRow}>
-					<Text style={styles.spec}>{property.bedrooms} bd</Text>
-					<Text style={styles.spec}>{property.bathrooms} ba</Text>
-					<Text style={styles.spec}>{property.areaSqm} sqm</Text>
+				{/* Bottom row: specs + price */}
+				<View style={styles.bottomRow}>
+					<View style={styles.specsRow}>
+						<View style={styles.specItem}>
+							<BedDouble size={12} color="#555" />
+							<Text style={styles.specText}>{property.bedrooms}</Text>
+						</View>
+						<View style={styles.specItem}>
+							<Bath size={12} color="#555" />
+							<Text style={styles.specText}>{property.bathrooms}</Text>
+						</View>
+						<View style={styles.specItem}>
+							<Maximize size={12} color="#555" />
+							<Text style={styles.specText}>{property.areaSqm} m²</Text>
+						</View>
+					</View>
+					<NormalTitle style={styles.price}>
+						฿{property.price.toLocaleString()}
+					</NormalTitle>
 				</View>
 			</View>
 		</TouchableOpacity>
@@ -48,82 +80,85 @@ export default function PropertyCard({ property }: { property: Property }) {
 }
 
 const styles = StyleSheet.create({
-	cardContainer: {
+	card: {
+		flexDirection: "row",
 		backgroundColor: "#fff",
 		borderRadius: 12,
-		marginBottom: 16,
+		marginBottom: 12,
 		overflow: "hidden",
+		...globalStyles.shadows,
 	},
-
-	upperSide: {
-		position: "relative",
-		height: 180,
+	imageContainer: {
+		width: 130,
+		alignSelf: "stretch",
 	},
-
-	coverImage: {
+	image: {
+		flex: 1,
 		width: "100%",
-		height: "100%",
+		resizeMode: "cover",
 	},
-
-	newBadge: {
-		position: "absolute",
-		top: 10,
-		left: 10,
-		backgroundColor: "#007bff",
-		color: "#fff",
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-		borderRadius: 4,
-		fontSize: 12,
-		fontWeight: "bold",
+	infoContainer: {
+		flex: 1,
+		padding: 10,
+		justifyContent: "space-between",
 	},
-
-	priceContainer: {
-		position: "absolute",
-		bottom: 10,
-		left: 10,
-		backgroundColor: "rgba(0,0,0,0.6)",
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-		borderRadius: 4,
-	},
-
-	price: {
-		color: "#fff",
-		fontSize: 14,
-		fontWeight: "bold",
-	},
-
-	bottomSide: {
-		padding: 12,
-	},
-
-	title: {
-		fontSize: 14,
-		fontWeight: "bold",
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "center",
 		marginBottom: 4,
 	},
-
-	address: {
-		fontSize: 12,
-		color: "#666",
+	typeText: {
+		color: "#2c6e9e",
+		textTransform: "capitalize",
+	},
+	newBadge: {
+		backgroundColor: "#da9a0fff",
+		paddingHorizontal: 6,
+		paddingVertical: 2,
+		borderRadius: 4,
+		marginLeft: 8,
+	},
+	newText: {
+		color: "#fff",
+		fontSize: 10,
+		fontWeight: "bold",
+	},
+	title: {
+		marginBottom: 4,
+		lineHeight: 20,
+	},
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
 		marginBottom: 8,
 	},
-
-	divider: {
-		height: 1,
-		backgroundColor: "#eee",
-		marginVertical: 8,
+	address: {
+		marginLeft: 4,
+		color: "#666",
+		fontSize: 12,
+		flexShrink: 1,
 	},
-
+	bottomRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+	},
 	specsRow: {
 		flexDirection: "row",
-		justifyContent: "flex-start",
-		gap: 10,
+		gap: 8,
 	},
-
-	spec: {
+	specItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	specText: {
 		fontSize: 12,
 		color: "#555",
+	},
+	price: {
+		fontSize: 16,
+		fontWeight: "bold",
+		color: "#000",
 	},
 });

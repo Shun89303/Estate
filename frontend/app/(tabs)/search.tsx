@@ -3,17 +3,22 @@ import {
 	View,
 	Text,
 	TouchableOpacity,
-	TextInput,
 	FlatList,
 	StyleSheet,
-	ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
 import PropertyCard from "@/components/home/property/PropertyCard";
 import { useRouter } from "expo-router";
 import { MOCK_BUYSELL, Property } from "@/mock/buySell";
+import { PropertyMap } from "@/components/common/PropertyMap";
+import FilterSection from "@/components/common/FilterSection";
+import BackButton from "@/components/common/BackButton";
+import { SlidersHorizontal } from "lucide-react-native";
+import HorizontalTypeFilter from "@/components/common/HorizontalTypeFilter";
+import { useTheme } from "@/hooks/useTheme";
+import ClearFiltersButton from "@/components/common/ClearFiltersButton";
+import SearchBar from "@/components/common/SearchBar";
+import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
 
 // Filter options
 const PURPOSES = [
@@ -86,8 +91,10 @@ const mapTypeToEnum = (typeStr: string): Property["type"] | null => {
 
 export default function Search() {
 	const router = useRouter();
+	const colors = useTheme();
 	const [viewMode, setViewMode] = useState<"list" | "map">("list");
 	const [showFilters, setShowFilters] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
 
 	// Filter states
 	const [selectedPurpose, setSelectedPurpose] = useState("All");
@@ -124,88 +131,129 @@ export default function Search() {
 	// Filter logic
 	const filteredProperties = useMemo(() => {
 		return MOCK_BUYSELL.filter((property) => {
+			// Search filter (title or address)
+			const matchesSearch =
+				searchQuery === "" ||
+				property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				property.location.address
+					.toLowerCase()
+					.includes(searchQuery.toLowerCase());
+
 			// Type filter
+			let matchesType = true;
 			if (selectedType !== "All") {
 				const expectedType = mapTypeToEnum(selectedType);
-				if (expectedType && property.type !== expectedType) return false;
+				if (expectedType && property.type !== expectedType) matchesType = false;
 			}
 
-			// Location filter (case-insensitive partial match in address)
+			// Location filter
+			let matchesLocation = true;
 			if (selectedLocation !== "All") {
 				const lowerAddress = property.location.address.toLowerCase();
 				if (!lowerAddress.includes(selectedLocation.toLowerCase()))
-					return false;
+					matchesLocation = false;
 			}
 
 			// Price filter
 			const [minPrice, maxPrice] = getPriceRange(selectedPrice);
-			if (property.price < minPrice || property.price > maxPrice) return false;
+			const matchesPrice =
+				property.price >= minPrice && property.price <= maxPrice;
 
 			// Bedrooms filter
 			const minBed = getBedroomsMin(selectedBedrooms);
-			if (property.bedrooms < minBed) return false;
+			const matchesBedrooms = property.bedrooms >= minBed;
 
-			// Purpose filter – currently not implemented in data, so skip filtering
-			return true;
+			return (
+				matchesSearch &&
+				matchesType &&
+				matchesLocation &&
+				matchesPrice &&
+				matchesBedrooms
+			);
 		});
-	}, [selectedType, selectedLocation, selectedPrice, selectedBedrooms]);
+	}, [
+		searchQuery,
+		selectedType,
+		selectedLocation,
+		selectedPrice,
+		selectedBedrooms,
+	]);
+
+	const activeFilterCount = useMemo(() => {
+		let count = 0;
+		if (selectedPurpose !== "All") count++;
+		if (selectedType !== "All") count++;
+		if (selectedLocation !== "All") count++;
+		if (selectedPrice !== "Any") count++;
+		if (selectedBedrooms !== "Any") count++;
+		return count;
+	}, [
+		selectedPurpose,
+		selectedType,
+		selectedLocation,
+		selectedPrice,
+		selectedBedrooms,
+	]);
 
 	return (
 		<SafeAreaView style={styles.container}>
 			{/* HEADER */}
 			<View style={styles.header}>
-				<TouchableOpacity onPress={() => router.back()}>
-					<Text>{"<"}</Text>
-				</TouchableOpacity>
+				<BackButton />
 
-				<TextInput placeholder="Search..." style={styles.searchBar} />
+				<SearchBar
+					placeholder="Search property or location..."
+					value={searchQuery}
+					onChangeText={setSearchQuery}
+				/>
 
-				<TouchableOpacity onPress={() => setShowFilters((prev) => !prev)}>
-					<Ionicons name="filter" size={24} color="#333" />
+				<TouchableOpacity
+					onPress={() => setShowFilters((prev) => !prev)}
+					style={[
+						{
+							padding: 5,
+							borderRadius: 10,
+						},
+						showFilters && { backgroundColor: colors.border }, // background only when open
+					]}
+				>
+					<View style={{ position: "relative" }}>
+						<SlidersHorizontal
+							size={24}
+							color={showFilters ? colors.primary : "#000"} // black when closed, primary when open
+						/>
+						{activeFilterCount > 0 && (
+							<View
+								style={[
+									styles.badge,
+									{
+										backgroundColor: colors.primary,
+									},
+								]}
+							>
+								<Text style={styles.badgeText}>{activeFilterCount}</Text>
+							</View>
+						)}
+					</View>
 				</TouchableOpacity>
 			</View>
 
 			{/* CATEGORY ROW */}
-			<ScrollView
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={styles.categoryRow}
-			>
-				<TouchableOpacity
-					style={styles.categoryBtn}
-					onPress={() => router.push("/(tabs)/search")}
-				>
-					<Text style={{ fontSize: 15, fontWeight: "500" }}>Buy/Sell</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.categoryBtn}
-					onPress={() => router.push("/roomRent/roomRent")}
-				>
-					<Text style={{ fontSize: 15, fontWeight: "500" }}>Room Rent</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.categoryBtn}
-					onPress={() => router.push("/ownerDirect/ownerDirect")}
-				>
-					<Text style={{ fontSize: 15, fontWeight: "500" }}>Owner-Direct</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.categoryBtn}
-					onPress={() => router.push("/offPlan/offPlan")}
-				>
-					<Text style={{ fontSize: 15, fontWeight: "500" }}>Off-Plan</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.categoryBtn}
-					onPress={() => router.push("/business/business")}
-				>
-					<Text style={{ fontSize: 15, fontWeight: "500" }}>Business</Text>
-				</TouchableOpacity>
-			</ScrollView>
+
+			<View style={{ flexShrink: 0 }}>
+				<HorizontalTypeFilter />
+			</View>
 
 			{/* FILTERS */}
 			{showFilters && (
-				<View style={styles.filtersContainer}>
+				<View
+					style={[
+						styles.filtersContainer,
+						{
+							borderColor: colors.primaryMute,
+						},
+					]}
+				>
 					<FilterSection
 						title="Purpose"
 						options={PURPOSES}
@@ -238,43 +286,30 @@ export default function Search() {
 					/>
 
 					{/* Clear all filters button (only shown when any filter is active) */}
-					{hasActiveFilters && (
-						<TouchableOpacity
-							style={styles.clearButton}
-							onPress={clearAllFilters}
-						>
-							<Ionicons name="close-circle-outline" size={18} color="#d9534f" />
-							<Text style={styles.clearButtonText}>Clear all filters</Text>
-						</TouchableOpacity>
-					)}
+					{hasActiveFilters && <ClearFiltersButton onPress={clearAllFilters} />}
 				</View>
 			)}
 
 			{/* TOGGLE + TOTAL */}
-			<View style={styles.toggleRowWithCount}>
-				<Text style={styles.totalCount}>
-					{filteredProperties.length} properties found
-				</Text>
-				<View style={styles.toggleRow}>
-					<TouchableOpacity onPress={() => setViewMode("list")}>
-						<Text style={viewMode === "list" ? styles.active : undefined}>
-							List
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => setViewMode("map")}>
-						<Text style={viewMode === "map" ? styles.active : undefined}>
-							Map
-						</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
+			<ViewToggleWithCount
+				count={filteredProperties.length}
+				countLabel="properties found"
+				viewMode={viewMode}
+				onViewModeChange={setViewMode}
+			/>
 
 			{/* CONTENT */}
 			{viewMode === "list" ? (
 				<FlatList
 					data={filteredProperties}
 					keyExtractor={(item) => item.id!.toString()}
-					renderItem={({ item }) => <PropertyCard property={item} />}
+					renderItem={({ item }) => (
+						<PropertyCard
+							property={item}
+							style={{ marginHorizontal: 0, width: "auto" }}
+						/>
+					)}
+					contentContainerStyle={{ paddingHorizontal: 16 }}
 					ListEmptyComponent={
 						<Text style={styles.emptyText}>
 							No properties match your filters.
@@ -282,69 +317,19 @@ export default function Search() {
 					}
 				/>
 			) : (
-				<MapView
+				<PropertyMap
+					markers={filteredProperties.map((p) => ({
+						id: p.id,
+						latitude: p.location.latitude,
+						longitude: p.location.longitude,
+						title: p.title,
+						description: p.location.address,
+						onPress: () => router.push(`/buySell/${p.id}`),
+					}))}
 					style={styles.map}
-					initialRegion={{
-						latitude: filteredProperties[0]?.location.latitude || 13.7563,
-						longitude: filteredProperties[0]?.location.longitude || 100.5018,
-						latitudeDelta: 0.1,
-						longitudeDelta: 0.1,
-					}}
-				>
-					{filteredProperties.map((p) =>
-						p.location.latitude && p.location.longitude ? (
-							<Marker
-								key={p.id}
-								coordinate={{
-									latitude: p.location.latitude,
-									longitude: p.location.longitude,
-								}}
-								title={p.title}
-								description={p.location.address}
-								onPress={() => router.push(`/buySell/${p.id}`)}
-							/>
-						) : null,
-					)}
-				</MapView>
+				/>
 			)}
 		</SafeAreaView>
-	);
-}
-
-// FilterSection component (unchanged except styles)
-function FilterSection({
-	title,
-	options,
-	selected,
-	onSelect,
-}: {
-	title: string;
-	options: string[];
-	selected: string;
-	onSelect: (value: string) => void;
-}) {
-	return (
-		<View style={styles.filterSection}>
-			<Text style={styles.filterTitle}>{title}</Text>
-			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-				{options.map((opt) => (
-					<TouchableOpacity
-						key={opt}
-						style={[
-							styles.filterBtn,
-							selected === opt && styles.filterBtnActive,
-						]}
-						onPress={() => onSelect(opt)}
-					>
-						<Text
-							style={selected === opt ? styles.filterTextActive : undefined}
-						>
-							{opt}
-						</Text>
-					</TouchableOpacity>
-				))}
-			</ScrollView>
-		</View>
 	);
 }
 
@@ -363,9 +348,44 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		height: 40,
 	},
+	searchContainer: {
+		flex: 1,
+		flexDirection: "row",
+		alignItems: "center",
+		borderWidth: 1,
+		borderColor: "#ccc",
+		borderRadius: 8,
+		paddingHorizontal: 10,
+		height: 40,
+		gap: 8,
+	},
+	searchInput: {
+		flex: 1,
+		height: "100%",
+		padding: 0,
+	},
+	badge: {
+		position: "absolute",
+		top: -6,
+		right: -6,
+		borderRadius: 10,
+		minWidth: 18,
+		height: 18,
+		justifyContent: "center",
+		alignItems: "center",
+		paddingHorizontal: 4,
+	},
+	badgeText: {
+		color: "#fff",
+		fontSize: 10,
+		fontWeight: "bold",
+	},
 	filtersContainer: {
 		paddingHorizontal: 16,
-		paddingBottom: 16,
+		paddingVertical: 16,
+		borderTopWidth: 2,
+		borderBottomWidth: 2,
+		marginVertical: 16,
 	},
 	filterSection: {
 		marginBottom: 12,
@@ -436,7 +456,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		marginTop: 8,
 		paddingVertical: 8,
-		backgroundColor: "#f9f2f2",
 		borderRadius: 20,
 		alignSelf: "flex-start",
 		paddingHorizontal: 12,
@@ -446,5 +465,32 @@ const styles = StyleSheet.create({
 		color: "#d9534f",
 		fontSize: 14,
 		fontWeight: "500",
+	},
+	toggleContainer: {
+		flexDirection: "row",
+		backgroundColor: "#f0f0f0",
+		borderRadius: 30,
+		padding: 4,
+	},
+	toggleButton: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingHorizontal: 16,
+		paddingVertical: 6,
+		borderRadius: 30,
+		gap: 6,
+	},
+	toggleButtonActive: {
+		backgroundColor: "#fff",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.1,
+		shadowRadius: 2,
+		elevation: 2,
+	},
+	toggleText: {
+		fontSize: 14,
+		fontWeight: "500",
+		color: "#666",
 	},
 });

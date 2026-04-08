@@ -9,11 +9,21 @@ import ReviewsSection from "@/components/home/ReviewsSection";
 import ContentsSection from "@/components/home/ContentsSection";
 import ConsultationCTA from "@/components/home/ConsultationCTA";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Home() {
+	const colors = useTheme();
+
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			<ScrollView style={styles.container}>
+			<ScrollView
+				style={[
+					styles.container,
+					{
+						backgroundColor: colors.appBackground,
+					},
+				]}
+			>
 				<Header />
 				<SearchBar />
 				<TypeFilter />
@@ -30,5 +40,5 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: "#fff", marginBottom: 50 },
+	container: { flex: 1, marginBottom: 50 },
 });

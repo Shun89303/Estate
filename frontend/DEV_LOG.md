@@ -197,14 +197,13 @@ implemented off-plan page + details page
 <!-- Latest to do -->
 
 purpose filter not concrete just yet
-implement login navigation for user in case user clicks on ui that requires to collect user's data
 wait for boss's design update about color
 
 <!--  -->
 
 Apr-7-2026
 
-implemented owner direct page + details page
+implemented owner-direct page + details page
 
 implemented business page + details page
 
@@ -212,9 +211,13 @@ implemented contents page + details page + home page display
 
 implemented filter system in search page
 
-implemented unique code for each listing
+inserted unique code for each listing
 
-<!-- Check list -->
+created mock auth pages: login + register for user
+
+created zustand store: authStore to test user authenticated state
+
+created helper / wrapper function requireAuth to guide no account users to auth page
 
 initial skeleton completed pages:
 Home page
@@ -224,3 +227,29 @@ Bookings page
 Profile page
 
 <!-- Latest ongoing progress -->
+
+creating reusable components:
+currently created reusable components:
+maps(single + multi)
+FilterSection (used in buy/sell, room rent, business)
+
+creating title and body text reusables and implementing starting from home page...
+
+<!--  -->
+
+Apr-8-2026
+
+currently created reusable components:
+back button
+search bar
+filter button
+filter section
+clear filter button
+view toggle with count
+
+created contents home display and content page display cards
+created buy sell page display card and home page display card
+
+home page completed applying reusable texts
+
+search page completed applying reusable components

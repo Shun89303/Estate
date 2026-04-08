@@ -5,17 +5,16 @@ import {
 	TouchableOpacity,
 	TextInput,
 	FlatList,
-	ScrollView,
 	Image,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
 import { useRouter } from "expo-router";
 import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
+import { PropertyMap } from "@/components/common/PropertyMap";
+import FilterSection from "@/components/common/FilterSection";
 
-// Property type filters
 const PROPERTY_TYPES = [
 	"All",
 	"SINGLE ROOM",
@@ -35,7 +34,6 @@ export default function RoomRent() {
 	const [activeLocation, setActiveLocation] = useState("All");
 	const [activePrice, setActivePrice] = useState("Any");
 
-	// filter mock data by search, type, location, price
 	const filteredRooms = MOCK_ROOM_RENT.filter((r) => {
 		const matchesSearch = r.title
 			.toLowerCase()
@@ -59,20 +57,16 @@ export default function RoomRent() {
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			{/* HEADER */}
 			<View style={styles.header}>
 				<TouchableOpacity onPress={() => router.back()}>
 					<Text style={styles.backBtn}>Back</Text>
 				</TouchableOpacity>
-
 				<Text style={styles.title}>Room Renting</Text>
-
 				<TouchableOpacity onPress={() => setShowFilters((prev) => !prev)}>
 					<Ionicons name="filter" size={24} color="#333" />
 				</TouchableOpacity>
 			</View>
 
-			{/* SEARCH */}
 			<View style={styles.searchContainer}>
 				<TextInput
 					placeholder="Search rooms..."
@@ -82,86 +76,33 @@ export default function RoomRent() {
 				/>
 			</View>
 
-			{/* CONDITIONAL FILTERS */}
+			{/* Conditional Filters (Location & Price) */}
 			{showFilters && (
-				<View style={{ paddingHorizontal: 16 }}>
-					{/* Location */}
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						style={{ marginVertical: 8 }}
-					>
-						{LOCATIONS.map((loc) => (
-							<TouchableOpacity
-								key={loc}
-								style={[
-									styles.filterBtn,
-									activeLocation === loc && styles.activeTypeBtn,
-								]}
-								onPress={() => setActiveLocation(loc)}
-							>
-								<Text
-									style={
-										activeLocation === loc ? styles.activeTypeText : undefined
-									}
-								>
-									{loc}
-								</Text>
-							</TouchableOpacity>
-						))}
-					</ScrollView>
-
-					{/* Price */}
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						style={{ marginBottom: 8 }}
-					>
-						{PRICE_RANGES.map((p) => (
-							<TouchableOpacity
-								key={p}
-								style={[
-									styles.filterBtn,
-									activePrice === p && styles.activeTypeBtn,
-								]}
-								onPress={() => setActivePrice(p)}
-							>
-								<Text
-									style={activePrice === p ? styles.activeTypeText : undefined}
-								>
-									{p}
-								</Text>
-							</TouchableOpacity>
-						))}
-					</ScrollView>
+				<View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+					<FilterSection
+						title="Location"
+						options={LOCATIONS}
+						selected={activeLocation}
+						onSelect={setActiveLocation}
+					/>
+					<FilterSection
+						title="Price Range"
+						options={PRICE_RANGES}
+						selected={activePrice}
+						onSelect={setActivePrice}
+					/>
 				</View>
 			)}
 
-			{/* PROPERTY TYPE FILTERS */}
-			<ScrollView
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={styles.typeRow}
-			>
-				{PROPERTY_TYPES.map((type) => (
-					<TouchableOpacity
-						key={type}
-						style={[
-							styles.typeBtn,
-							activeType === type && styles.activeTypeBtn,
-						]}
-						onPress={() => setActiveType(type)}
-					>
-						<Text
-							style={activeType === type ? styles.activeTypeText : undefined}
-						>
-							{type}
-						</Text>
-					</TouchableOpacity>
-				))}
-			</ScrollView>
+			{/* Property Type Filter (always visible) */}
+			<View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+				<FilterSection
+					options={PROPERTY_TYPES}
+					selected={activeType}
+					onSelect={setActiveType}
+				/>
+			</View>
 
-			{/* TOTAL + TOGGLE */}
 			<View style={styles.toggleRowWithCount}>
 				<Text style={styles.totalCount}>
 					{filteredRooms.length} rooms found
@@ -180,7 +121,6 @@ export default function RoomRent() {
 				</View>
 			</View>
 
-			{/* CONTENT */}
 			{viewMode === "list" ? (
 				<FlatList
 					data={filteredRooms}
@@ -188,50 +128,33 @@ export default function RoomRent() {
 					renderItem={({ item }) => <RoomCard property={item} />}
 				/>
 			) : (
-				<MapView
+				<PropertyMap
+					markers={filteredRooms.map((p) => ({
+						id: p.id,
+						latitude: p.location.latitude,
+						longitude: p.location.longitude,
+						title: p.title,
+						description: p.location.address,
+						onPress: () => router.push(`/roomRent/${p.id}`),
+					}))}
 					style={{ flex: 1 }}
-					initialRegion={{
-						latitude: filteredRooms[0]?.location.latitude || 13.7563,
-						longitude: filteredRooms[0]?.location.longitude || 100.5018,
-						latitudeDelta: 0.1,
-						longitudeDelta: 0.1,
-					}}
-				>
-					{filteredRooms.map((r) =>
-						r.location.latitude && r.location.longitude ? (
-							<Marker
-								key={r.id}
-								coordinate={{
-									latitude: r.location.latitude,
-									longitude: r.location.longitude,
-								}}
-								title={r.title}
-								description={r.location.address}
-								onPress={() => router.push(`/roomRent/${r.id}`)}
-							/>
-						) : null,
-					)}
-				</MapView>
+				/>
 			)}
 		</SafeAreaView>
 	);
 }
 
-/* ---------------- ROOM CARD ---------------- */
 function RoomCard({ property }: { property: RoomRentProperty }) {
 	const router = useRouter();
-
 	return (
 		<TouchableOpacity onPress={() => router.push(`/roomRent/${property.id}`)}>
 			<View style={styles.card}>
 				{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
-
 				<Image
 					source={{ uri: property.media.cover }}
 					style={styles.cardImage}
 					resizeMode="cover"
 				/>
-
 				<View style={styles.cardInfo}>
 					<Text style={styles.propertyType}>{property.propertyType}</Text>
 					<Text style={styles.propertyTitle}>{property.title}</Text>
@@ -246,8 +169,7 @@ function RoomCard({ property }: { property: RoomRentProperty }) {
 					)}
 					<Text style={styles.propertyDetails}>
 						{property.price.minContractMonths} months min - ฿
-						{property.price.rent}
-						/mo
+						{property.price.rent}/mo
 					</Text>
 				</View>
 			</View>
@@ -255,7 +177,6 @@ function RoomCard({ property }: { property: RoomRentProperty }) {
 	);
 }
 
-/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
 	header: {
 		flexDirection: "row",
@@ -274,28 +195,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		height: 40,
 	},
-	filterBtn: {
-		paddingVertical: 6,
-		paddingHorizontal: 12,
-		borderRadius: 6,
-		backgroundColor: "#eee",
-		marginRight: 8,
-	},
-	typeRow: {
-		flexDirection: "row",
-		paddingHorizontal: 16,
-		paddingVertical: 8,
-		flexGrow: 0,
-	},
-	typeBtn: {
-		paddingVertical: 6,
-		paddingHorizontal: 12,
-		borderRadius: 6,
-		backgroundColor: "#eee",
-		marginRight: 8,
-	},
-	activeTypeBtn: { backgroundColor: "#333" },
-	activeTypeText: { color: "#fff" },
 	toggleRowWithCount: {
 		flexDirection: "row",
 		justifyContent: "space-between",

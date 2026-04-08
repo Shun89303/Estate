@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { Marker } from "react-native-maps";
 import { Video } from "expo-av";
 import { MOCK_BUYSELL, Property } from "@/mock/buySell";
 import { Ionicons } from "@expo/vector-icons";
+import { PropertyMap } from "@/components/common/PropertyMap";
 
 export default function BuySellDetails() {
 	const { id } = useLocalSearchParams();
@@ -180,24 +180,18 @@ export default function BuySellDetails() {
 				{/* MAP */}
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Location</Text>
-					<MapView
-						style={styles.map}
-						initialRegion={{
-							latitude: property.location.latitude,
-							longitude: property.location.longitude,
-							latitudeDelta: 0.01,
-							longitudeDelta: 0.01,
-						}}
-					>
-						<Marker
-							coordinate={{
+					<PropertyMap
+						markers={[
+							{
+								id: property.id,
 								latitude: property.location.latitude,
 								longitude: property.location.longitude,
-							}}
-							title={property.title}
-							description={property.location.address}
-						/>
-					</MapView>
+								title: property.title,
+								description: property.location.address,
+							},
+						]}
+						style={{ height: 200 }}
+					/>
 				</View>
 
 				{/* AGENT */}
@@ -235,7 +229,10 @@ export default function BuySellDetails() {
 
 				{/* CTA BUTTONS */}
 				<View style={styles.ctaRow}>
-					<Pressable style={styles.ctaButton}>
+					<Pressable
+						style={styles.ctaButton}
+						onPress={() => router.push("/booking")}
+					>
 						<Text style={styles.ctaText}>Consultation</Text>
 					</Pressable>
 					<Pressable style={styles.ctaButton}>

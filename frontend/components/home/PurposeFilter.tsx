@@ -1,40 +1,111 @@
 import { ScrollView, Text, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { useTheme } from "@/hooks/useTheme";
+import { NormalTitle } from "../atoms/Typography";
 
 export default function PurposeFilter() {
 	const router = useRouter();
+	const colors = useTheme();
 
 	return (
 		<ScrollView
 			horizontal
 			showsHorizontalScrollIndicator={false}
 			style={styles.container}
+			contentContainerStyle={styles.contentContainer}
 		>
-			<Pressable onPress={() => router.push("/(tabs)/search")}>
-				<Text style={styles.item}>For Investment</Text>
+			<Pressable
+				onPress={() => router.push("/(tabs)/search")}
+				style={[
+					styles.item,
+					{
+						backgroundColor: colors.primaryBackground,
+						borderColor: colors.border,
+					},
+				]}
+			>
+				<NormalTitle
+					style={{
+						color: colors.primary,
+					}}
+				>
+					📈 For Investment
+				</NormalTitle>
 			</Pressable>
 
-			<Pressable onPress={() => router.push("/(tabs)/search")}>
-				<Text style={styles.item}>For Living</Text>
+			<Pressable
+				onPress={() => router.push("/(tabs)/search")}
+				style={[
+					styles.item,
+					{
+						backgroundColor: colors.primaryBackground,
+						borderColor: colors.border,
+					},
+				]}
+			>
+				<NormalTitle
+					style={{
+						color: colors.primary,
+					}}
+				>
+					🏠 For Living
+				</NormalTitle>
 			</Pressable>
 
-			<Pressable onPress={() => router.push("/(tabs)/search")}>
-				<Text style={styles.item}>For Rent</Text>
+			<Pressable
+				onPress={() => router.push("/(tabs)/search")}
+				style={[
+					styles.item,
+					{
+						backgroundColor: colors.primaryBackground,
+						borderColor: colors.border,
+					},
+				]}
+			>
+				<NormalTitle
+					style={{
+						color: colors.primary,
+					}}
+				>
+					🔑 For Rent
+				</NormalTitle>
 			</Pressable>
 
-			<Pressable onPress={() => router.push("/(tabs)/search")}>
-				<Text style={styles.item}>For Long Stay Visa</Text>
+			<Pressable
+				onPress={() => router.push("/(tabs)/search")}
+				style={[
+					styles.item,
+					{
+						backgroundColor: colors.primaryBackground,
+						borderColor: colors.border,
+					},
+				]}
+			>
+				<NormalTitle
+					style={{
+						color: colors.primary,
+					}}
+				>
+					🛂 For Long Stay Visa
+				</NormalTitle>
 			</Pressable>
 		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { paddingHorizontal: 16, marginBottom: 16 },
+	container: {
+		flexGrow: 0,
+		marginVertical: 20, // pushes elements below
+	},
+	contentContainer: {
+		paddingHorizontal: 16,
+		gap: 10,
+	},
 	item: {
-		backgroundColor: "#eee",
-		padding: 8,
-		borderRadius: 6,
-		marginRight: 8,
+		borderWidth: 1,
+		paddingVertical: 8,
+		paddingHorizontal: 14,
+		borderRadius: 15, // pill shape for modern look
 	},
 });
