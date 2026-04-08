@@ -1,18 +1,47 @@
-import { useRouter } from "expo-router";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { Href, useRouter } from "expo-router";
+import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRef, useMemo, useCallback } from "react";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import TopUpCoins from "@/components/profile/TopUpCoins";
 import { requireAuth } from "@/utils/requireAuth";
 import { useAuthStore } from "@/stores/authStore";
+import BackButton from "@/components/common/BackButton";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import NotificationBell from "@/components/common/NotificationBell";
+import { useTheme } from "@/hooks/useTheme";
+import {
+	ChevronRight,
+	User,
+	Settings,
+	HelpCircle,
+	LogOut,
+	Coins,
+	Building2,
+	LucideIcon,
+} from "lucide-react-native";
+import globalStyles from "@/styles/styles";
+
+type MenuItem = {
+	id: string;
+	label: string;
+	icon: LucideIcon;
+	route: Href;
+	requiresAuth: boolean;
+};
 
 export default function Profile() {
 	const router = useRouter();
+	const colors = useTheme();
 	const logout = useAuthStore((s) => s.logout);
 	const bottomSheetRef = useRef<BottomSheet>(null);
 	const logoutSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => ["50%", "70%"], []);
+	const snapPoints = useMemo(() => ["50%", "70%", "100%"], []);
 
 	const handleOpenSheet = useCallback(() => {
 		bottomSheetRef.current?.expand();
@@ -23,223 +52,369 @@ export default function Profile() {
 		logoutSheetRef.current?.expand();
 	}, []);
 
+	const menuItems: MenuItem[] = [
+		{
+			id: "editProfile",
+			label: "Edit Profile",
+			icon: User,
+			route: "/profile/editProfile",
+			requiresAuth: true,
+		},
+		{
+			id: "settings",
+			label: "Settings",
+			icon: Settings,
+			route: "/profile/settings",
+			requiresAuth: false,
+		},
+		{
+			id: "help",
+			label: "Help & Support",
+			icon: HelpCircle,
+			route: "/profile/help",
+			requiresAuth: false,
+		},
+	];
+
 	return (
-		<SafeAreaView style={{ flex: 1, padding: 16 }}>
-			{/* HEADER */}
-			<View
-				style={{
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "space-between",
-					marginBottom: 20,
-				}}
-			>
-				<TouchableOpacity onPress={() => router.back()}>
-					<Text>{"< Back"}</Text>
-				</TouchableOpacity>
-
-				<Text style={{ fontWeight: "bold", fontSize: 18 }}>Profile</Text>
-
-				<TouchableOpacity onPress={() => router.push("/notifications")}>
-					<Text>🔔</Text>
-				</TouchableOpacity>
-			</View>
-
-			{/* PROFILE INFO */}
-			<View style={{ alignItems: "center", marginBottom: 24 }}>
-				<Image
-					source={{
-						uri: "abc",
-					}}
-					style={{
-						width: 100,
-						height: 100,
-						borderRadius: 20,
-						marginBottom: 10,
-						backgroundColor: "black",
-					}}
-				/>
-
-				<Text style={{ fontSize: 18, fontWeight: "600" }}>Myanmar User</Text>
-				<Text style={{ color: "gray" }}>+95 9 xxx xxx xxx</Text>
-			</View>
-
-			{/* COIN CONTAINER */}
-			<View
-				style={{
-					padding: 16,
-					borderRadius: 12,
-					backgroundColor: "#f5f5f5",
-					marginBottom: 16,
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "space-between",
-				}}
-			>
-				{/* LEFT */}
-				<View style={{ flexDirection: "row", alignItems: "center" }}>
-					<Text style={{ marginRight: 10 }}>🪙</Text>
-					<View>
-						<Text style={{ fontWeight: "600" }}>Coin Balance</Text>
-						<Text>20</Text>
+		<SafeAreaView
+			style={[styles.container, { backgroundColor: colors.appBackground }]}
+		>
+			<ScrollView showsVerticalScrollIndicator={false}>
+				{/* HEADER */}
+				<View style={styles.header}>
+					<View style={styles.leftHeader}>
+						<BackButton />
+						<PageTitle style={{ color: colors.textPrimary }}>Profile</PageTitle>
 					</View>
+					<NotificationBell />
 				</View>
 
-				{/* RIGHT */}
-				<View style={{ flexDirection: "row" }}>
-					<TouchableOpacity
-						style={{ marginRight: 12 }}
-						onPress={() => router.push("/profile/coinHistory")}
+				{/* PROFILE INFO */}
+				<View style={styles.profileSection}>
+					<View
+						style={[
+							styles.avatarContainer,
+							{ backgroundColor: colors.darkGold },
+						]}
 					>
-						<Text>History</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={handleOpenSheet}>
-						<Text>Top Up</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-
-			{/* AGENT / OWNER */}
-			<TouchableOpacity
-				style={{
-					padding: 16,
-					borderRadius: 12,
-					backgroundColor: "#f5f5f5",
-					marginBottom: 16,
-					flexDirection: "row",
-					alignItems: "center",
-					justifyContent: "space-between",
-				}}
-				onPress={() => router.push("/profile/appAd")}
-			>
-				<View style={{ flexDirection: "row", alignItems: "center" }}>
-					<Text style={{ marginRight: 10 }}>🏠</Text>
-					<View>
-						<Text style={{ fontWeight: "600" }}>
-							Are you an Agent or Owner?
-						</Text>
-						<Text style={{ color: "gray" }}>
-							Post your property & find buyers
-						</Text>
+						<User size={48} color={colors.primaryGold} />
 					</View>
+					<NormalTitle style={{ marginTop: 8, color: colors.textPrimary }}>
+						Myanmar User
+					</NormalTitle>
+					<BodyText style={{ color: colors.textSecondary, marginTop: 4 }}>
+						+95 9 xxx xxx xxx
+					</BodyText>
 				</View>
 
-				<Text>{">"}</Text>
-			</TouchableOpacity>
-
-			{/* MENU ITEMS */}
-			<View>
-				<TouchableOpacity
-					style={{
-						paddingVertical: 16,
-						borderBottomWidth: 1,
-						borderBottomColor: "#eee",
-					}}
-					onPress={() => requireAuth(() => router.push("/profile/editProfile"))}
+				{/* COIN BALANCE CARD */}
+				<View
+					style={[
+						styles.card,
+						{ backgroundColor: colors.background, ...globalStyles.shadows },
+					]}
 				>
-					<Text>Edit Profile</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={{
-						paddingVertical: 16,
-						borderBottomWidth: 1,
-						borderBottomColor: "#eee",
-					}}
-					onPress={() => router.push("/profile/settings")}
-				>
-					<Text>Settings</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={{
-						paddingVertical: 16,
-						borderBottomWidth: 1,
-						borderBottomColor: "#eee",
-					}}
-					onPress={() => router.push("/profile/help")}
-				>
-					<Text>Help & Support</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={{
-						paddingVertical: 16,
-						borderBottomWidth: 1,
-						borderBottomColor: "#eee",
-					}}
-					onPress={openLogoutSheet}
-				>
-					<Text style={{ color: "red" }}>Log Out</Text>
-				</TouchableOpacity>
-			</View>
-			<BottomSheet
-				ref={bottomSheetRef}
-				snapPoints={snapPoints}
-				enablePanDownToClose
-				index={-1}
-			>
-				<BottomSheetView>
-					<TopUpCoins />
-				</BottomSheetView>
-			</BottomSheet>
-			<BottomSheet
-				ref={logoutSheetRef}
-				snapPoints={["30%"]}
-				index={-1}
-				enablePanDownToClose
-			>
-				<BottomSheetView>
-					<View style={{ padding: 16 }}>
-						<Text
-							style={{
-								fontSize: 16,
-								fontWeight: "600",
-								marginBottom: 12,
-							}}
-						>
-							Are you sure you want to log out of your account?
-						</Text>
-
-						<View
-							style={{ flexDirection: "row", justifyContent: "space-between" }}
-						>
-							{/* Cancel */}
+					<View style={styles.coinRow}>
+						<View style={styles.coinLeft}>
+							<Coins size={32} color={colors.primaryGold} />
+							<View>
+								<BodyText
+									style={{ color: colors.textSecondary, marginBottom: 2 }}
+								>
+									Coin Balance
+								</BodyText>
+								<NormalTitle
+									style={{ fontWeight: "bold", color: colors.primaryGold }}
+								>
+									20
+								</NormalTitle>
+							</View>
+						</View>
+						<View style={styles.coinActions}>
 							<TouchableOpacity
-								style={{
-									flex: 1,
-									padding: 12,
-									borderRadius: 8,
-									backgroundColor: "#eee",
-									marginRight: 8,
-									alignItems: "center",
-								}}
-								onPress={() => logoutSheetRef.current?.close()}
+								onPress={() => router.push("/profile/coinHistory")}
 							>
-								<Text>Cancel</Text>
+								<BodyText
+									style={{ color: colors.primaryGray, fontWeight: "600" }}
+								>
+									History
+								</BodyText>
 							</TouchableOpacity>
-
-							{/* Confirm Logout */}
-							<TouchableOpacity
-								style={{
-									flex: 1,
-									padding: 12,
-									borderRadius: 8,
-									backgroundColor: "red",
-									alignItems: "center",
-								}}
-								onPress={() => {
-									logoutSheetRef.current?.close();
-									logout();
-									router.push("/auth/login");
-								}}
-							>
-								<Text style={{ color: "#fff" }}>Log Out</Text>
+							<TouchableOpacity onPress={handleOpenSheet}>
+								<BodyText
+									style={{ color: colors.primaryGold, fontWeight: "600" }}
+								>
+									Top Up →
+								</BodyText>
 							</TouchableOpacity>
 						</View>
 					</View>
-				</BottomSheetView>
-			</BottomSheet>
+				</View>
+
+				{/* AGENT / OWNER CARD */}
+				<TouchableOpacity
+					style={[
+						styles.card,
+						{
+							backgroundColor: colors.darkGold,
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+							borderWidth: 1,
+							borderColor: colors.darkerGoldBorder,
+						},
+					]}
+					onPress={() => router.push("/profile/appAd")}
+				>
+					<View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+						<View
+							style={[
+								styles.iconCircle,
+								{ backgroundColor: colors.darkerGold },
+							]}
+						>
+							<Building2 size={24} color={colors.primaryGold} />
+						</View>
+						<View>
+							<NormalTitle style={{ color: colors.textPrimary }}>
+								Are you an Agent or Owner?
+							</NormalTitle>
+							<BodyText style={{ color: colors.textSecondary, marginTop: 2 }}>
+								Post your property & find buyers
+							</BodyText>
+						</View>
+					</View>
+					<ChevronRight size={20} color={colors.primaryGold} />
+				</TouchableOpacity>
+
+				{/* MENU ITEMS */}
+				<View style={styles.menuContainer}>
+					{menuItems.map((item) => (
+						<TouchableOpacity
+							key={item.id}
+							style={[
+								styles.menuCard,
+								{ backgroundColor: colors.background, ...globalStyles.shadows },
+							]}
+							onPress={() => {
+								if (item.requiresAuth) {
+									requireAuth(() => router.push(item.route));
+								} else {
+									router.push(item.route);
+								}
+							}}
+						>
+							<View style={styles.menuCardContent}>
+								<View
+									style={[
+										styles.menuIconCircle,
+										{ backgroundColor: colors.secondaryMute },
+									]}
+								>
+									<item.icon size={20} color={colors.primaryGold} />
+								</View>
+								<SmallTitle
+									style={{ color: colors.textPrimary, marginLeft: 12 }}
+								>
+									{item.label}
+								</SmallTitle>
+							</View>
+							<ChevronRight size={20} color={colors.textSecondary} />
+						</TouchableOpacity>
+					))}
+
+					{/* Logout Card (separate with red) */}
+					<TouchableOpacity
+						style={[
+							styles.menuCard,
+							{ backgroundColor: colors.background, ...globalStyles.shadows },
+						]}
+						onPress={openLogoutSheet}
+					>
+						<View style={styles.menuCardContent}>
+							<View
+								style={[
+									styles.menuIconCircle,
+									{ backgroundColor: colors.darkRed },
+								]}
+							>
+								<LogOut size={20} color={colors.primaryRed} />
+							</View>
+							<BodyText style={{ color: colors.primaryRed, marginLeft: 12 }}>
+								Log Out
+							</BodyText>
+						</View>
+						<ChevronRight size={20} color={colors.textSecondary} />
+					</TouchableOpacity>
+				</View>
+				{/* BOTTOM SHEETS (unchanged) */}
+				<BottomSheet
+					ref={bottomSheetRef}
+					snapPoints={snapPoints}
+					enablePanDownToClose
+					index={-1}
+				>
+					<BottomSheetView>
+						<TopUpCoins />
+					</BottomSheetView>
+				</BottomSheet>
+				<BottomSheet
+					ref={logoutSheetRef}
+					snapPoints={["30%"]}
+					index={-1}
+					enablePanDownToClose
+				>
+					<BottomSheetView>
+						<View style={styles.logoutSheet}>
+							<NormalTitle
+								style={{
+									color: colors.textPrimary,
+									marginBottom: 20,
+									textAlign: "center",
+								}}
+							>
+								Are you sure you want to log out of your account?
+							</NormalTitle>
+							<View style={styles.logoutButtons}>
+								<TouchableOpacity
+									style={[
+										styles.logoutCancel,
+										{ backgroundColor: colors.secondaryMute },
+									]}
+									onPress={() => logoutSheetRef.current?.close()}
+								>
+									<BodyText style={{ color: colors.textPrimary }}>
+										Cancel
+									</BodyText>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={[
+										styles.logoutConfirm,
+										{ backgroundColor: colors.primaryRed },
+									]}
+									onPress={() => {
+										logoutSheetRef.current?.close();
+										logout();
+										router.push("/auth/login");
+									}}
+								>
+									<BodyText style={{ color: "#fff" }}>Log Out</BodyText>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</BottomSheetView>
+				</BottomSheet>
+			</ScrollView>
 		</SafeAreaView>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		padding: 16,
+		marginBottom: 55,
+	},
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		marginBottom: 24,
+	},
+	leftHeader: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
+	},
+	profileSection: {
+		alignItems: "center",
+		marginBottom: 24,
+	},
+	avatarContainer: {
+		width: 100,
+		height: 100,
+		borderRadius: 20,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	card: {
+		padding: 16,
+		borderRadius: 16,
+		marginBottom: 16,
+	},
+	coinRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+	},
+	coinLeft: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
+	},
+	coinActions: {
+		flexDirection: "row",
+		gap: 16,
+	},
+	iconCircle: {
+		width: 48,
+		height: 48,
+		borderRadius: 15,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	menu: {
+		marginTop: 8,
+	},
+	menuItem: {
+		paddingVertical: 16,
+		borderBottomWidth: 1,
+	},
+	menuItemContent: {
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	logoutSheet: {
+		padding: 20,
+	},
+	logoutButtons: {
+		flexDirection: "row",
+		gap: 12,
+	},
+	logoutCancel: {
+		flex: 1,
+		padding: 12,
+		borderRadius: 8,
+		alignItems: "center",
+	},
+	logoutConfirm: {
+		flex: 1,
+		padding: 12,
+		borderRadius: 8,
+		alignItems: "center",
+	},
+	menuContainer: {
+		marginTop: 8,
+		gap: 12,
+	},
+	menuCard: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		padding: 16,
+		borderRadius: 16,
+		marginBottom: 0, // gap handles spacing
+	},
+	menuCardContent: {
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	menuIconCircle: {
+		width: 40,
+		height: 40,
+		borderRadius: 12,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+});

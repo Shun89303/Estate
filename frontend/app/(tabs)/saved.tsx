@@ -28,8 +28,10 @@ export default function Saved() {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
-				<BackButton />
-				<PageTitle>Saved Properties</PageTitle>
+				<View style={styles.leftHeader}>
+					<BackButton />
+					<PageTitle>Saved Properties</PageTitle>
+				</View>
 				<BodyText>{savedProperties.length} saved</BodyText>
 			</View>
 
@@ -76,6 +78,11 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		borderBottomWidth: 1,
 		borderBottomColor: "#ccc",
+	},
+	leftHeader: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
 	},
 	emptyContainer: {
 		flex: 1,

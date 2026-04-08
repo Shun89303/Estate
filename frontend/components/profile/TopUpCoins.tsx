@@ -3,8 +3,8 @@ import {
 	View,
 	Text,
 	TouchableOpacity,
-	FlatList,
 	StyleSheet,
+	ScrollView,
 } from "react-native";
 
 export default function TopUpCoins() {
@@ -47,10 +47,12 @@ export default function TopUpCoins() {
 		},
 	];
 
-	const renderOneTimeCard = ({ item }: any) => (
-		<TouchableOpacity style={[styles.card, item.popular && styles.popularCard]}>
+	const renderOneTimeCard = (item: any) => (
+		<TouchableOpacity
+			key={item.title}
+			style={[styles.card, item.popular && styles.popularCard]}
+		>
 			<Text style={{ marginRight: 12 }}>🪙</Text>
-
 			<View style={{ flex: 1 }}>
 				<View
 					style={{
@@ -68,20 +70,20 @@ export default function TopUpCoins() {
 				</View>
 				<Text style={{ color: "#666", fontSize: 12 }}>{item.subtitle}</Text>
 			</View>
-
 			<Text style={{ fontWeight: "600" }}>{item.value}</Text>
 		</TouchableOpacity>
 	);
 
-	const renderSubscriptionCard = ({ item }: any) => (
-		<TouchableOpacity style={[styles.card, item.vip && styles.vipCard]}>
+	const renderSubscriptionCard = (item: any) => (
+		<TouchableOpacity
+			key={item.title}
+			style={[styles.card, item.vip && styles.vipCard]}
+		>
 			<Text style={{ marginRight: 12 }}>🪙</Text>
-
 			<View style={{ flex: 1 }}>
 				<Text style={{ fontWeight: "600", fontSize: 14 }}>{item.title}</Text>
 				<Text style={{ color: "#666", fontSize: 12 }}>{item.subtitle}</Text>
 			</View>
-
 			<View style={{ alignItems: "flex-end" }}>
 				<Text style={{ fontWeight: "600" }}>{item.value}</Text>
 				{item.subValue && (
@@ -92,7 +94,7 @@ export default function TopUpCoins() {
 	);
 
 	return (
-		<View style={{ padding: 16 }}>
+		<ScrollView style={{ padding: 16 }} showsVerticalScrollIndicator={false}>
 			{/* Header */}
 			<Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 4 }}>
 				Buy Coins
@@ -119,7 +121,6 @@ export default function TopUpCoins() {
 						One-time Packs
 					</Text>
 				</TouchableOpacity>
-
 				<TouchableOpacity
 					style={[
 						styles.toggleButton,
@@ -139,22 +140,10 @@ export default function TopUpCoins() {
 			</View>
 
 			{/* Cards */}
-			{selectedTab === "oneTime" ? (
-				<FlatList
-					data={oneTimePacks}
-					keyExtractor={(item) => item.title}
-					renderItem={renderOneTimeCard}
-					showsVerticalScrollIndicator={false}
-				/>
-			) : (
-				<FlatList
-					data={subscriptions}
-					keyExtractor={(item) => item.title}
-					renderItem={renderSubscriptionCard}
-					showsVerticalScrollIndicator={false}
-				/>
-			)}
-		</View>
+			{selectedTab === "oneTime"
+				? oneTimePacks.map((item) => renderOneTimeCard(item))
+				: subscriptions.map((item) => renderSubscriptionCard(item))}
+		</ScrollView>
 	);
 }
 

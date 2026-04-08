@@ -10,6 +10,7 @@ export const lightColors = {
 	secondaryGreen: "#EFF9F0",
 	primaryBlack: "#131620",
 	primaryRed: "#DA4138",
+	darkRed: "#FBECEB",
 	primaryBackground: "#FDF6EB", // main screen background
 	border: "#E3D8CA", // all borders
 	surface: "#F9F4EE", // cards, inputs, modals
@@ -18,7 +19,10 @@ export const lightColors = {
 	textSecondary: "#727683",
 	textTertiary: "#ABADB5",
 	primaryMute: "#EAECF0",
-	secondaryMute: "#F5F5F7",
+	secondaryMute: "hsla(240, 11%, 97%, 1.00)",
+	darkGold: "hsla(26, 17%, 92%, 1)",
+	darkerGold: "hsla(25, 28%, 87%, 1)",
+	darkerGoldBorder: "hsla(29, 11%, 85%, 1)",
 };
 
 export const darkColors = {
@@ -33,6 +37,7 @@ export const darkColors = {
 	secondaryGreen: "#EFF9F0",
 	primaryBlack: "#131620",
 	primaryRed: "#DA4138",
+	darkRed: "#FBECEB",
 	primaryBackground: "#FDF6EB", // main screen background
 	border: "#E3D8CA", // all borders
 	surface: "#F9F4EE", // cards, inputs, modals
@@ -42,6 +47,9 @@ export const darkColors = {
 	textTertiary: "#ABADB5",
 	primaryMute: "#EAECF0",
 	secondaryMute: "#F5F5F7",
+	darkGold: "hsla(26, 17%, 92%, 1)",
+	darkerGold: "hsla(25, 28%, 87%, 1)",
+	darkerGoldBorder: "hsla(29, 11%, 85%, 1)",
 };
 
 export type ThemeColors = typeof lightColors;

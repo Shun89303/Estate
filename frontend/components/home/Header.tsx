@@ -1,12 +1,9 @@
-import { useRouter } from "expo-router";
-import { View, StyleSheet, Pressable } from "react-native";
-import { Bell } from "lucide-react-native";
+import { View, StyleSheet } from "react-native";
 import { PageTitle } from "../atoms/Typography";
-import globalStyles from "@/styles/styles";
 import { useTheme } from "@/hooks/useTheme";
+import NotificationBell from "../common/NotificationBell";
 
 export default function Header() {
-	const router = useRouter();
 	const colors = useTheme();
 
 	return (
@@ -18,22 +15,7 @@ export default function Header() {
 			>
 				Pandora Property
 			</PageTitle>
-			<Pressable
-				onPress={() => router.push("/notifications")}
-				style={[styles.iconButton, globalStyles.shadows]}
-			>
-				<View style={styles.bellWrapper}>
-					<Bell size={20} color="#333" />
-					<View
-						style={[
-							styles.redDot,
-							{
-								backgroundColor: colors.primaryRed,
-							},
-						]}
-					/>
-				</View>
-			</Pressable>
+			<NotificationBell />
 		</View>
 	);
 }
