@@ -277,3 +277,4 @@ buy/sell, room rent, owner direct, off-plan, business: media carousel applied re
 
 buy/sell display page applied reusable components
 room rent display page applied reusable components
+owner direct display page applied reusable components

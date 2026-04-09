@@ -1,30 +1,19 @@
 import { useMemo, useState } from "react";
-import {
-	View,
-	TouchableOpacity,
-	FlatList,
-	Image,
-	StyleSheet,
-} from "react-native";
+import { View, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
+import { MOCK_ROOM_RENT } from "@/mock/roomRent";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import FilterSection from "@/components/common/FilterSection";
 import BackButton from "@/components/common/BackButton";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-	SmallTitle,
-} from "@/components/atoms/Typography";
+import { PageTitle } from "@/components/atoms/Typography";
 import ClearFiltersButton from "@/components/common/ClearFiltersButton";
 import FilterButton from "@/components/common/FilterButton";
 import SearchBar from "@/components/common/SearchBar";
 import { useTheme } from "@/hooks/useTheme";
 import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
-import { Calendar, MapPin, Users } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
+import RoomCard from "@/components/roomRent/RoomCard";
 
 const PROPERTY_TYPES = [
 	"All",
@@ -180,95 +169,6 @@ export default function RoomRent() {
 				/>
 			)}
 		</SafeAreaView>
-	);
-}
-
-function RoomCard({ property }: { property: RoomRentProperty }) {
-	const router = useRouter();
-	const colors = useTheme();
-
-	return (
-		<TouchableOpacity
-			onPress={() => router.push(`/roomRent/${property.id}`)}
-			activeOpacity={0.8}
-			style={styles.card}
-		>
-			{/* Left: Square Image with NEW badge overlay */}
-			<View style={styles.imageContainer}>
-				<Image source={{ uri: property.media.cover }} style={styles.image} />
-				{property.isNew && (
-					<View
-						style={[
-							styles.imageNewBadge,
-							{
-								backgroundColor: colors.primaryGold,
-							},
-						]}
-					>
-						<SmallTitle style={styles.imageNewBadgeText}>NEW</SmallTitle>
-					</View>
-				)}
-			</View>
-
-			{/* Right: Info */}
-			<View style={styles.infoContainer}>
-				<View style={styles.headerRow}>
-					<SmallTitle
-						style={{
-							color: colors.primaryGold,
-							textTransform: "uppercase",
-						}}
-					>
-						{property.propertyType}
-					</SmallTitle>
-				</View>
-
-				<NormalTitle numberOfLines={1} style={styles.title}>
-					{property.title}
-				</NormalTitle>
-
-				<View style={styles.locationRow}>
-					<MapPin size={12} color={colors.primaryGold} />
-					<BodyText style={styles.address} numberOfLines={1}>
-						{property.location.address}
-					</BodyText>
-				</View>
-
-				{/* Bottom row: stacked specs + price */}
-				<View style={styles.bottomRow}>
-					<View style={styles.specsColumn}>
-						{/* Roommate info */}
-						{property.roommateInfo && (
-							<View style={styles.specItem}>
-								<Users size={12} color={colors.textSecondary} />
-								<BodyText style={styles.specText}>
-									{property.roommateInfo.occupiedSpots}/
-									{property.roommateInfo.totalSpots}
-								</BodyText>
-							</View>
-						)}
-						{/* Contract months */}
-						{property.price.minContractMonths && (
-							<View style={styles.specItem}>
-								<Calendar size={12} color={colors.textSecondary} />
-								<BodyText style={styles.specText}>
-									{property.price.minContractMonths} mo min
-								</BodyText>
-							</View>
-						)}
-					</View>
-					<NormalTitle
-						style={{
-							fontSize: 16,
-							fontWeight: "bold",
-							color: colors.primaryGold,
-						}}
-					>
-						฿{property.price.rent.toLocaleString()}/mo
-					</NormalTitle>
-				</View>
-			</View>
-		</TouchableOpacity>
 	);
 }
 

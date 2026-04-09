@@ -1,142 +1,129 @@
 import { useRouter } from "expo-router";
-import {
-	View,
-	Text,
-	Pressable,
-	Image,
-	ScrollView,
-	StyleSheet,
-} from "react-native";
+import { View, Pressable, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRef, useMemo, useState } from "react";
-import TopUpCoins from "@/components/profile/TopUpCoins";
+import BackButton from "@/components/common/BackButton";
+import { BodyText, PageTitle, SmallTitle } from "@/components/atoms/Typography";
+import { Coins, EyeOff, Lock, LockOpen, Sparkles } from "lucide-react-native";
+import { useTheme } from "@/hooks/useTheme";
+import OwnerDirectCard from "@/components/ownerDirect/OwnerDirectCard";
+import BuyCoins from "@/components/ownerDirect/BuyCoins";
 
 export default function OwnerDirect() {
 	const router = useRouter();
+	const colors = useTheme();
 
 	const [selectedProperty, setSelectedProperty] = useState<Property | null>(
 		null,
 	);
 	const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
+	const [coinBalance, setCoinBalance] = useState(20);
+
 	const bottomSheetRef = useRef<BottomSheet>(null);
 	const topupSheetRef = useRef<BottomSheet>(null);
-
 	const snapPoints = useMemo(() => ["40%"], []);
 
 	const handleCardPress = (item: Property) => {
 		const isUnlocked = unlockedIds.includes(item.id);
-
 		if (isUnlocked) {
-			router.push(`/ownerDirect/${item.id}`); // adjust route
+			router.push(`/ownerDirect/${item.id}`);
 		} else {
 			setSelectedProperty(item);
 			bottomSheetRef.current?.expand();
 		}
 	};
 
-	const handleTopUpSheet = () => {
-		topupSheetRef.current?.expand();
-	};
+	const handleTopUpSheet = () => topupSheetRef.current?.expand();
 
 	const handleUnlock = () => {
 		if (!selectedProperty) return;
+		const cost = selectedProperty.unlockCoins;
+		if (coinBalance >= cost) {
+			setCoinBalance((prev) => prev - cost);
+			setUnlockedIds((prev) => [...prev, selectedProperty.id]);
+			bottomSheetRef.current?.close();
+		} else {
+			alert("Not enough coins. Please top up.");
+		}
+	};
 
-		setUnlockedIds((prev) => [...prev, selectedProperty.id]);
-		bottomSheetRef.current?.close();
+	const handleAddCoins = (amount: number) => {
+		setCoinBalance((prev) => prev + amount);
 	};
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			{/* HEADER */}
 			<View style={styles.header}>
-				<Pressable onPress={() => router.back()}>
-					<Ionicons name="arrow-back" size={22} />
-				</Pressable>
-
-				<Text style={styles.title}>Owner Direct</Text>
-
-				<Pressable style={styles.coins} onPress={handleTopUpSheet}>
-					<Text>🪙</Text>
-					<Text style={{ marginLeft: 4 }}>20</Text>
+				<View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+					<BackButton />
+					<PageTitle>Owner Direct</PageTitle>
+				</View>
+				<Pressable
+					style={[
+						styles.coins,
+						{
+							backgroundColor: colors.darkGold,
+							padding: 10,
+							borderWidth: 1,
+							borderRadius: 15,
+							borderColor: colors.primaryGold,
+						},
+					]}
+					onPress={handleTopUpSheet}
+				>
+					<Coins size={20} color={colors.primaryGold} />
+					<BodyText
+						style={{
+							marginLeft: 4,
+							color: colors.primaryGold,
+							fontWeight: "600",
+						}}
+					>
+						{coinBalance}
+					</BodyText>
 				</Pressable>
 			</View>
 
 			<ScrollView contentContainerStyle={{ padding: 16 }}>
 				{/* INFO BOX */}
-				<View style={styles.infoBox}>
-					<Ionicons name="sparkles" size={18} />
+				<View
+					style={[
+						styles.infoBox,
+						{
+							backgroundColor: colors.darkGold,
+							borderWidth: 1,
+							borderColor: colors.primaryGold,
+						},
+					]}
+				>
+					<Sparkles size={18} color={colors.primaryGold} />
 					<View style={{ flex: 1 }}>
-						<Text style={styles.infoTitle}>For Agents Only</Text>
-						<Text style={styles.infoText}>
+						<SmallTitle>For Agents Only</SmallTitle>
+						<BodyText>
 							Unlock owner contact info using coins. No commission sharing —
 							deal directly with owners.
-						</Text>
+						</BodyText>
 					</View>
 				</View>
 
-				{/* LIST */}
+				{/* CARDS LIST */}
 				{MOCK_OWNERDIRECT.map((item) => {
 					const isUnlocked = unlockedIds.includes(item.id);
-
 					return (
-						<Pressable
+						<OwnerDirectCard
 							key={item.id}
-							style={styles.card}
+							property={item}
+							isUnlocked={isUnlocked}
 							onPress={() => handleCardPress(item)}
-						>
-							{/* LEFT IMAGE */}
-							<View style={styles.imageWrapper}>
-								<Image
-									source={{ uri: item.media.cover }}
-									style={styles.image}
-								/>
-								<View style={styles.badge}>
-									<Text style={styles.badgeText}>OWNER</Text>
-								</View>
-							</View>
-
-							{/* RIGHT CONTENT */}
-							<View style={styles.content}>
-								<Text style={styles.type}>{item.type}</Text>
-								<Text style={styles.cardTitle}>{item.title}</Text>
-								<Text style={styles.location}>{item.location.address}</Text>
-
-								<Text style={styles.specs}>
-									{item.bedrooms} bd • {item.bathrooms} ba • {item.areaSqm} sqm
-								</Text>
-
-								{/* BOTTOM ROW */}
-								<View style={styles.bottomRow}>
-									<View style={styles.unlockRow}>
-										<Ionicons
-											name={isUnlocked ? "lock-open" : "lock-closed"}
-											size={14}
-										/>
-
-										{isUnlocked ? (
-											<Text style={{ marginLeft: 6 }}>{item.owner.phone}</Text>
-										) : (
-											<>
-												<Text>🪙</Text>
-												<Text style={{ marginLeft: 4 }}>
-													{item.unlockCoins}
-												</Text>
-											</>
-										)}
-									</View>
-
-									<Text style={styles.price}>
-										฿{item.price.toLocaleString()}
-									</Text>
-								</View>
-							</View>
-						</Pressable>
+						/>
 					);
 				})}
 			</ScrollView>
+
+			{/* UNLOCK BOTTOM SHEET */}
 			<BottomSheet
 				ref={bottomSheetRef}
 				index={-1}
@@ -145,53 +132,90 @@ export default function OwnerDirect() {
 			>
 				{selectedProperty && (
 					<BottomSheetView style={styles.sheetContent}>
-						<Ionicons name="lock-closed" size={24} />
+						<View style={{ alignItems: "center" }}>
+							<View
+								style={{
+									backgroundColor: colors.secondaryGold,
+									padding: 10,
+									borderRadius: 99,
+								}}
+							>
+								<Lock size={30} color={colors.primaryGold} />
+							</View>
+							<SmallTitle style={styles.sheetTitle}>
+								Unlock Owner Info
+							</SmallTitle>
+							<BodyText style={styles.sheetSubtitle}>
+								{selectedProperty.title}
+							</BodyText>
+						</View>
 
-						<Text style={styles.sheetTitle}>Unlock Owner Info</Text>
-						<Text style={styles.sheetSubtitle}>{selectedProperty.title}</Text>
-
-						{/* OWNER INFO BOX */}
 						<View style={styles.sheetBox}>
 							<View>
-								<Text>Owner Name</Text>
-								<Text>Phone Number</Text>
+								<BodyText>Owner Name</BodyText>
+								<BodyText>Phone Number</BodyText>
 							</View>
-
 							<View style={{ alignItems: "flex-end" }}>
 								<View style={styles.hiddenRow}>
-									<Ionicons name="eye-off" size={14} />
-									<Text style={{ marginLeft: 4 }}>Hidden</Text>
+									<EyeOff size={12} color={colors.textPrimary} />
+									<BodyText>Hidden</BodyText>
 								</View>
 								<View style={styles.hiddenRow}>
-									<Ionicons name="eye-off" size={14} />
-									<Text style={{ marginLeft: 4 }}>Hidden</Text>
+									<EyeOff size={12} color={colors.textPrimary} />
+									<BodyText>Hidden</BodyText>
 								</View>
 							</View>
 						</View>
 
-						{/* COST BOX */}
-						<View style={styles.sheetBox}>
+						<View
+							style={[
+								styles.sheetBox,
+								{
+									backgroundColor: "transparent",
+								},
+							]}
+						>
 							<View>
-								<Text>Cost</Text>
-								<Text>Your Balance</Text>
+								<BodyText>Cost</BodyText>
+								<BodyText>Your Balance</BodyText>
 							</View>
-
 							<View style={{ alignItems: "flex-end" }}>
-								<Text>{selectedProperty.unlockCoins} Coins</Text>
-								<Text>15 coins</Text>
+								<View style={styles.hiddenRow}>
+									<Coins size={12} color={colors.primaryGold} />
+									<BodyText
+										style={{
+											color: colors.primaryGold,
+										}}
+									>
+										{selectedProperty.unlockCoins} Coins
+									</BodyText>
+								</View>
+								<View style={styles.hiddenRow}>
+									<Coins size={12} color={colors.primaryGold} />
+									<BodyText>{coinBalance} coins</BodyText>
+								</View>
 							</View>
 						</View>
 
-						{/* BUTTON */}
-						<Pressable style={styles.unlockBtn} onPress={handleUnlock}>
-							<Ionicons name="lock-open" size={16} />
-							<Text style={{ marginLeft: 6 }}>
+						<Pressable
+							style={[
+								styles.unlockBtn,
+								{
+									backgroundColor: colors.primaryGold,
+								},
+							]}
+							onPress={handleUnlock}
+						>
+							<LockOpen size={12} color={"#fff"} />
+							<BodyText style={{ fontWeight: "600", color: "#fff" }}>
 								Unlock for {selectedProperty.unlockCoins} Coins
-							</Text>
+							</BodyText>
 						</Pressable>
 					</BottomSheetView>
 				)}
 			</BottomSheet>
+
+			{/* TOP‑UP BOTTOM SHEET */}
 			<BottomSheet
 				ref={topupSheetRef}
 				index={-1}
@@ -199,7 +223,11 @@ export default function OwnerDirect() {
 				enablePanDownToClose
 			>
 				<BottomSheetView>
-					<TopUpCoins />
+					<BuyCoins
+						currentBalance={coinBalance}
+						onAddCoins={handleAddCoins}
+						onClose={() => topupSheetRef.current?.close()}
+					/>
 				</BottomSheetView>
 			</BottomSheet>
 		</SafeAreaView>
@@ -213,113 +241,30 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		padding: 16,
 	},
-	title: {
-		fontSize: 16,
-		fontWeight: "600",
-	},
 	coins: {
 		flexDirection: "row",
 		alignItems: "center",
 	},
-
 	infoBox: {
 		flexDirection: "row",
 		gap: 8,
-		backgroundColor: "#f1f1f1",
 		padding: 12,
 		borderRadius: 10,
 		marginBottom: 16,
-	},
-	infoTitle: {
-		fontWeight: "600",
-		marginBottom: 4,
-	},
-	infoText: {
-		fontSize: 12,
-		color: "#666",
-	},
-
-	card: {
-		flexDirection: "row",
-		marginBottom: 16,
-	},
-
-	imageWrapper: {
-		position: "relative",
-	},
-	image: {
-		width: 100,
-		height: 100,
-		borderRadius: 8,
-	},
-	badge: {
-		position: "absolute",
-		top: 6,
-		left: 6,
-		backgroundColor: "black",
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		borderRadius: 4,
-	},
-	badgeText: {
-		color: "#fff",
-		fontSize: 10,
-	},
-
-	content: {
-		flex: 1,
-		marginLeft: 12,
-	},
-
-	type: {
-		fontSize: 10,
-		color: "#777",
-		marginBottom: 2,
-	},
-	cardTitle: {
-		fontWeight: "600",
-		marginBottom: 2,
-	},
-	location: {
-		fontSize: 12,
-		color: "#666",
-		marginBottom: 4,
-	},
-	specs: {
-		fontSize: 12,
-		color: "#444",
-		marginBottom: 6,
-	},
-
-	bottomRow: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-	},
-
-	unlockRow: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-
-	price: {
-		fontWeight: "600",
 	},
 	sheetContent: {
 		padding: 16,
 		gap: 12,
 	},
-
 	sheetTitle: {
 		fontWeight: "600",
 		fontSize: 16,
+		marginBottom: 2,
 	},
-
 	sheetSubtitle: {
 		fontSize: 12,
 		color: "#666",
 	},
-
 	sheetBox: {
 		flexDirection: "row",
 		justifyContent: "space-between",
@@ -327,19 +272,23 @@ const styles = StyleSheet.create({
 		padding: 12,
 		borderRadius: 10,
 	},
-
 	hiddenRow: {
 		flexDirection: "row",
 		alignItems: "center",
+		gap: 5,
 	},
-
 	unlockBtn: {
 		marginTop: 8,
 		padding: 12,
-		backgroundColor: "#ddd",
 		borderRadius: 8,
-		alignItems: "center",
 		flexDirection: "row",
+		alignItems: "center",
 		justifyContent: "center",
+		gap: 5,
+	},
+
+	subtitle: {
+		color: "#666",
+		fontSize: 12,
 	},
 });
