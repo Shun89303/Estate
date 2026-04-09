@@ -94,9 +94,9 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		description:
 			"Bright and clean private room in a shared apartment. 5-minute walk to BTS Thonglor. Quiet neighborhood.",
 		agent: {
-			profileImage: "agents/agent1.jpg",
+			profileImage: "http://localhost:3000/uploads/agents/agent1.jpg",
 			name: "John Doe",
-			phone: "+66 123 4567",
+			phone: "+66 89 123 4567",
 		},
 		reserveCoins: 5,
 	},
@@ -135,9 +135,9 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		description:
 			"Compact studio apartment in the heart of Sukhumvit. Ideal for single professionals.",
 		agent: {
-			profileImage: "agents/agent2.jpg",
+			profileImage: "http://localhost:3000/uploads/agents/agent2.jpg",
 			name: "Jane Smith",
-			phone: "+66 987 6543",
+			phone: "+66 89 123 4567",
 		},
 		reserveCoins: 8,
 	},
@@ -185,9 +185,9 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		description:
 			"Spacious master room with private bathroom in a shared apartment. Close to Rama 9 MRT.",
 		agent: {
-			profileImage: "agents/agent3.jpg",
+			profileImage: "http://localhost:3000/uploads/agents/agent3.jpg",
 			name: "Somchai Lee",
-			phone: "+66 555 6789",
+			phone: "+66 89 123 4567",
 		},
 		reserveCoins: 6,
 	},

@@ -1,29 +1,54 @@
+import { useEffect, useState } from "react";
 import {
 	View,
-	Text,
 	Image,
 	ScrollView,
 	TouchableOpacity,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import MediaCarousel from "@/components/common/MediaCarousel";
+import NotFound from "@/components/common/NotFound";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import {
+	Calendar,
+	Users,
+	Shield,
+	MessageCircle,
+	Coins,
+	MapPin,
+} from "lucide-react-native";
+import globalStyles from "@/styles/styles";
+import { formatPrice } from "@/utils/formatPrice";
+import { maskPhoneNumber } from "@/utils/maskPhoneNumber";
 
 export default function RoomRentDetails() {
+	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
-	const property: RoomRentProperty | undefined = MOCK_ROOM_RENT.find(
-		(r) => r.id.toString() === id,
-	);
+	const [property, setProperty] = useState<RoomRentProperty | undefined>();
+	const colors = useTheme();
 
-	if (!property) return <Text>Property not found</Text>;
+	useEffect(() => {
+		const found = MOCK_ROOM_RENT.find((r) => r.id.toString() === id);
+		setProperty(found);
+	}, [id]);
+
+	if (!property) return <NotFound title="Room Not Found" />;
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<ScrollView style={{ flex: 1 }}>
-				{/* Reusable Media Carousel */}
+		<SafeAreaView
+			style={[styles.container, { backgroundColor: colors.background }]}
+		>
+			<ScrollView>
 				<MediaCarousel
 					cover={property.media.cover}
 					images={property.media.images}
@@ -33,77 +58,153 @@ export default function RoomRentDetails() {
 				/>
 
 				{/* PROPERTY INFO */}
-				<View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
-					<View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-						<Text style={styles.propertyType}>{property.propertyType}</Text>
-						{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
-						<Text>{property.uniqueCode}</Text>
+				<View style={styles.section}>
+					<View style={styles.infoRow}>
+						<View
+							style={[
+								styles.typePill,
+								{ backgroundColor: colors.secondaryMute },
+							]}
+						>
+							<SmallTitle style={{ color: colors.primaryGold }}>
+								{property.propertyType}
+							</SmallTitle>
+						</View>
+						{property.isNew && (
+							<SmallTitle
+								style={{ color: colors.primaryRed, fontWeight: "bold" }}
+							>
+								NEW
+							</SmallTitle>
+						)}
+						<BodyText
+							style={{ color: colors.textSecondary, marginLeft: "auto" }}
+						>
+							{property.uniqueCode}
+						</BodyText>
 					</View>
 
-					<Text style={styles.title}>{property.title}</Text>
-					<Text style={styles.location}>{property.location.address}</Text>
+					<NormalTitle style={styles.title}>{property.title}</NormalTitle>
 
-					{/* Price Box */}
-					<View style={styles.priceBox}>
-						<View style={{ flex: 1 }}>
-							<Text style={styles.priceTitle}>฿{property.price.rent}/mo</Text>
-							<Text style={styles.priceSubtitle}>per month</Text>
+					{/* Address with pin */}
+					<View style={styles.locationRow}>
+						<MapPin size={14} color={colors.primaryGold} />
+						<BodyText style={styles.location}>
+							{property.location.address}
+						</BodyText>
+					</View>
+
+					{/* Combined Price & Available container */}
+					<View style={[styles.combinedBox, { backgroundColor: "#fff" }]}>
+						{/* Price part */}
+						<View style={styles.priceInnerBox}>
+							<View style={{ flex: 1 }}>
+								<PageTitle
+									style={{
+										marginBottom: 0,
+										fontSize: 20,
+										color: colors.primaryGold,
+									}}
+								>
+									฿{formatPrice(property.price.rent)}/mo
+								</PageTitle>
+								<BodyText style={styles.priceSubtitle}>per month</BodyText>
+							</View>
+							<View style={{ flex: 1 }}>
+								<NormalTitle style={styles.priceTitle}>
+									Deposit: ฿{formatPrice(property.price.deposit)}
+								</NormalTitle>
+								<BodyText style={styles.priceSubtitle}>
+									Min {property.price.minContractMonths} months contract
+								</BodyText>
+							</View>
 						</View>
-						<View style={{ flex: 1 }}>
-							<Text style={styles.priceTitle}>
-								Deposit: ฿{property.price.deposit}
-							</Text>
-							<Text style={styles.priceSubtitle}>
-								Min {property.price.minContractMonths} months contract
-							</Text>
+
+						{/* Available from */}
+						<View style={styles.availableRow}>
+							<Calendar size={14} color={colors.primaryGold} />
+							<BodyText>
+								Available from: {property.price.availableFrom}
+							</BodyText>
 						</View>
 					</View>
-					<Text style={{ marginVertical: 4 }}>
-						Available from: {property.price.availableFrom}
-					</Text>
 
-					{/* Roommate Info */}
+					{/* Roommate Info Box */}
 					{property.roommateInfo && (
-						<View style={styles.infoBox}>
-							<Text style={styles.infoTitle}>Roommate Info</Text>
-							<Text>
-								{property.roommateInfo.occupiedSpots} of{" "}
-								{property.roommateInfo.totalSpots} spots taken{" "}
-								{property.roommateInfo.preferences || ""}
-							</Text>
+						<View style={[styles.infoBox, { backgroundColor: "#fff" }]}>
+							<NormalTitle style={styles.infoTitle}>Roommate Info</NormalTitle>
+							<View style={styles.roommateRow}>
+								<Users size={16} color={colors.primaryGold} />
+								<BodyText>
+									{property.roommateInfo.occupiedSpots} of{" "}
+									{property.roommateInfo.totalSpots} spots taken
+								</BodyText>
+								{property.roommateInfo.preferences && (
+									<View
+										style={[
+											styles.preferencePill,
+											{ backgroundColor: colors.secondaryMute },
+										]}
+									>
+										<BodyText style={{ color: colors.primaryGold }}>
+											{property.roommateInfo.preferences}
+										</BodyText>
+									</View>
+								)}
+							</View>
 						</View>
 					)}
 
 					{/* Amenities */}
-					<View style={styles.infoBox}>
-						<Text style={styles.infoTitle}>Amenities</Text>
-						<Text>
+					<View style={styles.simpleBox}>
+						<NormalTitle style={styles.infoTitle}>Amenities</NormalTitle>
+						<ScrollView
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={styles.amenitiesRow}
+						>
 							{Object.keys(property.amenities)
 								.filter((k) => property.amenities[k])
-								.join(", ")}
-						</Text>
+								.map((amenity, idx) => (
+									<View
+										key={idx}
+										style={[
+											styles.amenityPill,
+											{ backgroundColor: colors.secondaryMute },
+										]}
+									>
+										<BodyText style={{ color: colors.textPrimary }}>
+											{amenity}
+										</BodyText>
+									</View>
+								))}
+						</ScrollView>
 					</View>
 
-					{/* House Rules */}
-					<View style={styles.infoBox}>
-						<Text style={styles.infoTitle}>House Rules</Text>
-						<Text>
-							{Object.keys(property.houseRules)
-								.filter((k) => property.houseRules[k])
-								.join(", ")}
-						</Text>
+					{/* House Rules (column with icons) */}
+					<View style={styles.simpleBox}>
+						<NormalTitle style={styles.infoTitle}>House Rules</NormalTitle>
+						{Object.keys(property.houseRules)
+							.filter((k) => property.houseRules[k])
+							.map((rule, idx) => (
+								<View key={idx} style={styles.ruleRow}>
+									<Shield size={14} color={colors.primaryGold} />
+									<BodyText>{rule}</BodyText>
+								</View>
+							))}
 					</View>
 
 					{/* About */}
 					{property.description && (
-						<View style={styles.infoBox}>
-							<Text style={styles.infoTitle}>About</Text>
-							<Text>{property.description}</Text>
+						<View style={styles.simpleBox}>
+							<NormalTitle style={styles.infoTitle}>About</NormalTitle>
+							<BodyText>{property.description}</BodyText>
 						</View>
 					)}
 
 					{/* Map */}
-					<View style={{ height: 200, marginVertical: 8 }}>
+					<View style={styles.simpleBox}>
+						<NormalTitle style={styles.infoTitle}>Location</NormalTitle>
 						<PropertyMap
 							markers={[
 								{
@@ -118,15 +219,17 @@ export default function RoomRentDetails() {
 						/>
 					</View>
 
-					{/* Agent */}
-					<View style={styles.agentBox}>
+					{/* Agent Box */}
+					<View style={[styles.agentBox, { backgroundColor: "#fff" }]}>
 						<Image
 							source={{ uri: property.agent.profileImage }}
 							style={styles.agentImage}
 						/>
-						<View>
-							<Text style={styles.agentName}>{property.agent.name}</Text>
-							<Text>{property.agent.phone}</Text>
+						<View style={styles.agentInfo}>
+							<NormalTitle style={styles.agentName}>
+								{property.agent.name}
+							</NormalTitle>
+							<BodyText>{maskPhoneNumber(property.agent.phone)}</BodyText>
 						</View>
 					</View>
 				</View>
@@ -135,16 +238,28 @@ export default function RoomRentDetails() {
 			{/* BOTTOM CTA */}
 			<View style={styles.ctaRow}>
 				<TouchableOpacity
-					style={[styles.ctaBtn, { backgroundColor: "#333" }]}
-					onPress={() => {}}
+					style={[
+						styles.ctaBtn,
+						{
+							backgroundColor: "#fff",
+							borderColor: colors.primaryGray + 50,
+							borderWidth: 1,
+						},
+					]}
+					onPress={() => router.push("/booking")}
 				>
-					<Text style={{ color: "#fff" }}>Consultation</Text>
+					<MessageCircle size={18} color={colors.textPrimary} />
+					<BodyText style={{ color: colors.textPrimary }}>
+						Consultation
+					</BodyText>
 				</TouchableOpacity>
 				<TouchableOpacity
-					style={[styles.ctaBtn, { backgroundColor: "#f0ad4e" }]}
-					onPress={() => {}}
+					style={[styles.ctaBtn, { backgroundColor: colors.primaryGold }]}
 				>
-					<Text>Reserve {property.reserveCoins} coins</Text>
+					<Coins size={18} color="#fff" />
+					<BodyText style={{ color: "#fff" }}>
+						Reserve {property.reserveCoins} coins
+					</BodyText>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
@@ -152,43 +267,107 @@ export default function RoomRentDetails() {
 }
 
 const styles = StyleSheet.create({
-	propertyType: { fontSize: 12, fontWeight: "500", color: "#555" },
-	newBadge: {
-		fontSize: 10,
-		color: "#fff",
-		backgroundColor: "red",
-		paddingHorizontal: 4,
-	},
-	title: { fontSize: 16, fontWeight: "600", marginVertical: 4 },
-	location: { fontSize: 12, color: "#777", marginBottom: 8 },
-	priceBox: {
+	container: { flex: 1 },
+	section: { paddingHorizontal: 16, paddingVertical: 8, gap: 16 },
+	infoRow: {
 		flexDirection: "row",
-		justifyContent: "space-between",
+		alignItems: "center",
+		flexWrap: "wrap",
+		gap: 8,
+	},
+	typePill: {
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 20,
+		alignSelf: "flex-start",
+	},
+	title: { marginVertical: 4, lineHeight: 24 },
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 6,
 		marginBottom: 4,
 	},
-	priceTitle: { fontWeight: "600" },
-	priceSubtitle: { fontSize: 12, color: "#555" },
-	infoBox: { marginVertical: 8 },
-	infoTitle: { fontWeight: "600", marginBottom: 2 },
+	location: { fontSize: 14, flexShrink: 1 },
+	combinedBox: {
+		borderRadius: 16,
+		...globalStyles.shadows,
+	},
+	priceInnerBox: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		padding: 16,
+	},
+	priceTitle: { fontWeight: "600", marginBottom: 2 },
+	priceSubtitle: { fontSize: 12 },
+	availableRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 6,
+		padding: 12,
+	},
+	infoBox: {
+		padding: 16,
+		borderRadius: 16,
+		gap: 8,
+		...globalStyles.shadows,
+	},
+	roommateRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		flexWrap: "wrap",
+		gap: 8,
+	},
+	preferencePill: {
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 20,
+	},
+	simpleBox: {
+		gap: 8,
+	},
+	infoTitle: { fontWeight: "600", fontSize: 18, marginBottom: 4 },
+	ruleRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 8,
+		marginVertical: 2,
+	},
 	agentBox: {
 		flexDirection: "row",
-		gap: 12,
 		alignItems: "center",
-		marginVertical: 8,
+		gap: 12,
+		padding: 16,
+		borderRadius: 16,
+		...globalStyles.shadows,
 	},
-	agentImage: { width: 50, height: 50, borderRadius: 25 },
-	agentName: { fontWeight: "600" },
+	agentImage: { width: 60, height: 60, borderRadius: 12 },
+	agentInfo: { flex: 1 },
+	agentName: { fontWeight: "600", marginBottom: 2 },
 	ctaRow: {
 		flexDirection: "row",
 		padding: 16,
 		gap: 12,
 		borderTopWidth: 1,
-		borderColor: "#ddd",
+		borderColor: "#eee",
 	},
 	ctaBtn: {
 		flex: 1,
-		paddingVertical: 12,
-		borderRadius: 8,
+		flexDirection: "row",
 		alignItems: "center",
+		justifyContent: "center",
+		paddingVertical: 12,
+		borderRadius: 15,
+		gap: 8,
+	},
+	amenitiesRow: {
+		flexDirection: "row",
+		gap: 8,
+	},
+	amenityPill: {
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 20,
+		marginRight: 8,
 	},
 });
