@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	View,
 	Text,
@@ -7,7 +7,7 @@ import {
 	Dimensions,
 	Pressable,
 } from "react-native";
-import { Video } from "expo-av";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { Review } from "@/mock/reviews";
 import { BodyText, SmallTitle } from "@/components/atoms/Typography";
 
@@ -16,17 +16,30 @@ const { width } = Dimensions.get("window");
 export default function ReviewCard({ review }: { review: Review }) {
 	const [isPlaying, setIsPlaying] = useState(false);
 
+	const player = useVideoPlayer("", (player) => {
+		player.loop = true;
+	});
+
+	useEffect(() => {
+		if (isPlaying && review.video) {
+			player
+				.replaceAsync(review.video)
+				.then(() => player.play())
+				.catch(console.error);
+		} else if (!isPlaying && player.playing) {
+			player.pause();
+		}
+	}, [isPlaying, review.video]);
+
 	return (
 		<View style={styles.card}>
-			{/* THUMBNAIL OR VIDEO */}
 			<View style={styles.thumbnailWrapper}>
 				{isPlaying ? (
-					<Video
-						source={{ uri: review.video }}
+					<VideoView
+						player={player}
 						style={styles.thumbnail}
-						shouldPlay
-						isLooping
-						useNativeControls
+						nativeControls
+						contentFit="cover"
 					/>
 				) : (
 					<>
@@ -45,7 +58,6 @@ export default function ReviewCard({ review }: { review: Review }) {
 				)}
 			</View>
 
-			{/* INFO: profile image + title + name & rating */}
 			<View style={styles.info}>
 				<View style={styles.row}>
 					<Image source={{ uri: review.profile_image }} style={styles.avatar} />
@@ -134,11 +146,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		flexWrap: "wrap",
-	},
-	name: {
-		fontSize: 12,
-		color: "#333",
-		fontWeight: "500",
 	},
 	dot: {
 		marginHorizontal: 6,

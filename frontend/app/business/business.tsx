@@ -1,17 +1,35 @@
-import React, { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
 	View,
-	Text,
-	Pressable,
 	FlatList,
+	StyleSheet,
+	TouchableOpacity,
 	Image,
-	TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { BusinessPropertyType, MOCK_BUSINESS } from "@/mock/business";
+import {
+	BusinessProperty,
+	BusinessPropertyType,
+	MOCK_BUSINESS,
+} from "@/mock/business";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import FilterSection from "@/components/common/FilterSection";
+import BackButton from "@/components/common/BackButton";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import ClearFiltersButton from "@/components/common/ClearFiltersButton";
+import FilterButton from "@/components/common/FilterButton";
+import SearchBar from "@/components/common/SearchBar";
+import { useTheme } from "@/hooks/useTheme";
+import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
+import EmptyState from "@/components/common/EmptyState";
+import globalStyles from "@/styles/styles";
+import { MapPin, Maximize, Users, Calendar } from "lucide-react-native";
 
 const LOCATIONS = [
 	"All",
@@ -34,18 +52,16 @@ const TYPE_FILTERS: BusinessPropertyType[] = [
 
 export default function Business() {
 	const router = useRouter();
+	const colors = useTheme();
+	const [viewMode, setViewMode] = useState<"list" | "map">("list");
 	const [showFilters, setShowFilters] = useState(false);
-	const [viewMode, setViewMode] = useState<"LIST" | "MAP">("LIST");
-
-	// Filter states
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedLocation, setSelectedLocation] = useState("All");
 	const [selectedPriceRange, setSelectedPriceRange] = useState<string>("All");
 	const [selectedType, setSelectedType] = useState<string>("All");
 
-	// Helper: check if price matches selected range
 	const matchesPriceRange = (price: number): boolean => {
-		if (selectedPriceRange === "All" || !selectedPriceRange) return true;
+		if (selectedPriceRange === "All") return true;
 		switch (selectedPriceRange) {
 			case "<฿10K":
 				return price < 10000;
@@ -60,72 +76,66 @@ export default function Business() {
 		}
 	};
 
-	// Filtered data based on all criteria
 	const filteredData = useMemo(() => {
 		return MOCK_BUSINESS.filter((item) => {
 			const matchesSearch =
 				searchQuery === "" ||
 				item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				item.location.address.toLowerCase().includes(searchQuery.toLowerCase());
-
 			const matchesLocation =
 				selectedLocation === "All" ||
 				item.location.address.includes(selectedLocation);
-
 			const matchesPrice = matchesPriceRange(item.pricing.amount);
-
 			const matchesType = selectedType === "All" || item.type === selectedType;
-
 			return matchesSearch && matchesLocation && matchesPrice && matchesType;
 		});
 	}, [searchQuery, selectedLocation, selectedPriceRange, selectedType]);
 
+	const hasActiveFilters = useMemo(() => {
+		return (
+			selectedLocation !== "All" ||
+			selectedPriceRange !== "All" ||
+			selectedType !== "All"
+		);
+	}, [selectedLocation, selectedPriceRange, selectedType]);
+
+	const clearAllFilters = () => {
+		setSelectedLocation("All");
+		setSelectedPriceRange("All");
+		setSelectedType("All");
+	};
+
+	const activeFilterCount = useMemo(() => {
+		let count = 0;
+		if (selectedLocation !== "All") count++;
+		if (selectedPriceRange !== "All") count++;
+		if (selectedType !== "All") count++;
+		return count;
+	}, [selectedLocation, selectedPriceRange, selectedType]);
+
 	return (
-		<SafeAreaView style={{ flex: 1, padding: 12 }}>
-			{/* Header */}
-			<View
-				style={{
-					flexDirection: "row",
-					justifyContent: "space-between",
-					alignItems: "center",
-				}}
-			>
-				<Pressable onPress={() => router.back()}>
-					<Text style={{ fontSize: 14, fontWeight: "500" }}>Back</Text>
-				</Pressable>
-				<Text style={{ fontSize: 16, fontWeight: "600" }}>Business Spaces</Text>
-				<Pressable onPress={() => setShowFilters(!showFilters)}>
-					<Text style={{ fontSize: 14, fontWeight: "500" }}>Filter</Text>
-				</Pressable>
+		<SafeAreaView style={{ flex: 1 }}>
+			<View style={styles.header}>
+				<View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+					<BackButton />
+					<PageTitle>Business Spaces</PageTitle>
+				</View>
+				<FilterButton
+					isOpen={showFilters}
+					activeCount={activeFilterCount}
+					onPress={() => setShowFilters((prev) => !prev)}
+				/>
 			</View>
 
-			{/* Search bar */}
-			<TextInput
-				placeholder="Search spaces"
+			<SearchBar
+				placeholder="Search by name, location or district..."
 				value={searchQuery}
 				onChangeText={setSearchQuery}
-				style={{
-					borderWidth: 1,
-					borderColor: "#ccc",
-					borderRadius: 8,
-					marginTop: 8,
-					paddingHorizontal: 12,
-					height: 40,
-				}}
+				containerStyle={{ marginHorizontal: 16, marginVertical: 8, flex: 0 }}
 			/>
 
-			{/* Expanded Filters (Location + Price) */}
 			{showFilters && (
-				<View
-					style={{
-						marginTop: 8,
-						paddingVertical: 8,
-						borderWidth: 1,
-						borderColor: "#eee",
-						borderRadius: 8,
-						paddingHorizontal: 8,
-					}}
-				>
+				<View style={{ paddingHorizontal: 16, marginTop: 8 }}>
 					<FilterSection
 						title="Location"
 						options={LOCATIONS}
@@ -133,16 +143,22 @@ export default function Business() {
 						onSelect={setSelectedLocation}
 					/>
 					<FilterSection
-						title="Price range"
+						title="Price Range"
 						options={PRICE_RANGES}
 						selected={selectedPriceRange}
 						onSelect={setSelectedPriceRange}
 					/>
+					{hasActiveFilters && (
+						<ClearFiltersButton
+							onPress={clearAllFilters}
+							iconColor={colors.primaryGold}
+							textColor={colors.primaryGold}
+						/>
+					)}
 				</View>
 			)}
 
-			{/* Type Filters (always visible) */}
-			<View style={{ marginTop: 8 }}>
+			<View style={{ paddingHorizontal: 16, marginTop: 8 }}>
 				<FilterSection
 					options={["All", ...TYPE_FILTERS].map((t) => t.replace("_", " "))}
 					selected={
@@ -160,105 +176,20 @@ export default function Business() {
 				/>
 			</View>
 
-			{/* Total spaces found + View toggle */}
-			<View
-				style={{
-					flexDirection: "row",
-					justifyContent: "space-between",
-					alignItems: "center",
-					marginVertical: 8,
-				}}
-			>
-				<Text>{filteredData.length} spaces found</Text>
-				<View style={{ flexDirection: "row" }}>
-					<Pressable
-						onPress={() => setViewMode("LIST")}
-						style={{ marginRight: 8 }}
-					>
-						<Text style={{ fontWeight: viewMode === "LIST" ? "700" : "400" }}>
-							List
-						</Text>
-					</Pressable>
-					<Pressable onPress={() => setViewMode("MAP")}>
-						<Text style={{ fontWeight: viewMode === "MAP" ? "700" : "400" }}>
-							Map
-						</Text>
-					</Pressable>
-				</View>
-			</View>
+			<ViewToggleWithCount
+				count={filteredData.length}
+				countLabel="spaces found"
+				viewMode={viewMode}
+				onViewModeChange={setViewMode}
+			/>
 
-			{/* List or Map View */}
-			{viewMode === "LIST" ? (
+			{viewMode === "list" ? (
 				<FlatList
 					data={filteredData}
 					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item }) => (
-						<Pressable onPress={() => router.push(`/business/${item.id}`)}>
-							<View
-								style={{
-									flexDirection: "row",
-									marginBottom: 12,
-									borderWidth: 1,
-									borderColor: "#eee",
-									borderRadius: 8,
-								}}
-							>
-								<View style={{ width: 100, height: 100, position: "relative" }}>
-									<Image
-										source={{ uri: item.media.cover }}
-										style={{ width: "100%", height: "100%", borderRadius: 8 }}
-									/>
-									<View
-										style={{
-											position: "absolute",
-											top: 6,
-											left: 6,
-											backgroundColor: "#000000aa",
-											paddingHorizontal: 4,
-											borderRadius: 4,
-											flexDirection: "row",
-											alignItems: "center",
-										}}
-									>
-										<Text style={{ color: "#fff", fontSize: 10 }}>
-											{item.type.replace("_", " ")}
-										</Text>
-									</View>
-								</View>
-
-								<View
-									style={{
-										flex: 1,
-										padding: 8,
-										justifyContent: "space-between",
-									}}
-								>
-									<Text style={{ fontWeight: "600" }}>{item.title}</Text>
-									<Text>{item.location.address}</Text>
-									<Text>
-										{item.areaSqm} sqm • {item.capacity} people
-									</Text>
-									<View
-										style={{
-											flexDirection: "row",
-											justifyContent: "space-between",
-										}}
-									>
-										<Text>{item.minLeaseMonths} mo</Text>
-										<Text>
-											฿{item.pricing.amount}/
-											{item.pricing.type === "MONTHLY" ? "mo" : "day"}
-										</Text>
-									</View>
-								</View>
-							</View>
-						</Pressable>
-					)}
-					ListEmptyComponent={
-						<Text style={{ textAlign: "center", marginTop: 20 }}>
-							No spaces match your filters.
-						</Text>
-					}
+					renderItem={({ item }) => <BusinessCard property={item} />}
+					contentContainerStyle={{ paddingHorizontal: 16 }}
+					ListEmptyComponent={<EmptyState />}
 				/>
 			) : (
 				<PropertyMap
@@ -276,3 +207,182 @@ export default function Business() {
 		</SafeAreaView>
 	);
 }
+
+function BusinessCard({ property }: { property: BusinessProperty }) {
+	const router = useRouter();
+	const colors = useTheme();
+	const pricingUnit = property.pricing.type === "MONTHLY" ? "mo" : "day";
+
+	const typeEmoji: Record<BusinessPropertyType, string> = {
+		OFFICE: "🏢",
+		CO_WORKING: "💻",
+		SHOP_RETAIL: "🛍️",
+		WAREHOUSE: "📦",
+		RESTAURANT: "🍽️",
+		EVENT_VENUE: "🎪",
+	};
+
+	const displayType = `${typeEmoji[property.type]} ${property.type.replace("_", " ")}`;
+
+	return (
+		<TouchableOpacity
+			onPress={() => router.push(`/business/${property.id}`)}
+			activeOpacity={0.8}
+			style={[styles.card, { backgroundColor: colors.background }]}
+		>
+			{/* Left: Square Image */}
+			<View style={styles.imageContainer}>
+				<Image source={{ uri: property.media.cover }} style={styles.image} />
+				<View
+					style={[styles.typeBadge, { backgroundColor: colors.primaryGold }]}
+				>
+					<SmallTitle style={styles.typeBadgeText}>{displayType}</SmallTitle>
+				</View>
+			</View>
+
+			{/* Right: Info – Upper + Lower */}
+			<View style={styles.infoContainer}>
+				{/* UPPER PART */}
+				<View>
+					<NormalTitle numberOfLines={1} style={styles.title}>
+						{property.title}
+					</NormalTitle>
+					<View style={styles.locationRow}>
+						<MapPin size={12} color={colors.primaryGold} />
+						<BodyText style={styles.address} numberOfLines={1}>
+							{property.location.address}
+						</BodyText>
+					</View>
+					<View style={styles.specsRow}>
+						<View style={styles.specItem}>
+							<Maximize size={12} color={colors.textSecondary} />
+							<BodyText style={styles.specText}>
+								{property.areaSqm} sqm
+							</BodyText>
+						</View>
+						<View style={styles.specItem}>
+							<Users size={12} color={colors.textSecondary} />
+							<BodyText style={styles.specText}>
+								{property.capacity} pax
+							</BodyText>
+						</View>
+					</View>
+				</View>
+
+				{/* LOWER PART */}
+				<View style={styles.bottomRow}>
+					<View style={styles.specItem}>
+						<Calendar size={12} color={colors.textSecondary} />
+						{property.minLeaseMonths ? (
+							<BodyText style={styles.specText}>
+								{property.minLeaseMonths} mo min
+							</BodyText>
+						) : (
+							<BodyText style={styles.specText}>Flexible</BodyText>
+						)}
+					</View>
+					<NormalTitle
+						style={{
+							fontSize: 16,
+							fontWeight: "bold",
+							color: colors.primaryGold,
+						}}
+					>
+						฿{property.pricing.amount.toLocaleString()}/{pricingUnit}
+					</NormalTitle>
+				</View>
+			</View>
+		</TouchableOpacity>
+	);
+}
+
+const styles = StyleSheet.create({
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+	},
+
+	// Card styles
+	card: {
+		flexDirection: "row",
+		borderRadius: 12,
+		marginBottom: 12,
+		overflow: "hidden",
+		...globalStyles.shadows,
+	},
+	imageContainer: {
+		width: 130,
+		alignSelf: "stretch",
+		position: "relative",
+	},
+	image: {
+		flex: 1,
+		width: "100%",
+		resizeMode: "cover",
+	},
+	typeBadge: {
+		position: "absolute",
+		top: 8,
+		left: 8,
+		paddingHorizontal: 6,
+		paddingVertical: 2,
+		borderRadius: 99,
+	},
+	typeBadgeText: {
+		color: "#fff",
+		fontSize: 10,
+		fontWeight: "bold",
+	},
+	infoContainer: {
+		flex: 1,
+		padding: 10,
+		justifyContent: "space-between",
+		paddingVertical: 20,
+	},
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 4,
+	},
+	title: {
+		marginBottom: 4,
+		lineHeight: 20,
+	},
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 8,
+	},
+	address: {
+		marginLeft: 4,
+		fontSize: 12,
+		flexShrink: 1,
+	},
+	bottomRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginTop: 8,
+	},
+	specsRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
+		marginTop: 4,
+	},
+	specsColumn: {
+		flexDirection: "column",
+		gap: 4,
+	},
+	specItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	specText: {
+		fontSize: 12,
+	},
+});

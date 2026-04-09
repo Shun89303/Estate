@@ -6,6 +6,7 @@ import { MOCK_OFFPLAN } from "@/mock/offPlan";
 import { SafeAreaView } from "react-native-safe-area-context";
 import OffPlanCard from "@/components/offPlan/OffPlanCard";
 import globalStyles from "@/styles/styles";
+import EmptyState from "@/components/common/EmptyState";
 
 export default function OffPlan() {
 	const colors = useTheme();
@@ -29,6 +30,7 @@ export default function OffPlan() {
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={({ item }) => <OffPlanCard property={item} />}
 				contentContainerStyle={{ padding: 16, ...globalStyles.shadows }}
+				ListEmptyComponent={<EmptyState title="No projects found" />}
 			/>
 		</SafeAreaView>
 	);

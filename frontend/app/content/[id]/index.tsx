@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	View,
 	Text,
@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Video } from "expo-av";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { ArticleContent, MOCK_CONTENTS, VideoContent } from "@/mock/contents";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -23,6 +23,23 @@ export default function ContentDetails() {
 
 	const [saved, setSaved] = useState(content?.saved || false);
 	const [liked, setLiked] = useState(false);
+
+	// For video content, create a player
+	const videoUrl =
+		content?.type === "video" ? (content as VideoContent).videoUrl : "";
+	const player = useVideoPlayer(videoUrl, (player) => {
+		player.loop = false;
+	});
+
+	// Replace player source when content changes
+	useEffect(() => {
+		if (content?.type === "video" && videoUrl) {
+			player
+				.replaceAsync(videoUrl)
+				.then(() => (player.loop = true))
+				.catch(console.error);
+		}
+	}, [content?.type, videoUrl]);
 
 	if (!content) {
 		return (
@@ -51,11 +68,11 @@ export default function ContentDetails() {
 							style={styles.heroImage}
 						/>
 					) : (
-						<Video
-							source={{ uri: (content as VideoContent).videoUrl }}
+						<VideoView
+							player={player}
 							style={styles.heroImage}
-							useNativeControls
-							isLooping
+							nativeControls
+							contentFit="cover"
 						/>
 					)}
 

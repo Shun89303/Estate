@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	View,
 	Text,
@@ -8,7 +8,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 } from "react-native";
-import { Video } from "expo-av";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { Heart, Share2, Image as ImageIcon } from "lucide-react-native";
 import BackButton from "./BackButton";
 import { useTheme } from "@/hooks/useTheme";
@@ -47,6 +47,7 @@ export default function MediaCarousel({
 	style,
 }: MediaCarouselProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
+
 	const colors = useTheme();
 
 	const mediaItems = [cover, ...images, ...videos];
@@ -55,15 +56,36 @@ export default function MediaCarousel({
 	const photoCount = images.length + hasCover;
 	const videoCount = videos.length;
 
+	// Create video player for the currently active video
+	const currentVideoUrl = isVideo(activeIndex) ? mediaItems[activeIndex] : null;
+	const player = useVideoPlayer(currentVideoUrl || "", (player) => {
+		player.loop = true;
+	});
+
+	// Reset player when active index changes to a video
+	useEffect(() => {
+		if (currentVideoUrl) {
+			player
+				.replaceAsync(currentVideoUrl)
+				.then(() => {
+					player.play();
+				})
+				.catch((error) => {
+					console.error("Failed to load video:", error);
+				});
+			player.loop = true;
+		}
+	}, [activeIndex, currentVideoUrl, player]);
+
 	return (
 		<View style={[styles.container, style]}>
 			<View style={styles.carouselContainer}>
 				{isVideo(activeIndex) ? (
-					<Video
-						source={{ uri: mediaItems[activeIndex] }}
+					<VideoView
+						player={player}
 						style={styles.carouselImage}
-						useNativeControls
-						isLooping
+						nativeControls
+						contentFit="cover"
 					/>
 				) : (
 					<Image
@@ -91,18 +113,12 @@ export default function MediaCarousel({
 					)}
 				</View>
 
-				{/* OFF‑PLAN OVERLAY with Typography */}
+				{/* OFF‑PLAN OVERLAY (unchanged) */}
 				{isOffPlan && offPlanData && (
 					<View style={styles.offPlanOverlay}>
-						{/* Top row: badge left, code right */}
 						<View style={styles.offPlanTopRow}>
 							<View
-								style={[
-									styles.badge,
-									{
-										backgroundColor: colors.primaryGold,
-									},
-								]}
+								style={[styles.badge, { backgroundColor: colors.primaryGold }]}
 							>
 								<SmallTitle style={styles.badgeText}>OFF-PLAN</SmallTitle>
 							</View>
@@ -110,7 +126,6 @@ export default function MediaCarousel({
 								{offPlanData.uniqueCode}
 							</BodyText>
 						</View>
-
 						<NormalTitle style={styles.offPlanTitle}>
 							{offPlanData.title}
 						</NormalTitle>
@@ -188,6 +203,7 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		backgroundColor: "rgba(0,0,0,0.3)",
 		zIndex: 5,
+		pointerEvents: "none",
 	},
 	backButton: {
 		position: "absolute",
@@ -311,4 +327,27 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	playText: { color: "#fff", fontSize: 10 },
+	videoContainer: {
+		width: "100%",
+		height: "100%",
+		position: "relative",
+	},
+	customPlayButton: {
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		transform: [{ translateX: -20 }, { translateY: -20 }],
+		backgroundColor: "rgba(0,0,0,0.6)",
+		width: 40,
+		height: 40,
+		borderRadius: 20,
+		justifyContent: "center",
+		alignItems: "center",
+		zIndex: 20,
+	},
+	playIcon: {
+		color: "#fff",
+		fontSize: 20,
+		marginLeft: 3, // slight offset for visual centering
+	},
 });

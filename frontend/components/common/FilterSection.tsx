@@ -45,6 +45,7 @@ export default function FilterSection({
 						key={opt}
 						style={[
 							styles.filterBtn,
+							{ backgroundColor: colors.primaryGray + 20 },
 							selected === opt && {
 								backgroundColor: colors.primaryGold,
 							},
@@ -70,10 +71,9 @@ const styles = StyleSheet.create({
 		marginBottom: 12,
 	},
 	filterBtn: {
-		backgroundColor: "#eee",
 		paddingVertical: 6,
 		paddingHorizontal: 12,
-		borderRadius: 6,
+		borderRadius: 10,
 		marginRight: 8,
 	},
 	filterTextActive: {

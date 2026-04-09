@@ -14,6 +14,7 @@ import { useTheme } from "@/hooks/useTheme";
 import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
 import globalStyles from "@/styles/styles";
 import RoomCard from "@/components/roomRent/RoomCard";
+import EmptyState from "@/components/common/EmptyState";
 
 const PROPERTY_TYPES = [
 	"All",
@@ -154,6 +155,7 @@ export default function RoomRent() {
 					data={filteredRooms}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={({ item }) => <RoomCard property={item} />}
+					ListEmptyComponent={<EmptyState title="No rooms found" />}
 				/>
 			) : (
 				<PropertyMap

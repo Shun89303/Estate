@@ -1,5 +1,11 @@
 import { useRouter } from "expo-router";
-import { View, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+	View,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	FlatList,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
@@ -10,6 +16,7 @@ import { Coins, EyeOff, Lock, LockOpen, Sparkles } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import OwnerDirectCard from "@/components/ownerDirect/OwnerDirectCard";
 import BuyCoins from "@/components/ownerDirect/BuyCoins";
+import EmptyState from "@/components/common/EmptyState";
 
 export default function OwnerDirect() {
 	const router = useRouter();
@@ -110,17 +117,23 @@ export default function OwnerDirect() {
 				</View>
 
 				{/* CARDS LIST */}
-				{MOCK_OWNERDIRECT.map((item) => {
-					const isUnlocked = unlockedIds.includes(item.id);
-					return (
-						<OwnerDirectCard
-							key={item.id}
-							property={item}
-							isUnlocked={isUnlocked}
-							onPress={() => handleCardPress(item)}
-						/>
-					);
-				})}
+				<FlatList
+					scrollEnabled={false}
+					data={MOCK_OWNERDIRECT}
+					keyExtractor={(item) => item.id.toString()}
+					renderItem={({ item }) => {
+						const isUnlocked = unlockedIds.includes(item.id);
+						return (
+							<OwnerDirectCard
+								key={item.id}
+								property={item}
+								isUnlocked={isUnlocked}
+								onPress={() => handleCardPress(item)}
+							/>
+						);
+					}}
+					ListEmptyComponent={<EmptyState title="No properties found" />}
+				/>
 			</ScrollView>
 
 			{/* UNLOCK BOTTOM SHEET */}
