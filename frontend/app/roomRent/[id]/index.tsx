@@ -1,99 +1,36 @@
-import { useState } from "react";
 import {
 	View,
 	Text,
-	Pressable,
 	Image,
 	ScrollView,
 	TouchableOpacity,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { Video } from "expo-av";
+import { useLocalSearchParams } from "expo-router";
 import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
 import { PropertyMap } from "@/components/common/PropertyMap";
+import MediaCarousel from "@/components/common/MediaCarousel";
 
 export default function RoomRentDetails() {
-	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const property: RoomRentProperty | undefined = MOCK_ROOM_RENT.find(
 		(r) => r.id.toString() === id,
 	);
 
-	const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-
 	if (!property) return <Text>Property not found</Text>;
-
-	const mediaItems = [
-		property.media.cover,
-		...property.media.images,
-		...property.media.videos,
-	];
-	const isVideo = (index: number) => index === mediaItems.length - 1;
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			{/* HEADER */}
-			<View style={styles.header}>
-				<Pressable onPress={() => router.back()}>
-					<Ionicons name="arrow-back" size={24} />
-				</Pressable>
-				<View style={{ flexDirection: "row", gap: 16 }}>
-					<Ionicons name="share-social-outline" size={24} />
-					<Ionicons name="heart-outline" size={24} />
-				</View>
-			</View>
-
 			<ScrollView style={{ flex: 1 }}>
-				{/* MEDIA CAROUSEL */}
-				<View style={styles.carouselContainer}>
-					{isVideo(activeMediaIndex) ? (
-						<Video
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							useNativeControls
-						/>
-					) : (
-						<Image
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							resizeMode="contain"
-						/>
-					)}
-
-					{/* MEDIA NAVIGATION */}
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						style={styles.mediaNav}
-					>
-						{mediaItems.map((item, idx) => (
-							<TouchableOpacity
-								key={idx}
-								onPress={() => setActiveMediaIndex(idx)}
-								style={[
-									styles.mediaThumb,
-									activeMediaIndex === idx && styles.activeMediaThumb,
-								]}
-							>
-								<Image
-									source={{ uri: item }}
-									style={{ width: 50, height: 50, borderRadius: 4 }}
-								/>
-								{isVideo(idx) && (
-									<Ionicons
-										name="play-circle"
-										size={20}
-										color="white"
-										style={{ position: "absolute", top: 15, left: 15 }}
-									/>
-								)}
-							</TouchableOpacity>
-						))}
-					</ScrollView>
-				</View>
+				{/* Reusable Media Carousel */}
+				<MediaCarousel
+					cover={property.media.cover}
+					images={property.media.images}
+					videos={property.media.videos}
+					onLike={() => console.log("Like")}
+					onShare={() => console.log("Share")}
+				/>
 
 				{/* PROPERTY INFO */}
 				<View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
@@ -215,18 +152,6 @@ export default function RoomRentDetails() {
 }
 
 const styles = StyleSheet.create({
-	header: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		paddingHorizontal: 16,
-		paddingVertical: 8,
-		alignItems: "center",
-	},
-	carouselContainer: { width: "100%", height: 250 },
-	carouselImage: { width: "100%", height: "100%" },
-	mediaNav: { position: "absolute", bottom: 8, left: 16, flexDirection: "row" },
-	mediaThumb: { marginRight: 8, borderWidth: 1, borderColor: "#ccc" },
-	activeMediaThumb: { borderColor: "#333", borderWidth: 2 },
 	propertyType: { fontSize: 12, fontWeight: "500", color: "#555" },
 	newBadge: {
 		fontSize: 10,

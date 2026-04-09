@@ -3,9 +3,11 @@ import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
 import { BedDouble, Bath, Maximize, MapPin } from "lucide-react-native";
 import { Property } from "@/mock/buySell";
 import { BodyText, PageTitle, SmallTitle } from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function HomePropertyCard({ property }: { property: Property }) {
 	const router = useRouter();
+	const colors = useTheme();
 
 	return (
 		<TouchableOpacity
@@ -19,29 +21,47 @@ export default function HomePropertyCard({ property }: { property: Property }) {
 					source={{ uri: property.media.cover }}
 					style={styles.coverImage}
 				/>
-				{property.isNew && <SmallTitle style={styles.newBadge}>NEW</SmallTitle>}
+
+				{/* Dark overlay for better text contrast */}
+				<View style={styles.overlay} />
+
+				{property.isNew && (
+					<SmallTitle
+						style={{
+							backgroundColor: colors.primaryGold,
+							position: "absolute",
+							top: 10,
+							left: 10,
+							color: "#fff",
+							paddingHorizontal: 8,
+							paddingVertical: 4,
+							borderRadius: 99,
+							fontSize: 12,
+							fontWeight: "bold",
+							zIndex: 1,
+						}}
+					>
+						NEW
+					</SmallTitle>
+				)}
+
 				<View style={styles.priceContainer}>
-					<PageTitle style={styles.price}>
+					<PageTitle style={styles.priceText}>
 						฿{property.price.toLocaleString()}
 					</PageTitle>
 				</View>
 			</View>
 
-			{/* BOTTOM SIDE */}
+			{/* BOTTOM SIDE (unchanged) */}
 			<View style={styles.bottomSide}>
 				<SmallTitle>{property.title}</SmallTitle>
-
-				{/* Location with icon */}
 				<View style={styles.locationRow}>
 					<MapPin size={14} color="#da9a0fff" />
 					<BodyText style={styles.locationText}>
 						{property.location.address}
 					</BodyText>
 				</View>
-
 				<View style={styles.divider} />
-
-				{/* Specs row with Lucide icons */}
 				<View style={styles.specsRow}>
 					<View style={styles.specItem}>
 						<BedDouble size={14} color="#555" />
@@ -76,28 +96,24 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "100%",
 	},
-	newBadge: {
+	overlay: {
 		position: "absolute",
-		top: 10,
-		left: 10,
-		backgroundColor: "#da9a0fff",
-		color: "#fff",
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-		borderRadius: 4,
-		fontSize: 12,
-		fontWeight: "bold",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: "rgba(0,0,0,0.25)", // dark semi‑transparent
 	},
 	priceContainer: {
 		position: "absolute",
-		bottom: 10,
-		left: 10,
-		backgroundColor: "rgba(0,0,0,0.6)",
+		bottom: 0,
+		left: 0,
 		paddingHorizontal: 8,
 		paddingVertical: 4,
 		borderRadius: 4,
+		zIndex: 1,
 	},
-	price: {
+	priceText: {
 		color: "#fff",
 	},
 	bottomSide: {

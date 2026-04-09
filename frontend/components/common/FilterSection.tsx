@@ -1,28 +1,45 @@
 import { useTheme } from "@/hooks/useTheme";
-import {
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { BodyText, SmallTitle } from "../atoms/Typography";
 
 export default function FilterSection({
 	title,
 	options,
 	selected,
 	onSelect,
+	titleColor,
+	showsHorizontalScrollIndicator,
 }: {
 	title?: string;
 	options: string[];
 	selected: string;
 	onSelect: (value: string) => void;
+	titleColor?: string;
+	showsHorizontalScrollIndicator?: boolean;
 }) {
 	const colors = useTheme();
 	return (
 		<View style={styles.filterSection}>
-			{title && <Text style={styles.filterTitle}>{title}</Text>}
-			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+			{title && (
+				<SmallTitle
+					style={{
+						fontWeight: "bold",
+						marginBottom: 6,
+						color: titleColor ? titleColor : colors.primaryGray,
+						textTransform: "uppercase",
+					}}
+				>
+					{title}
+				</SmallTitle>
+			)}
+			<ScrollView
+				horizontal
+				showsHorizontalScrollIndicator={
+					showsHorizontalScrollIndicator
+						? showsHorizontalScrollIndicator
+						: false
+				}
+			>
 				{options.map((opt) => (
 					<TouchableOpacity
 						key={opt}
@@ -34,11 +51,13 @@ export default function FilterSection({
 						]}
 						onPress={() => onSelect(opt)}
 					>
-						<Text
-							style={selected === opt ? styles.filterTextActive : undefined}
+						<BodyText
+							style={
+								selected === opt ? styles.filterTextActive : { color: "black" }
+							}
 						>
 							{opt}
-						</Text>
+						</BodyText>
 					</TouchableOpacity>
 				))}
 			</ScrollView>
@@ -49,10 +68,6 @@ export default function FilterSection({
 const styles = StyleSheet.create({
 	filterSection: {
 		marginBottom: 12,
-	},
-	filterTitle: {
-		fontWeight: "bold",
-		marginBottom: 6,
 	},
 	filterBtn: {
 		backgroundColor: "#eee",

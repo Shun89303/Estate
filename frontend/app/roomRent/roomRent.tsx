@@ -1,19 +1,30 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
 	View,
-	Text,
 	TouchableOpacity,
-	TextInput,
 	FlatList,
 	Image,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import FilterSection from "@/components/common/FilterSection";
+import BackButton from "@/components/common/BackButton";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import ClearFiltersButton from "@/components/common/ClearFiltersButton";
+import FilterButton from "@/components/common/FilterButton";
+import SearchBar from "@/components/common/SearchBar";
+import { useTheme } from "@/hooks/useTheme";
+import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
+import { Calendar, MapPin, Users } from "lucide-react-native";
+import globalStyles from "@/styles/styles";
 
 const PROPERTY_TYPES = [
 	"All",
@@ -27,6 +38,7 @@ const PRICE_RANGES = ["Any", "<฿5K", "฿5-8K", "฿8-12K", "฿12K+"];
 
 export default function RoomRent() {
 	const router = useRouter();
+	const colors = useTheme();
 	const [viewMode, setViewMode] = useState<"list" | "map">("list");
 	const [searchText, setSearchText] = useState("");
 	const [activeType, setActiveType] = useState("All");
@@ -55,26 +67,56 @@ export default function RoomRent() {
 		return matchesSearch && matchesType && matchesLocation && matchesPrice;
 	});
 
+	const hasActiveFilters = useMemo(() => {
+		return (
+			activeLocation !== "All" || activePrice !== "Any" || activeType !== "All"
+		);
+	}, [activeLocation, activePrice, activeType]);
+
+	const clearAllFilters = () => {
+		setActiveLocation("All");
+		setActivePrice("Any");
+		setActiveType("All");
+	};
+
+	const activeFilterCount = useMemo(() => {
+		let count = 0;
+		if (activeLocation !== "All") count++;
+		if (activePrice !== "Any") count++;
+		if (activeType !== "All") count++;
+		return count;
+	}, [activeLocation, activePrice, activeType]);
+
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			<View style={styles.header}>
-				<TouchableOpacity onPress={() => router.back()}>
-					<Text style={styles.backBtn}>Back</Text>
-				</TouchableOpacity>
-				<Text style={styles.title}>Room Renting</Text>
-				<TouchableOpacity onPress={() => setShowFilters((prev) => !prev)}>
-					<Ionicons name="filter" size={24} color="#333" />
-				</TouchableOpacity>
-			</View>
-
-			<View style={styles.searchContainer}>
-				<TextInput
-					placeholder="Search rooms..."
-					value={searchText}
-					onChangeText={setSearchText}
-					style={styles.searchInput}
+				<View
+					style={{
+						flexDirection: "row",
+						alignItems: "flex-end",
+					}}
+				>
+					<BackButton />
+					<PageTitle>Room Renting</PageTitle>
+				</View>
+				<FilterButton
+					isOpen={showFilters}
+					activeCount={activeFilterCount}
+					onPress={() => setShowFilters((prev) => !prev)}
 				/>
 			</View>
+
+			{/* Reusable SearchBar */}
+			<SearchBar
+				placeholder="Search by room name or location..."
+				value={searchText}
+				onChangeText={setSearchText}
+				containerStyle={{
+					marginHorizontal: 16,
+					marginVertical: 8,
+					flex: 0,
+				}}
+			/>
 
 			{/* Conditional Filters (Location & Price) */}
 			{showFilters && (
@@ -91,6 +133,13 @@ export default function RoomRent() {
 						selected={activePrice}
 						onSelect={setActivePrice}
 					/>
+					{hasActiveFilters && (
+						<ClearFiltersButton
+							onPress={clearAllFilters}
+							iconColor={colors.primaryGold}
+							textColor={colors.primaryGold}
+						/>
+					)}
 				</View>
 			)}
 
@@ -103,23 +152,13 @@ export default function RoomRent() {
 				/>
 			</View>
 
-			<View style={styles.toggleRowWithCount}>
-				<Text style={styles.totalCount}>
-					{filteredRooms.length} rooms found
-				</Text>
-				<View style={styles.toggleRow}>
-					<TouchableOpacity onPress={() => setViewMode("list")}>
-						<Text style={viewMode === "list" ? styles.active : undefined}>
-							List
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => setViewMode("map")}>
-						<Text style={viewMode === "map" ? styles.active : undefined}>
-							Map
-						</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
+			{/* TOGGLE + TOTAL */}
+			<ViewToggleWithCount
+				count={filteredRooms.length}
+				countLabel="rooms found"
+				viewMode={viewMode}
+				onViewModeChange={setViewMode}
+			/>
 
 			{viewMode === "list" ? (
 				<FlatList
@@ -146,31 +185,87 @@ export default function RoomRent() {
 
 function RoomCard({ property }: { property: RoomRentProperty }) {
 	const router = useRouter();
+	const colors = useTheme();
+
 	return (
-		<TouchableOpacity onPress={() => router.push(`/roomRent/${property.id}`)}>
-			<View style={styles.card}>
-				{property.isNew && <Text style={styles.newBadge}>NEW</Text>}
-				<Image
-					source={{ uri: property.media.cover }}
-					style={styles.cardImage}
-					resizeMode="cover"
-				/>
-				<View style={styles.cardInfo}>
-					<Text style={styles.propertyType}>{property.propertyType}</Text>
-					<Text style={styles.propertyTitle}>{property.title}</Text>
-					<Text style={styles.propertyLocation}>
+		<TouchableOpacity
+			onPress={() => router.push(`/roomRent/${property.id}`)}
+			activeOpacity={0.8}
+			style={styles.card}
+		>
+			{/* Left: Square Image with NEW badge overlay */}
+			<View style={styles.imageContainer}>
+				<Image source={{ uri: property.media.cover }} style={styles.image} />
+				{property.isNew && (
+					<View
+						style={[
+							styles.imageNewBadge,
+							{
+								backgroundColor: colors.primaryGold,
+							},
+						]}
+					>
+						<SmallTitle style={styles.imageNewBadgeText}>NEW</SmallTitle>
+					</View>
+				)}
+			</View>
+
+			{/* Right: Info */}
+			<View style={styles.infoContainer}>
+				<View style={styles.headerRow}>
+					<SmallTitle
+						style={{
+							color: colors.primaryGold,
+							textTransform: "uppercase",
+						}}
+					>
+						{property.propertyType}
+					</SmallTitle>
+				</View>
+
+				<NormalTitle numberOfLines={1} style={styles.title}>
+					{property.title}
+				</NormalTitle>
+
+				<View style={styles.locationRow}>
+					<MapPin size={12} color={colors.primaryGold} />
+					<BodyText style={styles.address} numberOfLines={1}>
 						{property.location.address}
-					</Text>
-					{property.roommateInfo && (
-						<Text style={styles.propertyDetails}>
-							Roommates: {property.roommateInfo.occupiedSpots}/
-							{property.roommateInfo.totalSpots}
-						</Text>
-					)}
-					<Text style={styles.propertyDetails}>
-						{property.price.minContractMonths} months min - ฿
-						{property.price.rent}/mo
-					</Text>
+					</BodyText>
+				</View>
+
+				{/* Bottom row: stacked specs + price */}
+				<View style={styles.bottomRow}>
+					<View style={styles.specsColumn}>
+						{/* Roommate info */}
+						{property.roommateInfo && (
+							<View style={styles.specItem}>
+								<Users size={12} color={colors.textSecondary} />
+								<BodyText style={styles.specText}>
+									{property.roommateInfo.occupiedSpots}/
+									{property.roommateInfo.totalSpots}
+								</BodyText>
+							</View>
+						)}
+						{/* Contract months */}
+						{property.price.minContractMonths && (
+							<View style={styles.specItem}>
+								<Calendar size={12} color={colors.textSecondary} />
+								<BodyText style={styles.specText}>
+									{property.price.minContractMonths} mo min
+								</BodyText>
+							</View>
+						)}
+					</View>
+					<NormalTitle
+						style={{
+							fontSize: 16,
+							fontWeight: "bold",
+							color: colors.primaryGold,
+						}}
+					>
+						฿{property.price.rent.toLocaleString()}/mo
+					</NormalTitle>
 				</View>
 			</View>
 		</TouchableOpacity>
@@ -185,8 +280,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 8,
 	},
-	backBtn: { fontSize: 14, fontWeight: "500" },
-	title: { fontSize: 16, fontWeight: "600" },
 	searchContainer: { paddingHorizontal: 16, paddingVertical: 8 },
 	searchInput: {
 		borderWidth: 1,
@@ -205,29 +298,84 @@ const styles = StyleSheet.create({
 	totalCount: { fontWeight: "bold" },
 	toggleRow: { flexDirection: "row", gap: 16 },
 	active: { fontWeight: "bold", textDecorationLine: "underline" },
-	card: {
-		flexDirection: "row",
-		padding: 12,
-		borderBottomWidth: 1,
-		borderColor: "#ddd",
-		alignItems: "center",
-	},
-	newBadge: {
-		position: "absolute",
-		top: 8,
-		left: 8,
-		backgroundColor: "red",
-		color: "#fff",
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		borderRadius: 4,
-		fontSize: 10,
-		zIndex: 1,
-	},
 	cardImage: { width: 100, height: 80, borderRadius: 6 },
 	cardInfo: { marginLeft: 12, flex: 1 },
 	propertyType: { fontSize: 12, fontWeight: "500", color: "#555" },
 	propertyTitle: { fontSize: 14, fontWeight: "600" },
 	propertyLocation: { fontSize: 12, color: "#777", marginVertical: 2 },
 	propertyDetails: { fontSize: 12, color: "#555" },
+	card: {
+		flexDirection: "row",
+		backgroundColor: "#fff",
+		borderRadius: 12,
+		marginHorizontal: 16,
+		marginBottom: 12,
+		overflow: "hidden",
+		...globalStyles.shadows,
+	},
+	imageContainer: {
+		width: 130,
+		alignSelf: "stretch",
+		position: "relative",
+	},
+	image: {
+		flex: 1,
+		width: "100%",
+		resizeMode: "cover",
+	},
+	imageNewBadge: {
+		position: "absolute",
+		top: 8,
+		left: 8,
+		paddingHorizontal: 6,
+		paddingVertical: 2,
+		borderRadius: 99,
+	},
+	imageNewBadgeText: {
+		color: "#fff",
+		fontSize: 10,
+		fontWeight: "bold",
+	},
+	infoContainer: {
+		flex: 1,
+		padding: 10,
+		justifyContent: "space-between",
+		paddingVertical: 20,
+	},
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 4,
+	},
+	title: {
+		marginBottom: 4,
+		lineHeight: 20,
+	},
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 8,
+	},
+	address: {
+		marginLeft: 4,
+		fontSize: 12,
+		flexShrink: 1,
+	},
+	bottomRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "flex-end",
+	},
+	specsColumn: {
+		flexDirection: "column",
+		gap: 4,
+	},
+	specItem: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	specText: {
+		fontSize: 12,
+	},
 });

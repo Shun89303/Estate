@@ -5,18 +5,15 @@ import {
 	Pressable,
 	Image,
 	ScrollView,
-	TouchableOpacity,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { Video } from "expo-av";
+import { useLocalSearchParams } from "expo-router";
 import { MOCK_OFFPLAN, OffPlanProperty, UnitType } from "@/mock/offPlan";
 import { PropertyMap } from "@/components/common/PropertyMap";
+import MediaCarousel from "@/components/common/MediaCarousel";
 
 export default function OffPlanDetails() {
-	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const [unitFilter, setUnitFilter] = useState<string>("All");
 
@@ -24,21 +21,12 @@ export default function OffPlanDetails() {
 		(p) => p.id.toString() === id,
 	);
 
-	const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 	const [activeTab, setActiveTab] = useState<"Units" | "Payment" | "Trust">(
 		"Units",
 	);
 	const [selectedUnit, setSelectedUnit] = useState<UnitType | null>(null);
 
 	if (!property) return <Text>Not found</Text>;
-
-	const mediaItems = [
-		property.media.cover,
-		...property.media.images,
-		...property.media.videos,
-	];
-
-	const isVideo = (index: number) => index === mediaItems.length - 1;
 
 	const availableUnitsCount = property.units.filter(
 		(u) => u.status === "Available",
@@ -57,68 +45,21 @@ export default function OffPlanDetails() {
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			{/* HEADER */}
-			<View style={styles.header}>
-				<Pressable onPress={() => router.back()}>
-					<Ionicons name="arrow-back" size={24} />
-				</Pressable>
-				<View style={{ flexDirection: "row", gap: 16 }}>
-					<Ionicons name="share-social-outline" size={24} />
-					<Ionicons name="heart-outline" size={24} />
-				</View>
-			</View>
-
 			<ScrollView>
-				{/* CAROUSEL */}
-				<View style={styles.carouselContainer}>
-					{isVideo(activeMediaIndex) ? (
-						<Video
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							useNativeControls
-						/>
-					) : (
-						<Image
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-						/>
-					)}
-
-					{/* OVERLAY */}
-					<View style={styles.overlay}>
-						<Text style={styles.badge}>OFF-PLAN</Text>
-						<Text>{property.uniqueCode}</Text>
-						<Text style={styles.overlayTitle}>{property.title}</Text>
-						<Text style={styles.overlaySub}>{property.developerName}</Text>
-					</View>
-
-					{/* NAVIGATOR */}
-					<ScrollView horizontal style={styles.mediaNav}>
-						{mediaItems.map((item, idx) => (
-							<TouchableOpacity
-								key={idx}
-								onPress={() => setActiveMediaIndex(idx)}
-								style={[
-									styles.thumb,
-									activeMediaIndex === idx && styles.activeThumb,
-								]}
-							>
-								<Image
-									source={{ uri: item }}
-									style={{ width: 50, height: 50 }}
-								/>
-								{isVideo(idx) && (
-									<Ionicons
-										name="play-circle"
-										size={18}
-										color="#fff"
-										style={styles.playIcon}
-									/>
-								)}
-							</TouchableOpacity>
-						))}
-					</ScrollView>
-				</View>
+				{/* Reusable Media Carousel */}
+				<MediaCarousel
+					cover={property.media.cover}
+					images={property.media.images}
+					videos={property.media.videos}
+					onLike={() => console.log("Like")}
+					onShare={() => console.log("Share")}
+					isOffPlan={true}
+					offPlanData={{
+						uniqueCode: property.uniqueCode,
+						title: property.title,
+						developerName: property.developerName,
+					}}
+				/>
 
 				{/* STATS */}
 				<View style={styles.sectionRow}>

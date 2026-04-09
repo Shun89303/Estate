@@ -226,8 +226,6 @@ Saved page
 Bookings page
 Profile page
 
-<!-- Latest ongoing progress -->
-
 creating reusable components:
 currently created reusable components:
 maps(single + multi)
@@ -257,3 +255,25 @@ search page completed applying reusable components
 saved page coompleted applying reusable components
 
 bookings page coompleted applying reusable components
+
+profile page completed applying reusable components
+
+Surface level pages have applied reusable components.
+Now continuing to apply reusable components to nested pages.
+
+home page's featured list's home property card applied reusable components.
+buy/sell details page's media carousel now became reusable.
+room rent details page now using reusable media carousel.
+owner direct details page now using reusable media carousel.
+business details page now using reusable media carousel.
+
+<!-- Latest ongoing progress -->
+
+<!--  -->
+
+Apr-9-2026
+
+buy/sell, room rent, owner direct, off-plan, business: media carousel applied reusable component
+
+buy/sell display page applied reusable components
+room rent display page applied reusable components

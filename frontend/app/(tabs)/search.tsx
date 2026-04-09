@@ -1,11 +1,5 @@
 import { useState, useMemo } from "react";
-import {
-	View,
-	Text,
-	TouchableOpacity,
-	FlatList,
-	StyleSheet,
-} from "react-native";
+import { View, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PropertyCard from "@/components/home/property/PropertyCard";
 import { useRouter } from "expo-router";
@@ -13,13 +7,13 @@ import { MOCK_BUYSELL, Property } from "@/mock/buySell";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import FilterSection from "@/components/common/FilterSection";
 import BackButton from "@/components/common/BackButton";
-import { SlidersHorizontal } from "lucide-react-native";
 import HorizontalTypeFilter from "@/components/common/HorizontalTypeFilter";
 import { useTheme } from "@/hooks/useTheme";
 import ClearFiltersButton from "@/components/common/ClearFiltersButton";
 import SearchBar from "@/components/common/SearchBar";
 import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
-import { BodyText } from "@/components/atoms/Typography";
+import EmptyState from "@/components/common/EmptyState";
+import FilterButton from "@/components/common/FilterButton";
 
 // Filter options
 const PURPOSES = [
@@ -208,37 +202,11 @@ export default function Search() {
 					onChangeText={setSearchQuery}
 				/>
 
-				<TouchableOpacity
+				<FilterButton
+					isOpen={showFilters}
+					activeCount={activeFilterCount}
 					onPress={() => setShowFilters((prev) => !prev)}
-					style={[
-						{
-							padding: 5,
-							borderRadius: 10,
-						},
-						showFilters && { backgroundColor: colors.border }, // background only when open
-					]}
-				>
-					<View style={{ position: "relative" }}>
-						<SlidersHorizontal
-							size={24}
-							color={showFilters ? colors.primaryGold : "#000"}
-						/>
-						{activeFilterCount > 0 && (
-							<View
-								style={[
-									styles.badge,
-									{
-										backgroundColor: colors.primaryGold,
-									},
-								]}
-							>
-								<BodyText style={styles.badgeText}>
-									{activeFilterCount}
-								</BodyText>
-							</View>
-						)}
-					</View>
-				</TouchableOpacity>
+				/>
 			</View>
 
 			{/* CATEGORY ROW */}
@@ -313,11 +281,7 @@ export default function Search() {
 						/>
 					)}
 					contentContainerStyle={{ paddingHorizontal: 16 }}
-					ListEmptyComponent={
-						<Text style={styles.emptyText}>
-							No properties match your filters.
-						</Text>
-					}
+					ListEmptyComponent={<EmptyState />}
 				/>
 			) : (
 				<PropertyMap

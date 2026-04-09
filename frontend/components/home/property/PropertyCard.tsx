@@ -1,6 +1,6 @@
 // components/PropertyCard.tsx
 import { useRouter } from "expo-router";
-import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import { TouchableOpacity, View, Image, StyleSheet } from "react-native";
 import { BedDouble, Bath, Maximize, MapPin } from "lucide-react-native";
 import { Property } from "@/mock/buySell";
 import {
@@ -9,6 +9,7 @@ import {
 	SmallTitle,
 } from "@/components/atoms/Typography";
 import globalStyles from "@/styles/styles";
+import { useTheme } from "@/hooks/useTheme";
 
 interface PropertyCardProps {
 	property: Property;
@@ -17,6 +18,7 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ property, style }: PropertyCardProps) {
 	const router = useRouter();
+	const colors = useTheme();
 
 	return (
 		<TouchableOpacity
@@ -33,22 +35,37 @@ export default function PropertyCard({ property, style }: PropertyCardProps) {
 			<View style={styles.infoContainer}>
 				{/* Top row: type + new badge */}
 				<View style={styles.headerRow}>
-					<SmallTitle style={styles.typeText}>{property.type}</SmallTitle>
+					<SmallTitle
+						style={{
+							color: colors.primaryGold,
+							textTransform: "uppercase",
+						}}
+					>
+						{property.type}
+					</SmallTitle>
 					{property.isNew && (
 						<View style={styles.newBadge}>
-							<Text style={styles.newText}>NEW</Text>
+							<SmallTitle
+								style={{
+									color: colors.primaryRed,
+									fontSize: 10,
+									fontWeight: "bold",
+								}}
+							>
+								• NEW
+							</SmallTitle>
 						</View>
 					)}
 				</View>
 
 				{/* Title */}
-				<NormalTitle numberOfLines={2} style={styles.title}>
+				<NormalTitle numberOfLines={1} style={styles.title}>
 					{property.title}
 				</NormalTitle>
 
 				{/* Address with icon */}
 				<View style={styles.locationRow}>
-					<MapPin size={12} color="#da9a0fff" />
+					<MapPin size={12} color={colors.primaryGold} />
 					<BodyText style={styles.address} numberOfLines={1}>
 						{property.location.address}
 					</BodyText>
@@ -58,19 +75,25 @@ export default function PropertyCard({ property, style }: PropertyCardProps) {
 				<View style={styles.bottomRow}>
 					<View style={styles.specsRow}>
 						<View style={styles.specItem}>
-							<BedDouble size={12} color="#555" />
-							<Text style={styles.specText}>{property.bedrooms}</Text>
+							<BedDouble size={12} color={colors.textSecondary} />
+							<BodyText style={styles.specText}>{property.bedrooms}</BodyText>
 						</View>
 						<View style={styles.specItem}>
-							<Bath size={12} color="#555" />
-							<Text style={styles.specText}>{property.bathrooms}</Text>
+							<Bath size={12} color={colors.textSecondary} />
+							<BodyText style={styles.specText}>{property.bathrooms}</BodyText>
 						</View>
 						<View style={styles.specItem}>
-							<Maximize size={12} color="#555" />
-							<Text style={styles.specText}>{property.areaSqm} m²</Text>
+							<Maximize size={12} color={colors.textSecondary} />
+							<BodyText style={styles.specText}>{property.areaSqm}</BodyText>
 						</View>
 					</View>
-					<NormalTitle style={styles.price}>
+					<NormalTitle
+						style={{
+							fontSize: 16,
+							fontWeight: "bold",
+							color: colors.primaryGold,
+						}}
+					>
 						฿{property.price.toLocaleString()}
 					</NormalTitle>
 				</View>
@@ -107,21 +130,11 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 4,
 	},
-	typeText: {
-		color: "#2c6e9e",
-		textTransform: "capitalize",
-	},
 	newBadge: {
-		backgroundColor: "#da9a0fff",
 		paddingHorizontal: 6,
 		paddingVertical: 2,
 		borderRadius: 4,
 		marginLeft: 8,
-	},
-	newText: {
-		color: "#fff",
-		fontSize: 10,
-		fontWeight: "bold",
 	},
 	title: {
 		marginBottom: 4,
@@ -134,7 +147,6 @@ const styles = StyleSheet.create({
 	},
 	address: {
 		marginLeft: 4,
-		color: "#666",
 		fontSize: 12,
 		flexShrink: 1,
 	},
@@ -154,11 +166,5 @@ const styles = StyleSheet.create({
 	},
 	specText: {
 		fontSize: 12,
-		color: "#555",
-	},
-	price: {
-		fontSize: 16,
-		fontWeight: "bold",
-		color: "#000",
 	},
 });

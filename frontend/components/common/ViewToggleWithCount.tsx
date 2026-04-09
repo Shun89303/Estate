@@ -45,7 +45,7 @@ export default function ViewToggleWithCount({
 				>
 					<List
 						size={18}
-						color={viewMode === "list" ? colors.primaryGold : "#666"}
+						color={viewMode === "list" ? colors.textPrimary : "#666"}
 					/>
 				</TouchableOpacity>
 				<TouchableOpacity
@@ -57,7 +57,7 @@ export default function ViewToggleWithCount({
 				>
 					<MapIcon
 						size={18}
-						color={viewMode === "map" ? colors.primaryGold : "#666"}
+						color={viewMode === "map" ? colors.textPrimary : "#666"}
 					/>
 				</TouchableOpacity>
 			</View>

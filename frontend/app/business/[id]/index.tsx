@@ -1,38 +1,24 @@
-import { useState } from "react";
 import {
 	View,
 	Text,
-	Pressable,
 	Image,
 	ScrollView,
 	TouchableOpacity,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { Video } from "expo-av";
+import { useLocalSearchParams } from "expo-router";
 import { MOCK_BUSINESS, BusinessProperty } from "@/mock/business";
 import { PropertyMap } from "@/components/common/PropertyMap";
+import MediaCarousel from "@/components/common/MediaCarousel";
 
 export default function BusinessDetails() {
-	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const property: BusinessProperty | undefined = MOCK_BUSINESS.find(
 		(p) => p.id.toString() === id,
 	);
 
-	const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-
 	if (!property) return <Text style={styles.notFound}>Property not found</Text>;
-
-	// Combine all media into one array: cover, photos, videos
-	const mediaItems = [
-		property.media.cover,
-		...property.media.photos,
-		...property.media.videos,
-	];
-	const isVideo = (index: number) => index >= property.media.photos.length + 1; // after cover + all photos
 
 	// Format pricing display
 	const pricingUnit = property.pricing.type === "MONTHLY" ? "mo" : "day";
@@ -45,65 +31,14 @@ export default function BusinessDetails() {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* Header with back, share, heart */}
-			<View style={styles.header}>
-				<Pressable onPress={() => router.back()}>
-					<Ionicons name="arrow-back" size={24} />
-				</Pressable>
-				<View style={{ flexDirection: "row", gap: 16 }}>
-					<Ionicons name="share-social-outline" size={24} />
-					<Ionicons name="heart-outline" size={24} />
-				</View>
-			</View>
-
 			<ScrollView showsVerticalScrollIndicator={false}>
-				{/* Media Carousel */}
-				<View style={styles.carouselContainer}>
-					{isVideo(activeMediaIndex) ? (
-						<Video
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							useNativeControls
-						/>
-					) : (
-						<Image
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							resizeMode="cover"
-						/>
-					)}
-
-					{/* Thumbnail navigator */}
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						style={styles.mediaNav}
-					>
-						{mediaItems.map((item, idx) => (
-							<TouchableOpacity
-								key={idx}
-								onPress={() => setActiveMediaIndex(idx)}
-								style={[
-									styles.mediaThumb,
-									activeMediaIndex === idx && styles.activeMediaThumb,
-								]}
-							>
-								<Image
-									source={{ uri: item }}
-									style={{ width: 50, height: 50, borderRadius: 4 }}
-								/>
-								{isVideo(idx) && (
-									<Ionicons
-										name="play-circle"
-										size={20}
-										color="white"
-										style={styles.playIcon}
-									/>
-								)}
-							</TouchableOpacity>
-						))}
-					</ScrollView>
-				</View>
+				<MediaCarousel
+					cover={property.media.cover}
+					images={property.media.photos}
+					videos={property.media.videos}
+					onLike={() => console.log("Like")}
+					onShare={() => console.log("Share")}
+				/>
 
 				{/* Property Info */}
 				<View style={styles.infoContainer}>

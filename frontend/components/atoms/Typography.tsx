@@ -14,10 +14,10 @@ export function PageTitle({ children, style, numberOfLines }: TypographyProps) {
 		<Text
 			style={[
 				styles.pageTitle,
-				style,
 				{
 					color: color.textPrimary,
 				},
+				style,
 			]}
 			numberOfLines={numberOfLines}
 		>

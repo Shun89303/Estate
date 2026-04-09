@@ -2,24 +2,21 @@ import { useEffect, useState } from "react";
 import {
 	View,
 	Text,
-	Pressable,
 	ScrollView,
 	Image,
 	StyleSheet,
-	TouchableOpacity,
+	Pressable,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Video } from "expo-av";
-import { Ionicons } from "@expo/vector-icons";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
 import { PropertyMap } from "@/components/common/PropertyMap";
+import MediaCarousel from "@/components/common/MediaCarousel";
+import NotFound from "@/components/common/NotFound";
 
 export default function OwnerDetails() {
 	const { id } = useLocalSearchParams();
 	const [property, setProperty] = useState<Property | null>(null);
-	const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-	const router = useRouter();
 
 	useEffect(() => {
 		if (!id) return;
@@ -29,108 +26,22 @@ export default function OwnerDetails() {
 		setProperty(found || null);
 	}, [id]);
 
-	if (!property)
-		return (
-			<SafeAreaView>
-				<Pressable onPress={() => router.back()}>
-					<Text style={{ fontSize: 12, fontWeight: "500" }}>Back</Text>
-				</Pressable>
-				<Text style={{ padding: 16 }}>Loading property...</Text>
-			</SafeAreaView>
-		);
-
-	const mediaItems = [
-		property.media.cover,
-		...property.media.images,
-		...property.media.videos,
-	];
-	const isVideo = (index: number) =>
-		index >= mediaItems.length - property.media.videos.length;
+	if (!property) return <NotFound title="Property Not Found" />;
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView>
-				{/* Top buttons */}
-				<View style={styles.topButtons}>
-					<Pressable onPress={() => router.back()} style={styles.topButton}>
-						<Text>Back</Text>
-					</Pressable>
-					<View style={{ flexDirection: "row", gap: 12 }}>
-						<Pressable style={styles.topButton}>
-							<Text>♡</Text>
-						</Pressable>
-						<Pressable style={styles.topButton}>
-							<Text>Share</Text>
-						</Pressable>
-					</View>
-				</View>
-
-				{/* MEDIA CAROUSEL */}
-				<View style={styles.carouselContainer}>
-					{isVideo(activeMediaIndex) ? (
-						<Video
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							useNativeControls
-							isLooping
-						/>
-					) : (
-						<Image
-							source={{ uri: mediaItems[activeMediaIndex] }}
-							style={styles.carouselImage}
-							resizeMode="cover"
-						/>
-					)}
-
-					{/* MEDIA NAVIGATION */}
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						style={styles.mediaNav}
-					>
-						{mediaItems.map((item, idx) => (
-							<TouchableOpacity
-								key={idx}
-								onPress={() => setActiveMediaIndex(idx)}
-								style={[
-									styles.mediaThumb,
-									activeMediaIndex === idx && styles.activeMediaThumb,
-								]}
-							>
-								<Image
-									source={{ uri: item }}
-									style={{ width: 50, height: 50, borderRadius: 4 }}
-								/>
-								{isVideo(idx) && (
-									<Ionicons
-										name="play-circle"
-										size={20}
-										color="white"
-										style={{ position: "absolute", top: 15, left: 15 }}
-									/>
-								)}
-							</TouchableOpacity>
-						))}
-					</ScrollView>
-				</View>
-
-				{/* MEDIA NAVIGATOR */}
-				<View style={styles.mediaNavigator}>
-					{mediaItems.map((_, index) => (
-						<TouchableOpacity
-							key={index}
-							onPress={() => setActiveMediaIndex(index)}
-							style={[
-								styles.navigatorItem,
-								activeMediaIndex === index && styles.navigatorItemActive,
-							]}
-						/>
-					))}
-				</View>
+				{/* Reusable Media Carousel */}
+				<MediaCarousel
+					cover={property.media.cover}
+					images={property.media.images}
+					videos={property.media.videos}
+					onLike={() => console.log("Like")}
+					onShare={() => console.log("Share")}
+				/>
 
 				{/* PROPERTY INFO */}
 				<View style={styles.section}>
-					{/* Price */}
 					<View style={styles.priceContainer}>
 						<Text style={styles.price}>฿{property.price.toLocaleString()}</Text>
 					</View>
@@ -143,7 +54,6 @@ export default function OwnerDetails() {
 					<Text style={styles.title}>{property.title}</Text>
 					<Text style={styles.address}>{property.location.address}</Text>
 
-					{/* Specs */}
 					<View style={styles.specsRow}>
 						<Text style={styles.spec}>{property.bedrooms} bd</Text>
 						<Text style={styles.spec}>{property.bathrooms} ba</Text>
@@ -196,7 +106,7 @@ export default function OwnerDetails() {
 					/>
 				</View>
 
-				{/* AGENT */}
+				{/* OWNER */}
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Property Owner</Text>
 					<View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
@@ -242,32 +152,6 @@ export default function OwnerDetails() {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: "#fff" },
-	topButtons: {
-		paddingHorizontal: 16,
-		paddingTop: 16,
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-	},
-	topButton: { padding: 6 },
-	carouselContainer: { width: "100%", height: 250 },
-	carouselImage: { width: "100%", height: "100%" },
-	mediaNav: { position: "absolute", bottom: 8, left: 16, flexDirection: "row" },
-	mediaThumb: { marginRight: 8, borderWidth: 1, borderColor: "#ccc" },
-	activeMediaThumb: { borderColor: "#333", borderWidth: 2 },
-	mediaNavigator: {
-		flexDirection: "row",
-		justifyContent: "center",
-		marginVertical: 8,
-		gap: 6,
-	},
-	navigatorItem: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		backgroundColor: "#ccc",
-	},
-	navigatorItemActive: { backgroundColor: "#007bff" },
 	section: { marginTop: 16, paddingHorizontal: 16 },
 	sectionTitle: { fontWeight: "bold", fontSize: 16, marginBottom: 8 },
 	ownerBadge: {
@@ -284,7 +168,6 @@ const styles = StyleSheet.create({
 	price: { fontSize: 16, fontWeight: "bold" },
 	featuresGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
 	featureItem: { backgroundColor: "#eee", padding: 6, borderRadius: 6 },
-	map: { height: 200, borderRadius: 12 },
 	ctaRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
