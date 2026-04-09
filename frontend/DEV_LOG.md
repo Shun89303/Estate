@@ -286,3 +286,4 @@ switched video usage from expo-av to expo-video
 buy/sell details page applied reusable components
 owner direct details page applied reusable components
 room rent details page applied reusable components
+business details page applied reusable components

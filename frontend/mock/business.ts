@@ -110,7 +110,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		contact: {
 			name: "John Doe",
 			profileImage: "http://localhost:3000/uploads/owners/owner1.jpg",
-			phone: "0912345678",
+			phone: "+66 89 123 4567",
 		},
 		reserveCoins: 5,
 	},
@@ -138,7 +138,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		},
 		contact: {
 			name: "Jane Smith",
-			phone: "0923456789",
+			phone: "+66 89 123 4567",
 			profileImage: "http://localhost:3000/uploads/owners/owner2.jpg",
 		},
 		reserveCoins: 3,
@@ -169,7 +169,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		},
 		contact: {
 			name: "Somsak Chai",
-			phone: "0934567890",
+			phone: "+66 89 123 4567",
 			profileImage: "http://localhost:3000/uploads/owners/owner3.jpg",
 		},
 		reserveCoins: 2,
@@ -197,7 +197,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		},
 		contact: {
 			name: "Nattapong Lee",
-			phone: "0945678901",
+			phone: "+66 89 123 4567",
 			profileImage: "http://localhost:3000/uploads/owners/owner4.jpg",
 		},
 		reserveCoins: 6,
@@ -231,7 +231,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		},
 		contact: {
 			name: "Kanya Wong",
-			phone: "0956789012",
+			phone: "+66 89 123 4567",
 			profileImage: "http://localhost:3000/uploads/owners/owner5.jpg",
 		},
 		reserveCoins: 8,
@@ -260,7 +260,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		},
 		contact: {
 			name: "Arthit Chai",
-			phone: "0967890123",
+			phone: "+66 89 123 4567",
 			profileImage: "http://localhost:3000/uploads/owners/owner6.jpg",
 		},
 		reserveCoins: 10,

@@ -1,37 +1,74 @@
+import { useEffect, useState } from "react";
 import {
 	View,
-	Text,
 	Image,
 	ScrollView,
 	TouchableOpacity,
 	StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
-import { MOCK_BUSINESS, BusinessProperty } from "@/mock/business";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+	MOCK_BUSINESS,
+	BusinessProperty,
+	BusinessPropertyType,
+} from "@/mock/business";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import MediaCarousel from "@/components/common/MediaCarousel";
+import NotFound from "@/components/common/NotFound";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+	SmallTitle,
+} from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import {
+	MapPin,
+	Maximize,
+	Users,
+	Calendar,
+	MessageCircle,
+	Coins,
+} from "lucide-react-native";
+import { maskPhoneNumber } from "@/utils/maskPhoneNumber";
+import globalStyles from "@/styles/styles";
+
+// Emoji mapping for business types
+const typeEmoji: Record<BusinessPropertyType, string> = {
+	OFFICE: "🏢",
+	CO_WORKING: "💻",
+	SHOP_RETAIL: "🛍️",
+	WAREHOUSE: "📦",
+	RESTAURANT: "🍽️",
+	EVENT_VENUE: "🎪",
+};
 
 export default function BusinessDetails() {
+	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
-	const property: BusinessProperty | undefined = MOCK_BUSINESS.find(
-		(p) => p.id.toString() === id,
-	);
+	const [property, setProperty] = useState<BusinessProperty | undefined>();
+	const colors = useTheme();
 
-	if (!property) return <Text style={styles.notFound}>Property not found</Text>;
+	useEffect(() => {
+		const found = MOCK_BUSINESS.find((p) => p.id.toString() === id);
+		setProperty(found);
+	}, [id]);
 
-	// Format pricing display
+	if (!property) return <NotFound title="Business Space Not Found" />;
+
 	const pricingUnit = property.pricing.type === "MONTHLY" ? "mo" : "day";
 	const formattedPrice = `฿${property.pricing.amount.toLocaleString()}/${pricingUnit}`;
-
-	// Get amenities list (keys with true value)
 	const amenitiesList = Object.entries(property.amenities)
 		.filter(([, value]) => value === true)
 		.map(([key]) => key);
+	const displayType = `${typeEmoji[property.type]} ${property.type.replace("_", " ")}`;
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<ScrollView showsVerticalScrollIndicator={false}>
+		<SafeAreaView
+			style={[styles.container, { backgroundColor: colors.background }]}
+		>
+			<ScrollView>
 				<MediaCarousel
 					cover={property.media.cover}
 					images={property.media.photos}
@@ -40,61 +77,109 @@ export default function BusinessDetails() {
 					onShare={() => console.log("Share")}
 				/>
 
-				{/* Property Info */}
-				<View style={styles.infoContainer}>
-					{/* Type */}
-					<Text style={styles.propertyType}>
-						{property.type.replace("_", " ")}
-					</Text>
-
-					<Text>{property.uniqueCode}</Text>
-
-					{/* Title */}
-					<Text style={styles.title}>{property.title}</Text>
-
-					{/* Address */}
-					<Text style={styles.location}>{property.location.address}</Text>
-
-					{/* Price & Deposit Box */}
-					<View style={styles.priceBox}>
-						<View style={{ flex: 1 }}>
-							<Text style={styles.priceTitle}>{formattedPrice}</Text>
-							<Text style={styles.priceSubtitle}>per {pricingUnit}</Text>
+				<View style={styles.section}>
+					<View style={styles.infoRow}>
+						<View
+							style={[
+								styles.typePill,
+								{ backgroundColor: colors.secondaryMute },
+							]}
+						>
+							<SmallTitle style={{ color: colors.primaryGold }}>
+								{displayType}
+							</SmallTitle>
 						</View>
-						<View style={{ flex: 1 }}>
-							<Text style={styles.priceTitle}>
+						<BodyText
+							style={{ color: colors.textSecondary, marginLeft: "auto" }}
+						>
+							{property.uniqueCode}
+						</BodyText>
+					</View>
+
+					<NormalTitle style={styles.title}>{property.title}</NormalTitle>
+
+					<View style={styles.locationRow}>
+						<MapPin size={14} color={colors.primaryGold} />
+						<BodyText style={styles.location}>
+							{property.location.address}
+						</BodyText>
+					</View>
+
+					{/* Single white container box */}
+					<View style={[styles.detailsBox, { backgroundColor: "#fff" }]}>
+						{/* Price */}
+						<PageTitle
+							style={{
+								marginBottom: 8,
+								fontSize: 24,
+								color: colors.primaryGold,
+							}}
+						>
+							{formattedPrice}
+						</PageTitle>
+
+						{/* Specs row (area, capacity, min lease) */}
+						<View style={styles.specsRow}>
+							<View style={styles.specItem}>
+								<Maximize size={16} color={colors.primaryGray} />
+								<BodyText>{property.areaSqm} sqm</BodyText>
+							</View>
+							<View style={styles.specItem}>
+								<Users size={16} color={colors.primaryGray} />
+								<BodyText>{property.capacity} capacity</BodyText>
+							</View>
+							<View style={styles.specItem}>
+								<Calendar size={16} color={colors.primaryGray} />
+								<BodyText>{property.minLeaseMonths} mo min</BodyText>
+							</View>
+						</View>
+
+						{/* Deposit & min lease text */}
+						<View style={styles.depositRow}>
+							<NormalTitle
+								style={{
+									fontWeight: "600",
+									color: colors.primaryGray,
+								}}
+							>
 								Deposit: ฿{property.pricing.deposit.toLocaleString()}
-							</Text>
-							<Text style={styles.priceSubtitle}>
-								Min {property.minLeaseMonths} months
-							</Text>
+							</NormalTitle>
 						</View>
 					</View>
 
-					{/* Area & Capacity */}
-					<View style={styles.rowDetails}>
-						<Text>📐 {property.areaSqm} sqm</Text>
-						<Text>👥 {property.capacity} people</Text>
-					</View>
-
-					{/* Amenities */}
+					{/* Amenities as pills (horizontal) */}
 					{amenitiesList.length > 0 && (
-						<View style={styles.infoBox}>
-							<Text style={styles.infoTitle}>Amenities</Text>
-							<Text>{amenitiesList.join(", ")}</Text>
+						<View style={styles.amenitiesSection}>
+							<NormalTitle style={styles.infoTitle}>Amenities</NormalTitle>
+							<View style={styles.amenitiesRow}>
+								{amenitiesList.map((item, idx) => (
+									<View
+										key={idx}
+										style={[
+											styles.amenityPill,
+											{ backgroundColor: colors.secondaryMute },
+										]}
+									>
+										<BodyText style={{ color: colors.textPrimary }}>
+											{item}
+										</BodyText>
+									</View>
+								))}
+							</View>
 						</View>
 					)}
 
 					{/* About */}
 					{property.about && (
-						<View style={styles.infoBox}>
-							<Text style={styles.infoTitle}>About</Text>
-							<Text>{property.about}</Text>
+						<View style={styles.simpleBox}>
+							<NormalTitle style={styles.infoTitle}>About</NormalTitle>
+							<BodyText>{property.about}</BodyText>
 						</View>
 					)}
 
 					{/* Map */}
-					<View style={styles.mapContainer}>
+					<View style={styles.simpleBox}>
+						<NormalTitle style={styles.infoTitle}>Location</NormalTitle>
 						<PropertyMap
 							markers={[
 								{
@@ -110,32 +195,46 @@ export default function BusinessDetails() {
 					</View>
 
 					{/* Contact Agent */}
-					<View style={styles.agentBox}>
+					<View style={[styles.agentBox, { backgroundColor: "#fff" }]}>
 						<Image
 							source={{ uri: property.contact.profileImage }}
 							style={styles.agentImage}
 						/>
-						<View>
-							<Text style={styles.agentName}>{property.contact.name}</Text>
-							<Text>{property.contact.phone}</Text>
+						<View style={styles.agentInfo}>
+							<NormalTitle style={styles.agentName}>
+								{property.contact.name}
+							</NormalTitle>
+							<BodyText>{maskPhoneNumber(property.contact.phone)}</BodyText>
 						</View>
 					</View>
 				</View>
 			</ScrollView>
 
-			{/* Bottom CTA Buttons */}
+			{/* Bottom CTA */}
 			<View style={styles.ctaRow}>
 				<TouchableOpacity
-					style={[styles.ctaBtn, { backgroundColor: "#333" }]}
-					onPress={() => {}}
+					style={[
+						styles.ctaBtn,
+						{
+							backgroundColor: "#fff",
+							borderColor: colors.primaryGray + 50,
+							borderWidth: 1,
+						},
+					]}
+					onPress={() => router.push("/booking")}
 				>
-					<Text style={{ color: "#fff" }}>Consultation</Text>
+					<MessageCircle size={18} color={colors.textPrimary} />
+					<BodyText style={{ color: colors.textPrimary }}>
+						Consultation
+					</BodyText>
 				</TouchableOpacity>
 				<TouchableOpacity
-					style={[styles.ctaBtn, { backgroundColor: "#f0ad4e" }]}
-					onPress={() => {}}
+					style={[styles.ctaBtn, { backgroundColor: colors.primaryGold }]}
 				>
-					<Text>Reserve {property.reserveCoins} coins</Text>
+					<Coins size={18} color="#fff" />
+					<BodyText style={{ color: "#fff" }}>
+						Reserve {property.reserveCoins} Coins
+					</BodyText>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
@@ -143,143 +242,87 @@ export default function BusinessDetails() {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#fff",
+	container: { flex: 1 },
+	section: { paddingHorizontal: 16, paddingVertical: 8, gap: 16 },
+	infoRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		flexWrap: "wrap",
+		gap: 8,
 	},
-	notFound: {
-		textAlign: "center",
-		marginTop: 50,
-		fontSize: 16,
+	typePill: {
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 20,
+		alignSelf: "flex-start",
 	},
-	header: {
+	title: { marginVertical: 4, lineHeight: 24 },
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 6,
+		marginBottom: 8,
+	},
+	location: { fontSize: 14, flexShrink: 1 },
+	detailsBox: {
+		padding: 16,
+		borderRadius: 16,
+		marginVertical: 8,
+		...globalStyles.shadows,
+	},
+	specsRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		paddingHorizontal: 16,
-		paddingVertical: 8,
-		alignItems: "center",
-		backgroundColor: "rgba(255,255,255,0.9)",
-	},
-	carouselContainer: {
-		width: "100%",
-		height: 250,
-		marginTop: 44, // space for header
-	},
-	carouselImage: {
-		width: "100%",
-		height: "100%",
-	},
-	mediaNav: {
-		position: "absolute",
-		bottom: 8,
-		left: 16,
-		flexDirection: "row",
-	},
-	mediaThumb: {
-		marginRight: 8,
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 4,
-		overflow: "hidden",
-	},
-	activeMediaThumb: {
-		borderColor: "#333",
-		borderWidth: 2,
-	},
-	playIcon: {
-		position: "absolute",
-		top: 15,
-		left: 15,
-	},
-	infoContainer: {
-		paddingHorizontal: 16,
-		paddingVertical: 12,
-	},
-	propertyType: {
-		fontSize: 12,
-		fontWeight: "500",
-		color: "#555",
-		marginBottom: 4,
-	},
-	title: {
-		fontSize: 20,
-		fontWeight: "bold",
-		marginVertical: 4,
-	},
-	location: {
-		fontSize: 14,
-		color: "#777",
+		gap: 16,
 		marginBottom: 12,
 	},
-	priceBox: {
+	specItem: {
 		flexDirection: "row",
-		justifyContent: "space-between",
-		backgroundColor: "#f8f8f8",
-		padding: 12,
-		borderRadius: 8,
-		marginVertical: 8,
+		alignItems: "center",
+		gap: 6,
 	},
-	priceTitle: {
-		fontWeight: "600",
-		fontSize: 16,
+	depositRow: {
+		marginTop: 4,
 	},
-	priceSubtitle: {
-		fontSize: 12,
-		color: "#555",
-		marginTop: 2,
-	},
-	rowDetails: {
+	amenitiesSection: { gap: 8 },
+	amenitiesRow: {
 		flexDirection: "row",
-		gap: 24,
-		marginVertical: 8,
+		flexWrap: "wrap",
+		gap: 8,
 	},
-	infoBox: {
-		marginVertical: 8,
+	amenityPill: {
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 20,
 	},
-	infoTitle: {
-		fontWeight: "600",
-		marginBottom: 4,
-		fontSize: 16,
-	},
-	mapContainer: {
-		height: 200,
-		marginVertical: 12,
-		borderRadius: 12,
-		overflow: "hidden",
-	},
-	map: {
-		flex: 1,
-	},
+	infoTitle: { fontWeight: "600", fontSize: 18, marginBottom: 4 },
+	simpleBox: { gap: 8 },
 	agentBox: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 12,
-		marginVertical: 12,
-		padding: 8,
-		backgroundColor: "#f8f8f8",
-		borderRadius: 12,
+		padding: 16,
+		borderRadius: 16,
+		marginVertical: 8,
+		...globalStyles.shadows,
 	},
-	agentImage: {
-		width: 50,
-		height: 50,
-		borderRadius: 25,
-	},
-	agentName: {
-		fontWeight: "600",
-		fontSize: 16,
-	},
+	agentImage: { width: 60, height: 60, borderRadius: 12 },
+	agentInfo: { flex: 1 },
+	agentName: { fontWeight: "600", marginBottom: 2 },
 	ctaRow: {
 		flexDirection: "row",
 		padding: 16,
 		gap: 12,
 		borderTopWidth: 1,
 		borderColor: "#eee",
-		backgroundColor: "#fff",
 	},
 	ctaBtn: {
 		flex: 1,
-		paddingVertical: 12,
-		borderRadius: 30,
+		flexDirection: "row",
 		alignItems: "center",
+		justifyContent: "center",
+		paddingVertical: 12,
+		borderRadius: 15,
+		gap: 8,
 	},
 });

@@ -1,27 +1,12 @@
 import { useMemo, useState } from "react";
-import {
-	View,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	Image,
-} from "react-native";
+import { View, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import {
-	BusinessProperty,
-	BusinessPropertyType,
-	MOCK_BUSINESS,
-} from "@/mock/business";
+import { BusinessPropertyType, MOCK_BUSINESS } from "@/mock/business";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import FilterSection from "@/components/common/FilterSection";
 import BackButton from "@/components/common/BackButton";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-	SmallTitle,
-} from "@/components/atoms/Typography";
+import { PageTitle } from "@/components/atoms/Typography";
 import ClearFiltersButton from "@/components/common/ClearFiltersButton";
 import FilterButton from "@/components/common/FilterButton";
 import SearchBar from "@/components/common/SearchBar";
@@ -29,7 +14,7 @@ import { useTheme } from "@/hooks/useTheme";
 import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
 import EmptyState from "@/components/common/EmptyState";
 import globalStyles from "@/styles/styles";
-import { MapPin, Maximize, Users, Calendar } from "lucide-react-native";
+import BusinessCard from "@/components/business/BusinessCard";
 
 const LOCATIONS = [
 	"All",
@@ -205,94 +190,6 @@ export default function Business() {
 				/>
 			)}
 		</SafeAreaView>
-	);
-}
-
-function BusinessCard({ property }: { property: BusinessProperty }) {
-	const router = useRouter();
-	const colors = useTheme();
-	const pricingUnit = property.pricing.type === "MONTHLY" ? "mo" : "day";
-
-	const typeEmoji: Record<BusinessPropertyType, string> = {
-		OFFICE: "🏢",
-		CO_WORKING: "💻",
-		SHOP_RETAIL: "🛍️",
-		WAREHOUSE: "📦",
-		RESTAURANT: "🍽️",
-		EVENT_VENUE: "🎪",
-	};
-
-	const displayType = `${typeEmoji[property.type]} ${property.type.replace("_", " ")}`;
-
-	return (
-		<TouchableOpacity
-			onPress={() => router.push(`/business/${property.id}`)}
-			activeOpacity={0.8}
-			style={[styles.card, { backgroundColor: colors.background }]}
-		>
-			{/* Left: Square Image */}
-			<View style={styles.imageContainer}>
-				<Image source={{ uri: property.media.cover }} style={styles.image} />
-				<View
-					style={[styles.typeBadge, { backgroundColor: colors.primaryGold }]}
-				>
-					<SmallTitle style={styles.typeBadgeText}>{displayType}</SmallTitle>
-				</View>
-			</View>
-
-			{/* Right: Info – Upper + Lower */}
-			<View style={styles.infoContainer}>
-				{/* UPPER PART */}
-				<View>
-					<NormalTitle numberOfLines={1} style={styles.title}>
-						{property.title}
-					</NormalTitle>
-					<View style={styles.locationRow}>
-						<MapPin size={12} color={colors.primaryGold} />
-						<BodyText style={styles.address} numberOfLines={1}>
-							{property.location.address}
-						</BodyText>
-					</View>
-					<View style={styles.specsRow}>
-						<View style={styles.specItem}>
-							<Maximize size={12} color={colors.textSecondary} />
-							<BodyText style={styles.specText}>
-								{property.areaSqm} sqm
-							</BodyText>
-						</View>
-						<View style={styles.specItem}>
-							<Users size={12} color={colors.textSecondary} />
-							<BodyText style={styles.specText}>
-								{property.capacity} pax
-							</BodyText>
-						</View>
-					</View>
-				</View>
-
-				{/* LOWER PART */}
-				<View style={styles.bottomRow}>
-					<View style={styles.specItem}>
-						<Calendar size={12} color={colors.textSecondary} />
-						{property.minLeaseMonths ? (
-							<BodyText style={styles.specText}>
-								{property.minLeaseMonths} mo min
-							</BodyText>
-						) : (
-							<BodyText style={styles.specText}>Flexible</BodyText>
-						)}
-					</View>
-					<NormalTitle
-						style={{
-							fontSize: 16,
-							fontWeight: "bold",
-							color: colors.primaryGold,
-						}}
-					>
-						฿{property.pricing.amount.toLocaleString()}/{pricingUnit}
-					</NormalTitle>
-				</View>
-			</View>
-		</TouchableOpacity>
 	);
 }
 
