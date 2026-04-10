@@ -25,7 +25,7 @@ export default function Metric({
 		<View style={[styles.metric, { backgroundColor: bgColor }]}>
 			<Icon size={16} color={iconColor} />
 			<SmallTitle
-				style={{ color: valueColor, fontSize: 12, fontWeight: "bold" }}
+				style={{ color: valueColor, fontSize: 16, fontWeight: "bold" }}
 			>
 				{value}
 			</SmallTitle>

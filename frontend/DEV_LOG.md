@@ -267,8 +267,6 @@ room rent details page now using reusable media carousel.
 owner direct details page now using reusable media carousel.
 business details page now using reusable media carousel.
 
-<!-- Latest ongoing progress -->
-
 <!--  -->
 
 Apr-9-2026
@@ -287,3 +285,15 @@ buy/sell details page applied reusable components
 owner direct details page applied reusable components
 room rent details page applied reusable components
 business details page applied reusable components
+
+<!-- Latest ongoing progress -->
+
+updating off plan details page
+
+around units contents, trying to use flatlist instead
+
+<!--  -->
+
+Apr-10-2026
+
+off plan details page applied reusable components

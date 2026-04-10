@@ -4,7 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 
 interface TypographyProps {
 	children: ReactNode;
-	style?: TextStyle;
+	style?: TextStyle | TextStyle[];
 	numberOfLines?: number;
 }
 
