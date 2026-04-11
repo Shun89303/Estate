@@ -286,14 +286,105 @@ owner direct details page applied reusable components
 room rent details page applied reusable components
 business details page applied reusable components
 
-<!-- Latest ongoing progress -->
-
-updating off plan details page
-
-around units contents, trying to use flatlist instead
-
 <!--  -->
 
 Apr-10-2026
 
+<!-- COMPLETED -->
+
 off plan details page applied reusable components
+notifications page applied reusable components
+customer reviews display page applied reusable components
+settings page applied reusable components
+help & support page applied reusable components
+logout applied reusable components
+contents display page applied reusable components
+coin top up applied reusable components
+edit profile applied reusable components
+contents details page applied reusable components
+consultations details page applied reusable components
+created reusable heart button, share button, bookmark button
+reserves details page applied reusable components
+coin history applied reusable components
+
+<!-- Latest to do -->
+
+main pages surface display - done
+5 properties display + details - done
+nested pages - not done
+
+<!-- Home nested pages:
+    notification page: easiest
+    customer reviews display page: easiest
+    contents display page: easy
+    contents details page: medium
+    booking process: hard -->
+
+<!-- My bookings nested pages:
+    consultations details page: medium
+    reserves details page: medium -->
+
+<!-- Profile nested pages:
+    coin history: medium
+    coin top up: easy
+    agent/owner login process: hardest
+    edit profile: easy
+    settings: easiest
+    help & support: easiest
+    logout: easiest -->
+
+<!-- notification page: easiest -->
+
+<!-- customer reviews display page: easiest -->
+
+<!-- settings: easiest -->
+
+<!-- help & support: easiest -->
+
+<!-- logout: easiest -->
+
+<!-- contents display page: easy -->
+
+<!-- coin top up: easy -->
+
+<!-- edit profile: easy -->
+
+<!-- contents details page: medium -->
+
+<!-- consultations details page: medium -->
+
+<!-- reserves details page: medium -->
+
+<!-- coin history: medium -->
+
+<!-- Latest ongoing progress -->
+
+pass data to booking process:
+router.push({
+pathname: "/booking",
+params: {
+image: property.media.cover,
+title: property.title,
+location: property.location.address,
+bedrooms: property.bedrooms,
+price: property.price,
+},
+});
+
+no need to find for specific property
+
+<!--  -->
+
+Apr-11-2026
+
+<!-- Latest to do -->
+
+<!-- booking process: hard -->
+
+agent/owner login process: hardest
+implement new property type
+implement new app name: insert brand image
+
+<!-- COMPLETED -->
+
+booking process: reusable + initial look

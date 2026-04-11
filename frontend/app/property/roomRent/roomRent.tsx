@@ -165,7 +165,7 @@ export default function RoomRent() {
 						longitude: p.location.longitude,
 						title: p.title,
 						description: p.location.address,
-						onPress: () => router.push(`/roomRent/${p.id}`),
+						onPress: () => router.push(`/property/roomRent/${p.id}`),
 					}))}
 					style={{ flex: 1 }}
 				/>

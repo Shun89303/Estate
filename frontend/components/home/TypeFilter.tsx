@@ -12,25 +12,25 @@ export default function TypeFilter() {
 			id: "roomRent",
 			label: "Room Rent",
 			emoji: "🛏️",
-			route: "/roomRent/roomRent",
+			route: "/property/roomRent/roomRent",
 		},
 		{
 			id: "ownerDirect",
 			label: "Owner Direct",
 			emoji: "🔓",
-			route: "/ownerDirect/ownerDirect",
+			route: "/property/ownerDirect/ownerDirect",
 		},
 		{
 			id: "offPlan",
 			label: "Off-Plan",
 			emoji: "📐",
-			route: "/offPlan/offPlan",
+			route: "/property/offPlan/offPlan",
 		},
 		{
 			id: "business",
 			label: "Business",
 			emoji: "💼",
-			route: "/business/business",
+			route: "/property/business/business",
 		},
 	];
 

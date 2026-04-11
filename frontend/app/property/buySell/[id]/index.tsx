@@ -232,7 +232,21 @@ export default function BuySellDetails() {
 							borderWidth: 1,
 						},
 					]}
-					onPress={() => router.push("/booking")}
+					onPress={() =>
+						router.push({
+							pathname: "/booking/[id]",
+							params: {
+								id: property.id,
+								image: property.media.cover,
+								title: property.title,
+								location: property.location.address,
+								price: property.price,
+								isAgent: 1,
+								agentName: property.agent.name,
+								agentImage: property.agent.image,
+							},
+						})
+					}
 				>
 					<MessageCircle size={18} color="#000000ff" />
 					<BodyText style={{ color: colors.textPrimary }}>

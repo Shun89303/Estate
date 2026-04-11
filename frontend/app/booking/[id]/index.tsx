@@ -1,8 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
 	View,
-	Text,
 	TextInput,
 	StyleSheet,
 	TouchableOpacity,
@@ -12,77 +11,224 @@ import {
 	ScrollView,
 	Image,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import PhoneInput from "react-native-phone-number-input";
-import { Agent, Property } from "@/stores/usePropertyStore";
-import { MOCK_PROPERTIES } from "@/mock/properties";
+import { SafeAreaView } from "react-native-safe-area-context";
+import BackButton from "@/components/common/BackButton";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+} from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import StepProgressBar from "@/components/common/StepProgressBar";
+import {
+	CalendarDays,
+	Eye,
+	EyeOff,
+	MapPin,
+	MessageCircle,
+	Phone,
+	VideoIcon,
+	Zap,
+} from "lucide-react-native";
+import globalStyles from "@/styles/styles";
 import { formatPrice } from "@/utils/formatPrice";
-import { MOCK_AGENTS } from "@/mock/agents";
-import ModalDateTimePicker from "react-native-modal-datetime-picker";
 
+// ---------- Separate Calendar Component ----------
+const InlineCalendar = ({
+	selectedDate,
+	onSelectDate,
+}: {
+	selectedDate: Date | null;
+	onSelectDate: (date: Date | null) => void;
+}) => {
+	const colors = useTheme();
+	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+	const getDaysInMonth = (year: number, month: number) => {
+		return new Date(year, month + 1, 0).getDate();
+	};
+
+	const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+	const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+	const daysArray = [];
+	for (let i = 0; i < firstDayOfMonth; i++) daysArray.push(null);
+	for (let i = 1; i <= daysInMonth; i++)
+		daysArray.push(new Date(currentYear, currentMonth, i));
+
+	const changeMonth = (delta: number) => {
+		let newMonth = currentMonth + delta;
+		let newYear = currentYear;
+		if (newMonth < 0) {
+			newMonth = 11;
+			newYear--;
+		} else if (newMonth > 11) {
+			newMonth = 0;
+			newYear++;
+		}
+		setCurrentMonth(newMonth);
+		setCurrentYear(newYear);
+	};
+
+	const isSelectedDate = (date: Date) =>
+		selectedDate && date.toDateString() === selectedDate.toDateString();
+
+	return (
+		<View
+			style={[styles.calendarContainer, { backgroundColor: colors.surface }]}
+		>
+			<View style={styles.calendarHeader}>
+				<TouchableOpacity onPress={() => changeMonth(-1)}>
+					<BodyText style={styles.calendarNav}>◀</BodyText>
+				</TouchableOpacity>
+				<NormalTitle style={styles.calendarMonth}>
+					{new Date(currentYear, currentMonth).toLocaleDateString("en-US", {
+						month: "long",
+						year: "numeric",
+					})}
+				</NormalTitle>
+				<TouchableOpacity onPress={() => changeMonth(1)}>
+					<BodyText style={styles.calendarNav}>▶</BodyText>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.calendarWeekDays}>
+				{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+					<BodyText key={day} style={styles.weekDay}>
+						{day}
+					</BodyText>
+				))}
+			</View>
+			<View style={styles.calendarDays}>
+				{daysArray.map((date, idx) => (
+					<TouchableOpacity
+						key={idx}
+						style={[styles.calendarDay]}
+						onPress={() => {
+							if (date) {
+								if (isSelectedDate(date)) {
+									onSelectDate(null);
+								} else {
+									onSelectDate(date);
+								}
+							}
+						}}
+						disabled={!date}
+					>
+						<BodyText
+							style={[
+								styles.calendarDayText,
+								date && isSelectedDate(date)
+									? { color: colors.primaryGold, fontWeight: "700" }
+									: {},
+							]}
+						>
+							{date ? date.getDate() : ""}
+						</BodyText>
+					</TouchableOpacity>
+				))}
+			</View>
+		</View>
+	);
+};
+
+// ---------- Main Component ----------
 export default function Booking() {
-	const { id } = useLocalSearchParams();
-	const [property, setProperty] = useState<Property | null>(null);
-	const [agent, setAgent] = useState<Agent | null>(null);
+	const router = useRouter();
+	const colors = useTheme();
+	const params = useLocalSearchParams();
+	const propertyImage = params.image as string;
+	const propertyTitle = params.title as string;
+	const propertyLocation = params.location as string;
+	const propertyPrice = params.price as string;
+	const isAgent = params.isAgent === "1"; // "1" -> true, otherwise false
+	const agentName = params.agentName as string;
+	const agentImage = params.agentImage as string;
+
+	const [step, setStep] = useState(1);
+	const [phoneNumber, setPhoneNumber] = useState("");
+	const [password, setPassword] = useState("");
 	const [question, setQuestion] = useState("");
-	const [timeOption, setTimeOption] = useState<"now" | "schedule" | null>(null);
-	const [showDatePicker, setShowDatePicker] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+
+	const [selectedOption, setSelectedOption] = useState<
+		"now" | "schedule" | null
+	>(null);
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 	const [selectedTime, setSelectedTime] = useState<string | null>(null);
+	const [showCalendar, setShowCalendar] = useState(false);
 	const [platform, setPlatform] = useState<"phone" | "zoom" | null>(null);
 	const [telegram, setTelegram] = useState("");
 	const [viber, setViber] = useState("");
 
-	const router = useRouter();
-
-	useEffect(() => {
-		if (!id) return;
-		const found = MOCK_PROPERTIES.find(
-			(p) => p.id?.toString() === id.toString(),
-		);
-		setProperty(found || null);
-		setAgent(MOCK_AGENTS[0]);
-	}, [id]);
-
-	// Step management
-	const [step, setStep] = useState(1);
-
-	// User inputs
-	const [phoneNumber, setPhoneNumber] = useState("");
-	const [password, setPassword] = useState("");
-
 	const phoneInputRef = useRef<PhoneInput>(null);
 
+	const formatDate = (date: Date) =>
+		date.toLocaleDateString("en-US", {
+			month: "long",
+			day: "numeric",
+			year: "numeric",
+		});
+
+	const timeSlots = [
+		"09:00",
+		"10:00",
+		"11:00",
+		"13:00",
+		"14:00",
+		"15:00",
+		"16:00",
+		"17:00",
+	];
+
+	const isStep4Valid = () => {
+		if (selectedOption === "now") return true;
+		if (selectedOption === "schedule" && selectedDate && selectedTime)
+			return true;
+		return false;
+	};
+
+	const isCurrentStepValid = () => {
+		if (step === 1) {
+			const isValid =
+				phoneInputRef.current?.isValidNumber(phoneNumber) || false;
+			return isValid && password.length >= 6;
+		}
+		if (step === 4) {
+			return isStep4Valid();
+		}
+		// Steps 2, 3, 5, 6, 7 have no required fields → always valid
+		return true;
+	};
+
 	const handleContinue = () => {
-		// Simple validation
-		const isValid = phoneInputRef.current?.isValidNumber(phoneNumber);
-
-		if (!isValid) {
-			Alert.alert("Invalid phone number");
+		if (step === 1) {
+			const isValid = phoneInputRef.current?.isValidNumber(phoneNumber);
+			if (!isValid) {
+				Alert.alert("Invalid phone number");
+				return;
+			}
+			if (password.length < 6) {
+				Alert.alert("Password must be at least 6 characters");
+				return;
+			}
+		}
+		if (step === 4 && !isStep4Valid()) {
+			Alert.alert("Please select a preferred time");
 			return;
 		}
-
-		if (password.length < 6) {
-			Alert.alert("Password must be at least 6 characters");
-			return;
-		}
-
-		// For now, just go to step 2
 		setStep(step + 1);
 	};
 
-	const coverMedia = property?.media?.find((m) => m.type === "cover");
-
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: colors.appBackground }}>
 			<KeyboardAvoidingView
 				style={{ flex: 1 }}
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
 			>
 				<ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
-					{/* Header */}
 					<View style={styles.header}>
-						<TouchableOpacity
+						<BackButton
 							onPress={() => {
 								if (step > 1) {
 									setStep(step - 1);
@@ -90,404 +236,603 @@ export default function Booking() {
 									router.back();
 								}
 							}}
-						>
-							<Text style={styles.backText}>Back</Text>
-						</TouchableOpacity>
-						<Text style={styles.title}>Book Consultation</Text>
+						/>
+						<PageTitle style={styles.title}>Book Consultation</PageTitle>
 					</View>
 
-					{/* Step indicator */}
-					<Text style={styles.stepIndicator}>Step {step} of 7</Text>
+					<BodyText style={styles.stepIndicator}>Step {step} of 7</BodyText>
+					<StepProgressBar currentStep={step} totalSteps={7} />
 
-					{/* Step content */}
+					{/* Step 1 */}
 					{step === 1 && (
 						<View style={styles.stepContainer}>
-							<Text style={styles.stepTitle}>Create Account</Text>
-							<Text style={styles.stepSubtitle}>
+							<NormalTitle style={styles.stepTitle}>Create Account</NormalTitle>
+							<BodyText style={styles.stepSubtitle}>
 								Enter your phone number and set a password
-							</Text>
+							</BodyText>
 
-							{/* Phone number input */}
+							{/* Phone Number input */}
+							<BodyText
+								style={[
+									styles.inputLabel,
+									{
+										color: colors.textPrimary,
+									},
+								]}
+							>
+								Phone Number
+							</BodyText>
 							<PhoneInput
 								ref={phoneInputRef}
 								defaultValue={phoneNumber}
-								defaultCode="MM" // Myanmar
-								layout="first"
+								defaultCode="MM"
+								layout="second"
 								onChangeFormattedText={setPhoneNumber}
-								containerStyle={styles.phoneContainer}
-								textContainerStyle={styles.phoneTextContainer}
+								containerStyle={{
+									backgroundColor: colors.background,
+									width: "100%",
+									height: 50,
+									marginBottom: 16,
+									gap: 10,
+								}}
 								countryPickerProps={{ renderFlagButton: undefined }}
+								withShadow={false}
+								autoFocus
+								textContainerStyle={{
+									backgroundColor: colors.surface,
+									paddingVertical: 0,
+									borderWidth: 1,
+									borderColor: colors.primaryGray + 50,
+									borderRadius: 15,
+									paddingHorizontal: 12,
+								}}
+								flagButtonStyle={{
+									borderWidth: 1,
+									borderColor: colors.primaryGray + 50,
+									borderRadius: 15,
+									width: "30%",
+								}}
+								placeholder="9 xxx xxx xxx"
 							/>
 
-							{/* Password input */}
-							<TextInput
-								style={styles.input}
-								placeholder="Password"
-								secureTextEntry
-								value={password}
-								onChangeText={setPassword}
-							/>
-
-							{/* Continue button */}
-							<TouchableOpacity
-								style={styles.continueButton}
-								onPress={handleContinue}
+							{/* Password input with eye icon */}
+							<BodyText
+								style={[
+									styles.inputLabel,
+									{
+										color: colors.textPrimary,
+									},
+								]}
 							>
-								<Text style={styles.continueText}>Continue</Text>
-							</TouchableOpacity>
+								Password
+							</BodyText>
+							<View
+								style={[
+									styles.passwordContainer,
+									{
+										borderColor: colors.border,
+										backgroundColor: colors.surface,
+									},
+								]}
+							>
+								<TextInput
+									style={[
+										styles.passwordInput,
+										{ borderColor: colors.border, color: colors.textPrimary },
+									]}
+									placeholder="Min 6 characters"
+									placeholderTextColor={colors.textSecondary}
+									secureTextEntry={!showPassword}
+									value={password}
+									onChangeText={setPassword}
+								/>
+								<TouchableOpacity
+									onPress={() => setShowPassword(!showPassword)}
+									style={styles.eyeIcon}
+								>
+									{showPassword ? (
+										<EyeOff size={20} color={colors.textSecondary} />
+									) : (
+										<Eye size={20} color={colors.textSecondary} />
+									)}
+								</TouchableOpacity>
+							</View>
 						</View>
 					)}
 
+					{/* Step 2 */}
+					{/* Step 2 */}
 					{step === 2 && (
 						<View style={styles.stepContainer}>
-							{/* Step 2 Title */}
-							<Text style={styles.stepTitle}>Property Selected</Text>
+							<NormalTitle style={styles.stepTitle}>
+								Property Selected
+							</NormalTitle>
 
-							{/* Property Card */}
-							<View style={styles.propertyCard}>
-								<View style={styles.propertyImageContainer}>
-									<Image
-										source={{ uri: coverMedia?.url }} // mock image
-										style={styles.propertyImage}
-									/>
-								</View>
-								<View style={styles.propertyInfo}>
-									<Text style={styles.propertyName}>{property?.name}</Text>
-									<Text style={styles.propertyLocation}>
-										{property?.location_text}
-									</Text>
-									<Text style={styles.propertyDetails}>
-										{property?.bedrooms} 🛏 · {property?.bathrooms} 🛁 · ฿
-										{formatPrice(property?.price)}
-									</Text>
-								</View>
-							</View>
-
-							{/* Agent Container */}
-							<View style={styles.agentContainer}>
-								<Image
-									source={{ uri: agent?.profile_image }} // mock agent image
-									style={styles.agentImage}
-								/>
-								<View style={styles.agentInfo}>
-									<Text style={styles.agentName}>{agent?.name}</Text>
-									<Text style={styles.agentSubtitle}>Your Property Agent</Text>
-								</View>
-							</View>
-
-							{/* Continue Button */}
-							<TouchableOpacity
-								style={styles.continueButton}
-								onPress={() => setStep(step + 1)}
+							<View
+								style={[
+									styles.propertyCard,
+									globalStyles.shadows,
+									{ backgroundColor: colors.surface, borderRadius: 16 },
+								]}
 							>
-								<Text style={styles.continueText}>Continue</Text>
-							</TouchableOpacity>
+								<Image
+									source={{ uri: propertyImage }}
+									style={[
+										styles.propertyCardImage,
+										{ borderTopLeftRadius: 16, borderTopRightRadius: 16 },
+									]}
+								/>
+								<View style={styles.propertyCardInfo}>
+									<NormalTitle
+										style={[
+											styles.propertyCardTitle,
+											{ color: colors.textPrimary },
+										]}
+									>
+										{propertyTitle}
+									</NormalTitle>
+									<View style={styles.locationRow}>
+										<MapPin size={14} color={colors.primaryGold} />
+										<BodyText
+											style={[
+												styles.propertyCardLocation,
+												{ color: colors.textSecondary },
+											]}
+										>
+											{propertyLocation}
+										</BodyText>
+									</View>
+									<PageTitle
+										style={[
+											styles.propertyCardPrice,
+											{ color: colors.primaryGold },
+										]}
+									>
+										฿{formatPrice(parseInt(propertyPrice))}
+									</PageTitle>
+								</View>
+							</View>
+
+							{/* Agent container remains unchanged */}
+							<View
+								style={[
+									styles.agentContainer,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
+							>
+								<Image source={{ uri: agentImage }} style={styles.agentImage} />
+								<View style={styles.agentInfo}>
+									<NormalTitle style={styles.agentName}>
+										{agentName}
+									</NormalTitle>
+									<BodyText style={styles.agentSubtitle}>
+										{isAgent ? "Your Property Agent" : "Property Owner"}
+									</BodyText>
+								</View>
+							</View>
 						</View>
 					)}
+
+					{/* Step 3 */}
 					{step === 3 && (
 						<View style={styles.stepContainer}>
-							{/* Step 3 Title */}
-							<Text style={styles.stepTitle}>Your Question</Text>
-							<Text style={styles.stepSubtitle}>
-								Optional – tell the agent what you’d like to know
-							</Text>
+							<NormalTitle style={styles.stepTitle}>Your Question</NormalTitle>
+							<BodyText style={styles.stepSubtitle}>
+								Optional – tell the agent what you&apos;d like to know
+							</BodyText>
 
-							{/* Huge text input */}
 							<TextInput
-								style={styles.textArea}
+								style={[
+									styles.textArea,
+									{
+										borderColor: colors.primaryGray + 50,
+										color: colors.textPrimary,
+										backgroundColor: colors.background,
+									},
+									globalStyles.shadows,
+								]}
 								placeholder="e.g. Is the price negotiable? Is it near BTS?…"
+								placeholderTextColor={colors.textSecondary}
 								multiline
 								numberOfLines={6}
 								textAlignVertical="top"
 								value={question}
 								onChangeText={setQuestion}
 							/>
-
-							{/* Continue Button */}
-							<TouchableOpacity
-								style={styles.continueButton}
-								onPress={() => setStep(step + 1)}
-							>
-								<Text style={styles.continueText}>Continue</Text>
-							</TouchableOpacity>
 						</View>
 					)}
+
+					{/* Step 4 */}
 					{step === 4 && (
 						<View style={styles.stepContainer}>
-							<Text style={styles.stepTitle}>Preferred Time</Text>
-
-							{/* Row of two boxes */}
-							<View
-								style={{
-									flexDirection: "row",
-									justifyContent: "space-between",
-								}}
-							>
+							<NormalTitle style={styles.stepTitle}>Preferred Time</NormalTitle>
+							<View style={styles.optionRow}>
+								{/* Right now option */}
 								<TouchableOpacity
 									style={[
-										styles.timeBox,
-										timeOption === "now" && styles.timeBoxSelected,
-										{ flex: 1, marginRight: 8 },
+										styles.optionBox,
+										{
+											backgroundColor:
+												selectedOption === "now"
+													? colors.primaryGold + "20"
+													: colors.background,
+											borderColor:
+												selectedOption === "now"
+													? colors.primaryGold
+													: colors.primaryGray + 50,
+										},
 									]}
 									onPress={() => {
-										setTimeOption("now");
+										setSelectedOption("now");
 										setSelectedDate(null);
 										setSelectedTime(null);
+										setShowCalendar(false);
 									}}
 								>
-									<Text style={styles.timeBoxTitle}>Right now</Text>
-									<Text style={styles.timeBoxSubtitle}>Start immediately</Text>
+									<View
+										style={[
+											styles.optionIconCircle,
+											{ backgroundColor: colors.primaryGold + "20" },
+										]}
+									>
+										<Zap size={24} color={colors.primaryGold} />
+									</View>
+									<NormalTitle style={styles.optionTitle}>
+										Right now
+									</NormalTitle>
+									<BodyText style={styles.optionSubtitle}>
+										Start immediately
+									</BodyText>
 								</TouchableOpacity>
 
+								{/* Schedule option */}
 								<TouchableOpacity
 									style={[
-										styles.timeBox,
-										timeOption === "schedule" && styles.timeBoxSelected,
-										{ flex: 1, marginLeft: 8 },
+										styles.optionBox,
+										{
+											backgroundColor:
+												selectedOption === "schedule"
+													? colors.primaryGold + "20"
+													: colors.background,
+											borderColor:
+												selectedOption === "schedule"
+													? colors.primaryGold
+													: colors.primaryGray + 50,
+										},
 									]}
-									onPress={() => setTimeOption("schedule")}
+									onPress={() => setSelectedOption("schedule")}
 								>
-									<Text style={styles.timeBoxTitle}>Schedule</Text>
-									<Text style={styles.timeBoxSubtitle}>Pick date & time</Text>
+									<View
+										style={[
+											styles.optionIconCircle,
+											{ backgroundColor: colors.primaryGold + "20" },
+										]}
+									>
+										<CalendarDays size={24} color={colors.primaryGold} />
+									</View>
+									<NormalTitle style={styles.optionTitle}>Schedule</NormalTitle>
+									<BodyText style={styles.optionSubtitle}>
+										Pick date & time
+									</BodyText>
 								</TouchableOpacity>
 							</View>
 
-							{/* Schedule options */}
-							{timeOption === "schedule" && (
-								<View style={{ marginTop: 12 }}>
+							{selectedOption === "schedule" && (
+								<View style={styles.scheduleContainer}>
+									{/* Calendar appears above the button when showCalendar is true */}
+									{showCalendar && (
+										<InlineCalendar
+											selectedDate={selectedDate}
+											onSelectDate={(date) => {
+												setSelectedDate(date);
+												setShowCalendar(false);
+											}}
+										/>
+									)}
+
 									<TouchableOpacity
-										style={styles.datePickerBox}
-										onPress={() => setShowDatePicker(true)}
+										style={[
+											styles.datePickerButton,
+											{
+												backgroundColor: colors.surface,
+												borderColor: colors.primaryGray,
+											},
+										]}
+										onPress={() => setShowCalendar(!showCalendar)}
 									>
-										<Text style={styles.datePickerText}>
-											{selectedDate
-												? selectedDate.toLocaleDateString("en-US", {
-														month: "long",
-														day: "numeric",
-														year: "numeric",
-													})
-												: "Pick a date"}
-										</Text>
+										<View style={styles.datePickerButtonContent}>
+											<CalendarDays size={18} color={colors.textPrimary} />
+											<BodyText
+												style={{
+													fontSize: 16,
+													color: colors.textPrimary,
+												}}
+											>
+												{selectedDate
+													? formatDate(selectedDate)
+													: "Pick a date"}
+											</BodyText>
+										</View>
 									</TouchableOpacity>
 
-									{/* Time slots */}
 									{selectedDate && (
-										<View
-											style={{
-												flexDirection: "row",
-												flexWrap: "wrap",
-												justifyContent: "space-between",
-											}}
-										>
-											{[
-												"09:00",
-												"10:00",
-												"11:00",
-												"13:00",
-												"14:00",
-												"15:00",
-												"16:00",
-												"17:00",
-											].map((time) => (
-												<TouchableOpacity
-													key={time}
-													style={[
-														styles.timeSlotBox,
-														selectedTime === time && styles.timeSlotSelected,
-														{ width: "23%", marginBottom: 12 },
-													]}
-													onPress={() => setSelectedTime(time)}
-												>
-													<Text
-														style={{
-															color: selectedTime === time ? "#fff" : "#000",
-															textAlign: "center",
-															fontWeight: "500",
-														}}
+										<View style={styles.timeSlotsContainer}>
+											<View style={styles.timeGrid}>
+												{timeSlots.map((time) => (
+													<TouchableOpacity
+														key={time}
+														style={[
+															styles.timeSlot,
+															{
+																backgroundColor: colors.background,
+																borderColor: colors.primaryGray + 50,
+															},
+															selectedTime === time && {
+																backgroundColor: colors.primaryGold,
+																borderColor: colors.primaryGold,
+															},
+														]}
+														onPress={() => setSelectedTime(time)}
 													>
-														{time}
-													</Text>
-												</TouchableOpacity>
-											))}
+														<BodyText
+															style={[
+																styles.timeSlotText,
+																{ color: colors.textPrimary },
+																selectedTime === time
+																	? styles.selectedTimeSlotText
+																	: {},
+															]}
+														>
+															{time}
+														</BodyText>
+													</TouchableOpacity>
+												))}
+											</View>
 										</View>
 									)}
 								</View>
 							)}
-
-							{/* Continue button */}
-							<TouchableOpacity
-								style={[
-									styles.continueButton,
-									!(timeOption === "now" || (selectedDate && selectedTime)) && {
-										opacity: 0.5,
-									},
-								]}
-								disabled={
-									!(timeOption === "now" || (selectedDate && selectedTime))
-								}
-								onPress={() => setStep(step + 1)}
-							>
-								<Text style={styles.continueText}>Continue</Text>
-							</TouchableOpacity>
-
-							{/* Date picker modal */}
-							<ModalDateTimePicker
-								isVisible={showDatePicker}
-								mode="date"
-								onConfirm={(date) => {
-									setSelectedDate(date);
-									setShowDatePicker(false);
-									setSelectedTime(null);
-								}}
-								onCancel={() => setShowDatePicker(false)}
-							/>
 						</View>
 					)}
+
+					{/* Step 5 */}
 					{step === 5 && (
 						<View style={styles.stepContainer}>
-							{/* Step 5 Title */}
-							<Text style={styles.stepTitle}>Consultation Fee</Text>
-
-							{/* Fee Box */}
-							<View style={styles.feeBox}>
-								<Text style={styles.feeTitle}>Agent Consultation Fee</Text>
-								<Text style={styles.feeAmount}>0 MMK</Text>
-								<Text style={styles.feeSubtitle}>
-									✦ Complimentary — Premium Promotion
-								</Text>
-							</View>
-
-							{/* Continue Button */}
-							<TouchableOpacity
-								style={styles.continueButton}
-								onPress={() => setStep(step + 1)}
+							<NormalTitle style={styles.stepTitle}>
+								Consultation Fee
+							</NormalTitle>
+							<View
+								style={[
+									styles.feeBox,
+									{
+										backgroundColor: colors.surface,
+										borderColor: colors.border,
+									},
+								]}
 							>
-								<Text style={styles.continueText}>Continue</Text>
-							</TouchableOpacity>
+								<BodyText style={styles.feeTitle}>
+									Agent Consultation Fee
+								</BodyText>
+								<PageTitle style={{ color: colors.primaryRed, fontSize: 30 }}>
+									0 MMK
+								</PageTitle>
+								<NormalTitle
+									style={{
+										color: colors.primaryGreen,
+										textAlign: "center",
+									}}
+								>
+									✦ Complimentary — Premium Promotion
+								</NormalTitle>
+							</View>
 						</View>
 					)}
+
+					{/* Step 6 */}
 					{step === 6 && (
 						<View style={styles.stepContainer}>
-							{/* Step 6 Title */}
-							<Text style={styles.stepTitle}>Platform</Text>
-
-							{/* Row of two platform options */}
-							<View
-								style={{
-									flexDirection: "row",
-									justifyContent: "space-between",
-									marginVertical: 12,
-								}}
-							>
-								{/* Phone Call */}
+							<NormalTitle style={styles.stepTitle}>Platform</NormalTitle>
+							<View style={styles.platformRow}>
+								{/* Phone Call option */}
 								<TouchableOpacity
 									style={[
 										styles.platformBox,
-										platform === "phone" && styles.platformBoxSelected,
-										{ flex: 1, marginRight: 8 },
+										{
+											backgroundColor:
+												platform === "phone"
+													? colors.primaryGold + "20"
+													: colors.background,
+											borderColor:
+												platform === "phone"
+													? colors.primaryGold
+													: colors.primaryGray + "50",
+										},
 									]}
 									onPress={() => setPlatform("phone")}
 								>
-									<Text style={styles.platformIcon}>📞</Text>
-									<Text style={styles.platformText}>Phone Call</Text>
+									<View
+										style={[
+											styles.platformIconCircle,
+											{ backgroundColor: colors.primaryGold + 20 },
+										]}
+									>
+										<Phone size={24} color={colors.primaryGold} />
+									</View>
+									<NormalTitle style={styles.platformText}>
+										Phone Call
+									</NormalTitle>
 								</TouchableOpacity>
 
-								{/* Zoom */}
+								{/* Zoom option */}
 								<TouchableOpacity
 									style={[
 										styles.platformBox,
-										platform === "zoom" && styles.platformBoxSelected,
-										{ flex: 1, marginLeft: 8 },
+										{
+											backgroundColor:
+												platform === "zoom"
+													? colors.primaryGold + "20"
+													: colors.background,
+											borderColor:
+												platform === "zoom"
+													? colors.primaryGold
+													: colors.primaryGray + "50",
+										},
 									]}
 									onPress={() => setPlatform("zoom")}
 								>
-									<Text style={styles.platformIcon}>📹</Text>
-									<Text style={styles.platformText}>Zoom</Text>
+									<View
+										style={[
+											styles.platformIconCircle,
+											{ backgroundColor: colors.primaryGold + 20 },
+										]}
+									>
+										<VideoIcon size={24} color={colors.primaryGold} />
+									</View>
+									<NormalTitle style={styles.platformText}>Zoom</NormalTitle>
 								</TouchableOpacity>
 							</View>
 
-							{/* Conditional rendering based on selection */}
-							{platform === "phone" && (
-								<View style={styles.altContactBox}>
-									<Text style={styles.altContactTitle}>
-										Optional – Alternative contact
-									</Text>
-									<TextInput
-										style={styles.input}
-										placeholder="Telegram ID (optional)"
-										value={telegram}
-										onChangeText={setTelegram}
-									/>
-									<TextInput
-										style={styles.input}
-										placeholder="Viber number (optional)"
-										value={viber}
-										onChangeText={setViber}
-									/>
+							{platform === "zoom" && (
+								<View
+									style={[
+										styles.zoomInfoBox,
+										{
+											backgroundColor: colors.primaryGray + 20,
+											borderColor: colors.primaryGray + 20,
+										},
+									]}
+								>
+									<BodyText
+										style={{
+											fontSize: 14,
+											color: colors.textPrimary,
+										}}
+									>
+										📹 A private Zoom link will be sent to you before your
+										session.
+									</BodyText>
 								</View>
 							)}
 
-							{platform === "zoom" && (
-								<>
-									<View style={styles.zoomInfoBox}>
-										<Text style={styles.zoomInfoText}>
-											📹 A private Zoom link will be sent to you before your
-											session.
-										</Text>
-									</View>
-									<View style={styles.altContactBox}>
-										<Text style={styles.altContactTitle}>
-											Optional – Alternative contact
-										</Text>
+							{platform && (
+								<View
+									style={[
+										styles.altContactBox,
+										{
+											backgroundColor: colors.background,
+											padding: 10,
+											borderRadius: 10,
+										},
+										globalStyles.shadows,
+									]}
+								>
+									<BodyText style={styles.altContactTitle}>
+										Optional – Alternative contact
+									</BodyText>
+
+									{/* Telegram input with icon outside */}
+									<View style={styles.altInputRow}>
+										<View style={[styles.altIconCircle]}>
+											<MessageCircle size={20} color="#08c" />
+										</View>
 										<TextInput
-											style={styles.input}
+											style={[
+												styles.altInputField,
+												{
+													borderColor: colors.border,
+													color: colors.textPrimary,
+												},
+											]}
 											placeholder="Telegram ID (optional)"
+											placeholderTextColor={colors.textSecondary}
 											value={telegram}
 											onChangeText={setTelegram}
 										/>
+									</View>
+
+									{/* Viber input with icon outside */}
+									<View style={styles.altInputRow}>
+										<View style={[styles.altIconCircle]}>
+											<Phone size={20} color="#7360f2" />
+										</View>
 										<TextInput
-											style={styles.input}
+											style={[
+												styles.altInputField,
+												{
+													borderColor: colors.border,
+													color: colors.textPrimary,
+												},
+											]}
 											placeholder="Viber number (optional)"
+											placeholderTextColor={colors.textSecondary}
 											value={viber}
 											onChangeText={setViber}
 										/>
 									</View>
-								</>
+								</View>
 							)}
-
-							{/* Continue Button */}
-							<TouchableOpacity
-								style={styles.continueButton}
-								onPress={() => setStep(step + 1)}
-							>
-								<Text style={styles.continueText}>Continue</Text>
-							</TouchableOpacity>
 						</View>
 					)}
+
+					{/* Step 7 */}
 					{step === 7 && (
 						<View style={styles.stepContainer}>
-							<Text style={styles.stepTitle}>Confirmation</Text>
+							<NormalTitle style={styles.stepTitle}>Confirmation</NormalTitle>
 
-							{/* Info rows */}
-							<View style={styles.infoRow}>
-								<Text style={styles.infoLabel}>Phone</Text>
-								<Text style={styles.infoValue}>{phoneNumber}</Text>
+							{/* Phone row */}
+							<View
+								style={[
+									styles.confirmCard,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
+							>
+								<BodyText style={styles.confirmLabel}>Phone</BodyText>
+								<NormalTitle style={styles.confirmValue}>
+									{phoneNumber}
+								</NormalTitle>
 							</View>
 
-							<View style={styles.infoRow}>
-								<Text style={styles.infoLabel}>Property</Text>
-								<Text style={styles.infoValue}>{property?.name}</Text>
+							{/* Property row */}
+							<View
+								style={[
+									styles.confirmCard,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
+							>
+								<BodyText style={styles.confirmLabel}>Property</BodyText>
+								<NormalTitle style={styles.confirmValue}>
+									Luxury Condo at Sukhumvit 24
+								</NormalTitle>
 							</View>
 
-							<View style={styles.infoRow}>
-								<Text style={styles.infoLabel}>Agent</Text>
-								<Text style={styles.infoValue}>{agent?.name}</Text>
+							{/* Agent row */}
+							<View
+								style={[
+									styles.confirmCard,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
+							>
+								<BodyText style={styles.confirmLabel}>Agent</BodyText>
+								<NormalTitle style={styles.confirmValue}>
+									Aye Thandar
+								</NormalTitle>
 							</View>
 
-							<View style={styles.infoRow}>
-								<Text style={styles.infoLabel}>Time</Text>
-								<Text style={styles.infoValue}>
-									{timeOption === "now"
+							{/* Time row */}
+							<View
+								style={[
+									styles.confirmCard,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
+							>
+								<BodyText style={styles.confirmLabel}>Time</BodyText>
+								<NormalTitle style={styles.confirmValue}>
+									{selectedOption === "now"
 										? "Right now"
 										: selectedDate && selectedTime
 											? `${selectedDate.toLocaleDateString("en-US", {
@@ -496,78 +841,107 @@ export default function Booking() {
 													year: "numeric",
 												})} at ${selectedTime}`
 											: "-"}
-								</Text>
+								</NormalTitle>
 							</View>
 
-							<View style={styles.infoRow}>
-								<Text style={styles.infoLabel}>Platform</Text>
-								<Text style={styles.infoValue}>
+							{/* Platform row */}
+							<View
+								style={[
+									styles.confirmCard,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
+							>
+								<BodyText style={styles.confirmLabel}>Platform</BodyText>
+								<NormalTitle style={styles.confirmValue}>
 									{platform === "phone"
 										? "Phone Call"
 										: platform === "zoom"
 											? "Zoom"
 											: "-"}
-								</Text>
+								</NormalTitle>
 							</View>
 
-							<View style={styles.infoRow}>
-								<Text style={styles.infoLabel}>Fee</Text>
-								<Text style={styles.infoValue}>0 MMK</Text>
-							</View>
-
-							{/* Confirm button */}
-							<TouchableOpacity
-								style={[styles.continueButton, { marginTop: 20 }]}
-								onPress={() => router.push("/success")}
+							{/* Fee row */}
+							<View
+								style={[
+									styles.confirmCard,
+									{ backgroundColor: colors.surface },
+									globalStyles.shadows,
+								]}
 							>
-								<Text style={styles.continueText}>✦Confirm Appointment</Text>
-							</TouchableOpacity>
+								<BodyText style={styles.confirmLabel}>Fee</BodyText>
+								<PageTitle
+									style={[
+										styles.confirmValue,
+										{ color: colors.primaryRed, fontSize: 18 },
+									]}
+								>
+									0 MMK
+								</PageTitle>
+							</View>
 						</View>
 					)}
 				</ScrollView>
+				<View
+					style={[
+						styles.bottomButtonContainer,
+						{
+							backgroundColor: colors.background,
+						},
+					]}
+				>
+					<TouchableOpacity
+						style={[
+							styles.continueButton,
+							{ backgroundColor: colors.primaryGold },
+							!isCurrentStepValid() && { opacity: 0.5 },
+						]}
+						onPress={() => {
+							if (step === 7) {
+								router.replace("/success");
+							} else {
+								handleContinue();
+							}
+						}}
+						disabled={!isCurrentStepValid()}
+					>
+						<BodyText style={styles.continueText}>
+							{step === 7 ? "✦ Confirm Appointment" : "Continue"}
+						</BodyText>
+					</TouchableOpacity>
+				</View>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }
 
-/* ---------------- STYLES ---------------- */
-
+// Styles (updated to use theme colors where appropriate, but keep structure)
 const styles = StyleSheet.create({
 	header: {
 		flexDirection: "row",
 		alignItems: "center",
 		marginBottom: 20,
+		gap: 12,
 	},
-	backText: { fontSize: 14, color: "#007bff" },
-	title: { fontSize: 18, fontWeight: "600" },
-	stepIndicator: { fontSize: 12, color: "#666", marginBottom: 12 },
+	title: { marginBottom: 0 },
+	stepIndicator: { fontSize: 12, marginBottom: 12 },
 	stepContainer: { marginTop: 16 },
 	stepTitle: { fontSize: 16, fontWeight: "600", marginBottom: 4 },
-	stepSubtitle: { fontSize: 12, color: "#555", marginBottom: 16 },
-	phoneContainer: { width: "100%", height: 50, marginBottom: 12 },
-	phoneTextContainer: { paddingVertical: 0 },
+	stepSubtitle: { fontSize: 12, marginBottom: 16 },
 	input: {
 		borderWidth: 1,
-		borderColor: "#ccc",
 		borderRadius: 8,
 		padding: 12,
 		marginBottom: 16,
+		fontSize: 14,
 	},
 	continueButton: {
-		backgroundColor: "#000",
 		padding: 14,
 		borderRadius: 8,
 		alignItems: "center",
 	},
 	continueText: { color: "#fff", fontWeight: "600" },
-	propertyCard: {
-		flexDirection: "row",
-		backgroundColor: "#f9f9f9",
-		borderRadius: 8,
-		padding: 12,
-		marginBottom: 16,
-		alignItems: "center",
-	},
 	propertyImageContainer: {
 		width: 100,
 		height: 100,
@@ -577,97 +951,129 @@ const styles = StyleSheet.create({
 	propertyImage: { width: 100, height: 100, borderRadius: 8 },
 	propertyInfo: { flex: 1, marginLeft: 12 },
 	propertyName: { fontSize: 14, fontWeight: "600" },
-	propertyLocation: { fontSize: 12, color: "#555", marginVertical: 2 },
-	propertyDetails: { fontSize: 12, color: "#666" },
-
+	propertyLocation: { fontSize: 12, marginVertical: 2 },
+	propertyDetails: { fontSize: 12 },
 	agentContainer: {
 		flexDirection: "row",
 		alignItems: "center",
 		padding: 12,
-		backgroundColor: "#f5f5f5",
 		borderRadius: 8,
 		marginBottom: 16,
 	},
-	agentImage: { width: 50, height: 50, borderRadius: 25 },
+	agentImage: { width: 50, height: 50, borderRadius: 10 },
 	agentInfo: { marginLeft: 12 },
 	agentName: { fontSize: 14, fontWeight: "600" },
-	agentSubtitle: { fontSize: 12, color: "#555" },
+	agentSubtitle: { fontSize: 12 },
 	textArea: {
 		borderWidth: 1,
-		borderColor: "#ccc",
+		borderRadius: 8,
+		padding: 12,
+		minHeight: 120,
+		textAlignVertical: "top",
+		marginBottom: 16,
+		fontSize: 14,
+	},
+	optionRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginBottom: 20,
+	},
+	optionBox: {
+		flex: 1,
+		borderRadius: 12,
+		padding: 16,
+		marginHorizontal: 6,
+		alignItems: "center",
+		borderWidth: 1,
+	},
+	selectedOptionBox: { borderColor: "#000", backgroundColor: "#e8e8e8" },
+	optionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 4 },
+	optionSubtitle: { fontSize: 12, color: "#666" },
+	scheduleContainer: { marginTop: 8, marginBottom: 16 },
+	datePickerButton: {
+		padding: 14,
+		borderRadius: 8,
+		alignItems: "center",
+		marginBottom: 12,
+		borderWidth: 1,
+	},
+	calendarContainer: {
 		borderRadius: 8,
 		padding: 12,
 		marginBottom: 16,
-		minHeight: 120,
+		elevation: 2,
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
 	},
-	timeBox: {
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 8,
-		padding: 16,
+	calendarHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
 		marginBottom: 12,
 	},
-	timeBoxSelected: {
-		borderColor: "#000",
-		backgroundColor: "#e6e6e6",
+	calendarNav: { fontSize: 20, paddingHorizontal: 12 },
+	calendarMonth: { fontSize: 16, fontWeight: "600" },
+	calendarWeekDays: { flexDirection: "row", marginBottom: 8 },
+	weekDay: { flex: 1, textAlign: "center", fontWeight: "500", fontSize: 12 },
+	calendarDays: {
+		flexDirection: "row",
+		flexWrap: "wrap",
 	},
-	timeBoxTitle: { fontSize: 14, fontWeight: "600" },
-	timeBoxSubtitle: { fontSize: 12, color: "#555", marginTop: 4 },
-	datePickerBox: {
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 8,
-		padding: 12,
+	calendarDay: {
+		width: "14.28%",
+		aspectRatio: 1,
+		justifyContent: "center",
+		alignItems: "center",
 	},
-	datePickerText: { fontSize: 14, color: "#000" },
-	timeSlotBox: {
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 8,
-		paddingVertical: 10,
+	timeSlotsContainer: { marginTop: 8 },
+	timeGrid: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		justifyContent: "space-between",
+	},
+	timeSlot: {
+		width: "23%",
+		paddingVertical: 12,
 		marginBottom: 8,
+		borderRadius: 8,
+		alignItems: "center",
+		borderWidth: 1,
 	},
-	timeSlotSelected: {
-		backgroundColor: "#000",
-		borderColor: "#000",
-	},
+	timeSlotText: { fontSize: 14 },
+	selectedTimeSlotText: { color: "#fff" },
 	feeBox: {
 		borderWidth: 1,
-		borderColor: "#ccc",
 		borderRadius: 8,
 		padding: 16,
 		marginBottom: 16,
-		backgroundColor: "#f9f9f9",
+		alignItems: "center",
 	},
 	feeTitle: { fontSize: 14, fontWeight: "600", marginBottom: 4 },
-	feeAmount: { fontSize: 18, fontWeight: "700", marginBottom: 4 },
-	feeSubtitle: { fontSize: 12, color: "#555" },
+	feeSubtitle: { fontSize: 12 },
+	platformRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginVertical: 12,
+		gap: 16,
+	},
 	platformBox: {
+		flex: 1,
 		borderWidth: 1,
-		borderColor: "#ccc",
 		borderRadius: 8,
 		padding: 16,
 		alignItems: "center",
 	},
-	platformBoxSelected: {
-		borderColor: "#000",
-		backgroundColor: "#e6e6e6",
-	},
+	platformBoxSelected: { borderColor: "#000", backgroundColor: "#e6e6e6" },
 	platformIcon: { fontSize: 24, marginBottom: 8 },
 	platformText: { fontSize: 14, fontWeight: "600" },
-
 	altContactBox: { marginTop: 12 },
 	altContactTitle: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
-
 	zoomInfoBox: {
 		padding: 12,
 		borderWidth: 1,
-		borderColor: "#ccc",
 		borderRadius: 8,
-		backgroundColor: "#f9f9f9",
 		marginBottom: 12,
 	},
-	zoomInfoText: { fontSize: 14, color: "#000" },
 	infoRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
@@ -676,13 +1082,140 @@ const styles = StyleSheet.create({
 		borderBottomColor: "#eee",
 		marginBottom: 4,
 	},
-	infoLabel: {
-		fontSize: 14,
-		color: "#555",
+	infoLabel: { fontSize: 14 },
+	infoValue: { fontSize: 14, fontWeight: "600" },
+	bottomButtonContainer: {
+		paddingHorizontal: 16,
+		paddingBottom: 16,
+		paddingTop: 8,
 	},
-	infoValue: {
+	inputLabel: {
 		fontSize: 14,
+		fontWeight: "500",
+		marginBottom: 6,
+	},
+	passwordContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		borderWidth: 1,
+
+		borderRadius: 8,
+		marginBottom: 16,
+	},
+	passwordInput: {
+		flex: 1,
+		padding: 12,
+		fontSize: 14,
+		borderWidth: 0,
+	},
+	eyeIcon: {
+		padding: 12,
+	},
+	propertyCard: {
+		marginBottom: 16,
+	},
+	propertyCardImage: {
+		width: "100%",
+		height: 200,
+		resizeMode: "cover",
+	},
+	propertyCardInfo: {
+		padding: 16,
+	},
+	propertyCardTitle: {
+		fontSize: 18,
+		fontWeight: "bold",
+		marginBottom: 4,
+	},
+	locationRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 6,
+		marginBottom: 8,
+	},
+	propertyCardLocation: {
+		fontSize: 14,
+	},
+	propertyCardPrice: {
+		fontSize: 20,
+		marginTop: 4,
+	},
+	optionIconCircle: {
+		width: 48,
+		height: 48,
+		borderRadius: 12,
+		alignItems: "center",
+		justifyContent: "center",
+		marginBottom: 8,
+	},
+	datePickerButtonContent: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 8,
+		alignSelf: "flex-start",
+	},
+	calendarDayText: {
+		fontSize: 14,
+		textAlign: "center",
+	},
+	platformIconCircle: {
+		width: 48,
+		height: 48,
+		borderRadius: 12,
+		alignItems: "center",
+		justifyContent: "center",
+		marginBottom: 8,
+	},
+	altInputContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		borderWidth: 1,
+		borderRadius: 8,
+		marginBottom: 12,
+		paddingHorizontal: 12,
+	},
+	altInput: {
+		flex: 1,
+		paddingVertical: 12,
+		fontSize: 14,
+		marginLeft: 8,
+	},
+	altInputRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 12,
+		gap: 12,
+	},
+	altIconCircle: {
+		width: 40,
+		height: 40,
+		borderRadius: 12,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	altInputField: {
+		flex: 1,
+		borderWidth: 1,
+		borderRadius: 8,
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+		fontSize: 14,
+	},
+	confirmCard: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		padding: 16,
+		borderRadius: 12,
+		marginBottom: 12,
+	},
+	confirmLabel: {
+		fontSize: 14,
+		color: "#717684",
+	},
+	confirmValue: {
+		fontSize: 16,
 		fontWeight: "600",
-		color: "#000",
+		color: "black",
 	},
 });

@@ -41,7 +41,7 @@ export default function Profile() {
 	const logout = useAuthStore((s) => s.logout);
 	const bottomSheetRef = useRef<BottomSheet>(null);
 	const logoutSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => ["50%", "70%", "100%"], []);
+	const snapPoints = useMemo(() => ["50%", "70%", "90%"], []);
 
 	const handleOpenSheet = useCallback(() => {
 		bottomSheetRef.current?.expand();
@@ -267,20 +267,36 @@ export default function Profile() {
 				>
 					<BottomSheetView>
 						<View style={styles.logoutSheet}>
+							{/* Centered Logout Icon */}
+							<View
+								style={[
+									styles.logoutIconCircle,
+									{ backgroundColor: colors.darkRed },
+								]}
+							>
+								<LogOut size={32} color={colors.primaryRed} />
+							</View>
+
 							<NormalTitle
-								style={{
-									color: colors.textPrimary,
-									marginBottom: 20,
-									textAlign: "center",
-								}}
+								style={[styles.logoutTitle, { color: colors.textPrimary }]}
+							>
+								Log Out?
+							</NormalTitle>
+
+							<BodyText
+								style={[styles.logoutMessage, { color: colors.textSecondary }]}
 							>
 								Are you sure you want to log out of your account?
-							</NormalTitle>
+							</BodyText>
+
 							<View style={styles.logoutButtons}>
 								<TouchableOpacity
 									style={[
 										styles.logoutCancel,
-										{ backgroundColor: colors.secondaryMute },
+										{
+											backgroundColor: "#fff",
+											borderColor: colors.primaryGray + 50,
+										},
 									]}
 									onPress={() => logoutSheetRef.current?.close()}
 								>
@@ -387,6 +403,7 @@ const styles = StyleSheet.create({
 		padding: 12,
 		borderRadius: 8,
 		alignItems: "center",
+		borderWidth: 1,
 	},
 	logoutConfirm: {
 		flex: 1,
@@ -416,5 +433,26 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	logoutIconCircle: {
+		width: 64,
+		height: 64,
+		borderRadius: 15,
+		alignItems: "center",
+		justifyContent: "center",
+		marginBottom: 16,
+		alignSelf: "center",
+	},
+	logoutTitle: {
+		fontSize: 20,
+		fontWeight: "bold",
+		marginBottom: 8,
+		textAlign: "center",
+	},
+	logoutMessage: {
+		fontSize: 14,
+		textAlign: "center",
+		marginBottom: 24,
+		paddingHorizontal: 16,
 	},
 });

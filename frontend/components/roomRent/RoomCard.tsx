@@ -12,7 +12,7 @@ export default function RoomCard({ property }: { property: RoomRentProperty }) {
 
 	return (
 		<TouchableOpacity
-			onPress={() => router.push(`/roomRent/${property.id}`)}
+			onPress={() => router.push(`/property/roomRent/${property.id}`)}
 			activeOpacity={0.8}
 			style={styles.card}
 		>

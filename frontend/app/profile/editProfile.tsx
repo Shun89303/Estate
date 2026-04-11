@@ -1,7 +1,5 @@
 import { useRouter } from "expo-router";
 import {
-	Pressable,
-	Text,
 	View,
 	TextInput,
 	Image,
@@ -11,6 +9,10 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BackButton from "@/components/common/BackButton";
+import { BodyText, PageTitle } from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import { User, Camera } from "lucide-react-native";
 
 // Mock existing user data
 const mockUser = {
@@ -21,6 +23,7 @@ const mockUser = {
 
 export default function EditProfile() {
 	const router = useRouter();
+	const colors = useTheme();
 
 	const [imageUri, setImageUri] = useState<string | null>(null);
 	const [name, setName] = useState(mockUser?.name || "");
@@ -29,7 +32,7 @@ export default function EditProfile() {
 
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 1,
@@ -41,65 +44,95 @@ export default function EditProfile() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			{/* Back */}
-			<Pressable onPress={() => router.back()}>
-				<Text style={styles.back}>Back</Text>
-			</Pressable>
+		<SafeAreaView
+			style={[styles.container, { backgroundColor: colors.background }]}
+		>
+			<View style={styles.headerRow}>
+				<BackButton />
+				<PageTitle style={styles.header}>Edit Profile</PageTitle>
+			</View>
 
-			{/* Title */}
-			<Text style={styles.header}>Edit Profile</Text>
-
-			{/* Profile Image */}
+			{/* Profile Image with camera overlay */}
 			<TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
 				{imageUri ? (
 					<Image source={{ uri: imageUri }} style={styles.profileImage} />
 				) : (
-					<View style={styles.placeholder}>
-						<Text style={styles.placeholderText}>Upload Image</Text>
+					<View
+						style={[
+							styles.placeholder,
+							{ backgroundColor: colors.primaryGold + 20 },
+						]}
+					>
+						<User size={38} color={colors.primaryGold} />
 					</View>
 				)}
+				<View
+					style={[
+						styles.cameraIconContainer,
+						{ backgroundColor: colors.primaryGold },
+					]}
+				>
+					<Camera size={16} color="#fff" />
+				</View>
 			</TouchableOpacity>
 
 			{/* Inputs */}
 			<View style={styles.inputGroup}>
-				<Text style={styles.label}>Full Name</Text>
+				<BodyText style={[styles.label, { color: colors.textPrimary }]}>
+					Full Name
+				</BodyText>
 				<TextInput
-					style={styles.input}
+					style={[
+						styles.input,
+						{ borderColor: colors.border, color: colors.textPrimary },
+					]}
 					value={name}
 					onChangeText={setName}
 					placeholder="Enter your full name"
+					placeholderTextColor={colors.textSecondary}
 				/>
 			</View>
 
 			<View style={styles.inputGroup}>
-				<Text style={styles.label}>Phone Number</Text>
+				<BodyText style={[styles.label, { color: colors.textPrimary }]}>
+					Phone Number
+				</BodyText>
 				<TextInput
-					style={styles.input}
+					style={[
+						styles.input,
+						{ borderColor: colors.border, color: colors.textPrimary },
+					]}
 					value={phone}
 					onChangeText={setPhone}
 					placeholder="Enter your phone number"
 					keyboardType="phone-pad"
+					placeholderTextColor={colors.textSecondary}
 				/>
 			</View>
 
 			<View style={styles.inputGroup}>
-				<Text style={styles.label}>Email (optional)</Text>
+				<BodyText style={[styles.label, { color: colors.textPrimary }]}>
+					Email (optional)
+				</BodyText>
 				<TextInput
-					style={styles.input}
+					style={[
+						styles.input,
+						{ borderColor: colors.border, color: colors.textPrimary },
+					]}
 					value={email}
 					onChangeText={setEmail}
 					placeholder="Enter your email"
 					keyboardType="email-address"
+					placeholderTextColor={colors.textSecondary}
 				/>
 			</View>
 
 			{/* Save Changes */}
 			<TouchableOpacity
-				style={styles.saveButton}
+				style={[styles.saveButton, { backgroundColor: colors.primaryGold }]}
 				onPress={() => router.push("/(tabs)/profile")}
 			>
-				<Text style={styles.saveText}>Save Changes</Text>
+				<BodyText style={styles.saveText}>Save Changes</BodyText>
 			</TouchableOpacity>
 		</SafeAreaView>
 	);
@@ -108,75 +141,66 @@ export default function EditProfile() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#fff",
 		padding: 16,
 	},
-
-	back: {
-		fontSize: 14,
-		color: "#007bff",
-		marginBottom: 12,
-	},
-
-	header: {
-		fontSize: 20,
-		fontWeight: "700",
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
 		marginBottom: 24,
 	},
-
+	header: {
+		marginBottom: 0,
+	},
 	imagePicker: {
 		alignSelf: "center",
 		marginBottom: 24,
+		position: "relative",
 	},
-
 	profileImage: {
 		width: 100,
 		height: 100,
-		borderRadius: 50,
+		borderRadius: 15,
 	},
-
 	placeholder: {
 		width: 100,
 		height: 100,
-		borderRadius: 50,
-		backgroundColor: "#eee",
+		borderRadius: 15,
 		justifyContent: "center",
 		alignItems: "center",
 	},
-
-	placeholderText: {
-		color: "#666",
-		fontSize: 12,
-		textAlign: "center",
+	cameraIconContainer: {
+		position: "absolute",
+		bottom: -5,
+		right: -5,
+		width: 32,
+		height: 32,
+		borderRadius: 10,
+		justifyContent: "center",
+		alignItems: "center",
+		borderWidth: 2,
+		borderColor: "#fff",
 	},
-
 	inputGroup: {
 		marginBottom: 16,
 	},
-
 	label: {
 		fontSize: 12,
-		color: "#666",
 		marginBottom: 4,
 	},
-
 	input: {
 		borderWidth: 1,
-		borderColor: "#ccc",
 		borderRadius: 8,
 		paddingHorizontal: 12,
 		paddingVertical: 8,
 		fontSize: 14,
 	},
-
 	saveButton: {
-		backgroundColor: "#000",
 		paddingVertical: 12,
-		borderRadius: 8,
+		borderRadius: 15,
 		marginTop: 24,
 		alignItems: "center",
 	},
-
 	saveText: {
 		color: "#fff",
 		fontSize: 14,

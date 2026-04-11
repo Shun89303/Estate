@@ -9,7 +9,7 @@ import {
 	FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { MOCK_OFFPLAN, OffPlanProperty, UnitType } from "@/mock/offPlan";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import MediaCarousel from "@/components/common/MediaCarousel";
@@ -37,6 +37,7 @@ import globalStyles from "@/styles/styles";
 import formatPriceShort from "@/utils/formatPriceShort";
 
 export default function OffPlanDetails() {
+	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const [unitFilter, setUnitFilter] = useState<string>("All");
 	const [activeTab, setActiveTab] = useState<"Units" | "Payment" | "Trust">(
@@ -620,6 +621,19 @@ export default function OffPlanDetails() {
 				</View>
 				<Pressable
 					style={[styles.mainCta, { backgroundColor: colors.primaryGold }]}
+					onPress={() =>
+						router.push({
+							pathname: "/booking/[id]",
+							params: {
+								id: property.id,
+								image: property.media.cover,
+								title: property.title,
+								location: property.locationAddress,
+								bedrooms: 0,
+								price: 0,
+							},
+						})
+					}
 				>
 					<BodyText style={{ color: "#fff", fontWeight: "600" }}>
 						🏗️ Book Free Consultation

@@ -35,7 +35,7 @@ export default function OwnerDirect() {
 	const handleCardPress = (item: Property) => {
 		const isUnlocked = unlockedIds.includes(item.id);
 		if (isUnlocked) {
-			router.push(`/ownerDirect/${item.id}`);
+			router.push(`/property/ownerDirect/${item.id}`);
 		} else {
 			setSelectedProperty(item);
 			bottomSheetRef.current?.expand();

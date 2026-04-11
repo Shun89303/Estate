@@ -17,7 +17,7 @@ export type Notification = {
 export const MOCK_NOTIFICATIONS: Notification[] = [
 	{
 		id: 1,
-		title: "Welcome to the App",
+		title: "Welcome to King Capital!",
 		body: "Start exploring properties near you.",
 		createdAt: new Date(Date.now() - 5 * 60 * 1000),
 		read: false,

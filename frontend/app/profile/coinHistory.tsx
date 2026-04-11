@@ -1,99 +1,24 @@
-import { useRouter } from "expo-router";
-import {
-	Pressable,
-	Text,
-	View,
-	StyleSheet,
-	FlatList,
-	ScrollView,
-} from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// Mock history data
-const MOCK_HISTORY = [
-	{
-		id: "1",
-		icon: "arrow-upward",
-		title: "Top Up via Wallet",
-		date: "2026-04-01",
-		type: "Top Up",
-		value: "+50",
-	},
-	{
-		id: "2",
-		icon: "arrow-downward",
-		title: "Room Reservation",
-		date: "2026-04-02",
-		type: "Room Reserve",
-		value: "-20",
-	},
-	{
-		id: "3",
-		icon: "arrow-upward",
-		title: "Bought Coins",
-		date: "2026-04-03",
-		type: "Top Up",
-		value: "+30",
-	},
-	{
-		id: "4",
-		icon: "arrow-downward",
-		title: "Property Reservation",
-		date: "2026-04-04",
-		type: "Property Reserve",
-		value: "-15",
-	},
-	{
-		id: "5",
-		icon: "arrow-downward",
-		title: "Business Reserve",
-		date: "2026-04-05",
-		type: "Business Reserve",
-		value: "-10",
-	},
-];
+import { ArrowDownCircle, ArrowUpCircle, Coins } from "lucide-react-native";
+import BackButton from "@/components/common/BackButton";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+} from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import FilterSection from "@/components/common/FilterSection";
+import EmptyState from "@/components/common/EmptyState";
+import globalStyles from "@/styles/styles";
+import { MOCK_COIN_HISTORY } from "@/mock/coinHistory";
 
 export default function CoinHistory() {
-	const router = useRouter();
-	const [activeFilter, setActiveFilter] = useState<
-		| "All"
-		| "Top Up"
-		| "Room Reserve"
-		| "Property Reserve"
-		| "Business Reserve"
-		| "Unlock"
-		| "Refund"
-	>("All");
+	const colors = useTheme();
+	const [activeFilter, setActiveFilter] = useState<string>("All");
 
-	const filteredHistory =
-		activeFilter === "All"
-			? MOCK_HISTORY
-			: MOCK_HISTORY.filter((h) => h.type === activeFilter);
-
-	const mainBoxes = [
-		{
-			icon: "arrow-upward",
-			value: "+30",
-			title: "Earned / Bought",
-			color: "#4caf50",
-		},
-		{
-			icon: "arrow-downward",
-			value: "-10",
-			title: "Spent",
-			color: "#f44336",
-		},
-		{
-			icon: "attach-money",
-			value: "20",
-			title: "Balance",
-			color: "#ff9800",
-		},
-	];
-
-	const filters = [
+	const filterOptions = [
 		"All",
 		"Top Up",
 		"Room Reserve",
@@ -103,197 +28,222 @@ export default function CoinHistory() {
 		"Refund",
 	];
 
+	const filteredHistory =
+		activeFilter === "All"
+			? MOCK_COIN_HISTORY
+			: MOCK_COIN_HISTORY.filter((h) => h.type === activeFilter);
+
+	const mainBoxes = [
+		{
+			icon: ArrowUpCircle,
+			value: "+30",
+			title: "Earned / Bought",
+			color: colors.primaryGreen,
+			textColor: colors.primaryGray,
+			bgColor: colors.primaryGreen + "20",
+			borderColor: colors.primaryGreen + "50",
+		},
+		{
+			icon: ArrowDownCircle,
+			value: "-10",
+			title: "Spent",
+			color: colors.primaryOrange,
+			textColor: colors.primaryGray,
+			bgColor: colors.primaryOrange + "20",
+			borderColor: colors.primaryOrange + "50",
+		},
+		{
+			icon: Coins,
+			value: "20",
+			title: "Balance",
+			color: colors.primaryGold,
+			textColor: colors.primaryGray,
+			bgColor: colors.primaryGold + "20",
+			borderColor: colors.primaryGold + "50",
+		},
+	];
+
 	return (
-		<SafeAreaView style={styles.container}>
-			{/* Back */}
-			<Pressable onPress={() => router.back()}>
-				<Text style={styles.back}>Back</Text>
-			</Pressable>
+		<SafeAreaView
+			style={[styles.container, { backgroundColor: colors.background }]}
+		>
+			<View style={styles.headerRow}>
+				<BackButton />
+				<PageTitle style={styles.title}>Coin History</PageTitle>
+			</View>
 
-			{/* Title */}
-			<Text style={styles.title}>Coin History</Text>
-
-			{/* Boxes */}
 			<View style={styles.boxRow}>
 				{mainBoxes.map((box) => (
-					<View key={box.title} style={styles.box}>
-						<MaterialIcons name={box.icon as any} size={24} color={box.color} />
-						<Text style={styles.boxValue}>{box.value}</Text>
-						<Text style={styles.boxTitle}>{box.title}</Text>
+					<View
+						key={box.title}
+						style={[
+							styles.box,
+							{ backgroundColor: box.bgColor, borderColor: box.borderColor },
+						]}
+					>
+						<box.icon size={24} color={box.color} />
+						<NormalTitle style={[styles.boxValue, { color: box.color }]}>
+							{box.value}
+						</NormalTitle>
+						<BodyText
+							style={[styles.boxTitle, { color: box.textColor, opacity: 0.9 }]}
+						>
+							{box.title}
+						</BodyText>
 					</View>
 				))}
 			</View>
 
-			{/* Horizontally Scrollable Filters */}
-			<ScrollView
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={styles.scrollFilters}
-				contentContainerStyle={{ paddingHorizontal: 4 }}
-			>
-				{filters.map((f) => (
-					<Pressable
-						key={f}
-						style={[
-							styles.filterChip,
-							activeFilter === f && styles.filterChipActive,
-						]}
-						onPress={() => setActiveFilter(f as any)}
-					>
-						<Text
-							style={[
-								styles.filterText,
-								activeFilter === f && styles.filterTextActive,
-							]}
-						>
-							{f}
-						</Text>
-					</Pressable>
-				))}
-			</ScrollView>
-
-			{/* History List */}
-			<FlatList
-				data={filteredHistory}
-				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => (
-					<View style={styles.card}>
-						<MaterialIcons
-							name={item.icon as any}
-							size={24}
-							color={item.icon === "arrow-upward" ? "#4caf50" : "#f44336"}
-							style={{ marginRight: 12 }}
-						/>
-						<View style={styles.cardInfo}>
-							<Text style={styles.cardTitle}>{item.title}</Text>
-							<View style={styles.cardMetaRow}>
-								<Text style={styles.cardDate}>{item.date}</Text>
-								<Text style={styles.cardType}>{item.type}</Text>
-							</View>
-						</View>
-						<Text style={styles.cardValue}>{item.value}</Text>
-					</View>
-				)}
-				contentContainerStyle={{ paddingBottom: 20 }}
+			<FilterSection
+				options={filterOptions}
+				selected={activeFilter}
+				onSelect={setActiveFilter}
+				activeBgColor={colors.primaryGold}
+				activeTextColor="#fff"
+				inactiveBgColor={colors.primaryGray + "10"}
+				inactiveTextColor={colors.textPrimary}
+				borderRadius={20}
 			/>
+
+			{filteredHistory.length === 0 ? (
+				<EmptyState
+					title="No transactions found"
+					message="Try a different filter"
+					icon={Coins}
+				/>
+			) : (
+				<FlatList
+					data={filteredHistory}
+					keyExtractor={(item) => item.id}
+					renderItem={({ item }) => {
+						const isPositive = item.value.startsWith("+");
+						return (
+							<View style={[styles.card, globalStyles.shadows]}>
+								{/* Circular icon background */}
+								<View
+									style={[
+										styles.iconCircle,
+										{ backgroundColor: colors.secondaryMute },
+									]}
+								>
+									<Coins
+										size={24}
+										color={
+											isPositive ? colors.primaryGreen : colors.primaryGold
+										}
+									/>
+								</View>
+								<View style={styles.cardInfo}>
+									<NormalTitle style={styles.cardTitle}>
+										{item.title}
+									</NormalTitle>
+									<View style={styles.cardMetaRow}>
+										<BodyText
+											style={[styles.cardDate, { color: colors.textSecondary }]}
+										>
+											{item.date}
+										</BodyText>
+										<View
+											style={[
+												styles.typeBadge,
+												{ backgroundColor: colors.primaryGold + "20" },
+											]}
+										>
+											<BodyText
+												style={[styles.typeText, { color: colors.primaryGold }]}
+											>
+												{item.type}
+											</BodyText>
+										</View>
+									</View>
+								</View>
+								<NormalTitle
+									style={[
+										styles.cardValue,
+										{
+											color: isPositive
+												? colors.primaryGreen
+												: colors.primaryGold,
+										},
+									]}
+								>
+									{item.value}
+								</NormalTitle>
+							</View>
+						);
+					}}
+					contentContainerStyle={{ paddingBottom: 20 }}
+					showsVerticalScrollIndicator={false}
+				/>
+			)}
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: {
-		backgroundColor: "#fff",
-		padding: 16,
-	},
-
-	back: {
-		fontSize: 14,
-		color: "#007bff",
-		marginBottom: 12,
-	},
-
-	title: {
-		fontSize: 20,
-		fontWeight: "700",
+	container: { flex: 1, padding: 16 },
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
 		marginBottom: 16,
 	},
-
+	title: { marginBottom: 0 },
 	boxRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginBottom: 16,
+		marginBottom: 20,
+		gap: 12,
 	},
-
 	box: {
-		width: "30%",
-		backgroundColor: "#f5f5f5",
+		flex: 1,
 		paddingVertical: 12,
 		alignItems: "center",
-		borderRadius: 12,
-	},
-
-	boxValue: {
-		fontSize: 16,
-		fontWeight: "700",
-		marginVertical: 4,
-	},
-
-	boxTitle: {
-		fontSize: 12,
-		color: "#666",
-		textAlign: "center",
-	},
-
-	scrollFilters: {
-		marginBottom: 16,
-	},
-
-	filterChip: {
-		paddingHorizontal: 12, // keep some horizontal padding
-		paddingVertical: 4, // reduce vertical padding for shorter pills
 		borderRadius: 16,
 		borderWidth: 1,
-		borderColor: "#ccc",
-		marginRight: 8,
 	},
-
-	filterChipActive: {
-		backgroundColor: "#000",
-		borderColor: "#000",
+	boxValue: {
+		fontSize: 18,
+		fontWeight: "bold",
+		marginVertical: 4,
 	},
-
-	filterText: {
-		fontSize: 10, // smaller font
-		color: "#333",
-		fontWeight: "500",
+	boxTitle: {
+		fontSize: 12,
+		textAlign: "center",
 	},
-
-	filterTextActive: {
-		color: "#fff",
-	},
-
 	card: {
 		flexDirection: "row",
 		alignItems: "center",
-		backgroundColor: "#fff",
 		padding: 12,
-		borderRadius: 12,
+		borderRadius: 16,
 		marginBottom: 12,
-		elevation: 2,
-		shadowColor: "#000",
-		shadowOpacity: 0.1,
-		shadowOffset: { width: 0, height: 1 },
-		shadowRadius: 2,
+		backgroundColor: "#fff",
 	},
-
-	cardInfo: {
-		flex: 1,
+	iconCircle: {
+		width: 44,
+		height: 44,
+		borderRadius: 22,
+		alignItems: "center",
+		justifyContent: "center",
+		marginRight: 12,
 	},
-
-	cardTitle: {
-		fontSize: 14,
-		fontWeight: "600",
-	},
-
+	cardInfo: { flex: 1 },
+	cardTitle: { fontSize: 14, fontWeight: "600", marginBottom: 2 },
 	cardMetaRow: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 8,
-		marginTop: 2,
+		flexWrap: "wrap",
 	},
-
-	cardDate: {
-		fontSize: 11,
-		color: "#666",
+	cardDate: { fontSize: 11 },
+	typeBadge: {
+		paddingHorizontal: 8,
+		paddingVertical: 2,
+		borderRadius: 12,
 	},
-
-	cardType: {
-		fontSize: 11,
-		color: "#888",
+	typeText: {
+		fontSize: 10,
+		fontWeight: "500",
 	},
-
-	cardValue: {
-		fontSize: 14,
-		fontWeight: "700",
-	},
+	cardValue: { fontSize: 16, fontWeight: "bold" },
 });

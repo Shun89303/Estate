@@ -1,110 +1,138 @@
 import { useState } from "react";
+import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import {
-	View,
-	Text,
-	TouchableOpacity,
-	StyleSheet,
-	ScrollView,
-} from "react-native";
+	BodyText,
+	NormalTitle,
+	PageTitle,
+} from "@/components/atoms/Typography";
+import { useTheme } from "@/hooks/useTheme";
+import { Coins } from "lucide-react-native";
+import { MOCK_ONE_TIME_PACKS, MOCK_SUBSCRIPTIONS } from "@/mock/coinPacks";
 
 export default function TopUpCoins() {
+	const colors = useTheme();
 	const [selectedTab, setSelectedTab] = useState<"oneTime" | "subscriptions">(
 		"oneTime",
 	);
 
-	const oneTimePacks = [
-		{ title: "10 Coins", subtitle: "฿9.9/coin", value: "฿99" },
-		{
-			title: "30 Coins",
-			subtitle: "฿8.3/coin",
-			value: "฿249",
-			popular: true,
-		},
-		{ title: "50 Coins", subtitle: "฿7.9/coin", value: "฿399" },
-		{ title: "100 Coins", subtitle: "฿6.9/coin", value: "฿699" },
-		{ title: "200 Coins", subtitle: "฿5.9/coin", value: "฿1199" },
-	];
-
-	const subscriptions = [
-		{
-			title: "Basic",
-			subtitle: "30 coins/month",
-			value: "฿199/mo",
-			subValue: "Save 20%",
-		},
-		{
-			title: "Pro",
-			subtitle: "80 coins/month",
-			value: "฿449/mo",
-			subValue: "Save 35%",
-		},
-		{
-			title: "VIP",
-			subtitle: "200 coins/month",
-			value: "฿899/mo",
-			subValue: "Save 50%",
-			vip: true,
-		},
-	];
-
 	const renderOneTimeCard = (item: any) => (
 		<TouchableOpacity
 			key={item.title}
-			style={[styles.card, item.popular && styles.popularCard]}
+			style={[
+				styles.card,
+				{
+					backgroundColor: colors.primaryGray + "10",
+					borderColor: colors.primaryGray + "50",
+				},
+				item.popular && {
+					borderColor: colors.primaryGold,
+					backgroundColor: colors.primaryGold + "10",
+				},
+			]}
 		>
-			<Text style={{ marginRight: 12 }}>🪙</Text>
+			<Coins size={24} color={colors.primaryGold} style={{ marginRight: 12 }} />
 			<View style={{ flex: 1 }}>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						marginBottom: 2,
-					}}
-				>
-					<Text style={{ fontWeight: "600", fontSize: 14 }}>{item.title}</Text>
+				<View style={styles.cardTitleRow}>
+					<NormalTitle style={styles.cardTitle}>{item.title}</NormalTitle>
 					{item.popular && (
-						<View style={styles.popularBadge}>
-							<Text style={{ color: "#fff", fontSize: 10 }}>POPULAR</Text>
+						<View
+							style={[
+								styles.popularBadge,
+								{ backgroundColor: colors.primaryGold + "10" },
+							]}
+						>
+							<BodyText
+								style={{
+									color: colors.primaryGold,
+									fontWeight: "600",
+								}}
+							>
+								POPULAR
+							</BodyText>
 						</View>
 					)}
 				</View>
-				<Text style={{ color: "#666", fontSize: 12 }}>{item.subtitle}</Text>
+				<BodyText style={styles.cardSubtitle}>{item.subtitle}</BodyText>
 			</View>
-			<Text style={{ fontWeight: "600" }}>{item.value}</Text>
+			<NormalTitle
+				style={{
+					fontSize: 14,
+					fontWeight: "bold",
+					color: colors.primaryGold,
+				}}
+			>
+				{item.value}
+			</NormalTitle>
 		</TouchableOpacity>
 	);
 
 	const renderSubscriptionCard = (item: any) => (
 		<TouchableOpacity
 			key={item.title}
-			style={[styles.card, item.vip && styles.vipCard]}
+			style={[
+				styles.card,
+				{
+					backgroundColor: colors.primaryGold + 20,
+					borderColor: colors.primaryGold + 50,
+				},
+				item.vip && {
+					backgroundColor: colors.primaryPurple + "20",
+					borderColor: colors.primaryPurple + "80",
+				},
+			]}
 		>
-			<Text style={{ marginRight: 12 }}>🪙</Text>
+			<View
+				style={[
+					styles.iconContainer,
+					{ backgroundColor: item.iconColor + "20" },
+				]}
+			>
+				<item.icon size={24} color={item.iconColor} />
+			</View>
 			<View style={{ flex: 1 }}>
-				<Text style={{ fontWeight: "600", fontSize: 14 }}>{item.title}</Text>
-				<Text style={{ color: "#666", fontSize: 12 }}>{item.subtitle}</Text>
+				<NormalTitle style={styles.cardTitle}>{item.title}</NormalTitle>
+				<BodyText style={styles.cardSubtitle}>{item.subtitle}</BodyText>
 			</View>
 			<View style={{ alignItems: "flex-end" }}>
-				<Text style={{ fontWeight: "600" }}>{item.value}</Text>
+				<NormalTitle
+					style={{
+						fontSize: 14,
+						fontWeight: "bold",
+						color: colors.textPrimary,
+					}}
+				>
+					{item.value}
+				</NormalTitle>
 				{item.subValue && (
-					<Text style={{ color: "#666", fontSize: 12 }}>{item.subValue}</Text>
+					<BodyText
+						style={{
+							fontSize: 11,
+							color: colors.primaryGreen,
+						}}
+					>
+						{item.subValue}
+					</BodyText>
 				)}
 			</View>
 		</TouchableOpacity>
 	);
 
 	return (
-		<ScrollView style={{ padding: 16 }} showsVerticalScrollIndicator={false}>
-			{/* Header */}
-			<Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 4 }}>
-				Buy Coins
-			</Text>
-			<Text style={{ color: "#666", fontSize: 12, marginBottom: 16 }}>
-				Current balance: 20 coins
-			</Text>
+		<ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+			<View style={styles.header}>
+				<PageTitle style={styles.headerTitle}>Buy Coins</PageTitle>
+				<View style={styles.balanceRow}>
+					<BodyText style={styles.balanceLabel}>Current balance:</BodyText>
+					<BodyText
+						style={[styles.balanceAmount, { color: colors.primaryGold }]}
+					>
+						20 coins
+					</BodyText>
+				</View>
+			</View>
 
-			{/* Toggle */}
-			<View style={{ flexDirection: "row", marginBottom: 16 }}>
+			{/* Segmented toggle */}
+			<View style={styles.toggleContainer}>
 				<TouchableOpacity
 					style={[
 						styles.toggleButton,
@@ -112,14 +140,15 @@ export default function TopUpCoins() {
 					]}
 					onPress={() => setSelectedTab("oneTime")}
 				>
-					<Text
-						style={[
-							styles.toggleText,
-							selectedTab === "oneTime" && styles.toggleTextActive,
-						]}
+					<BodyText
+						style={
+							selectedTab === "oneTime"
+								? [styles.toggleText, styles.toggleTextActive]
+								: styles.toggleText
+						}
 					>
 						One-time Packs
-					</Text>
+					</BodyText>
 				</TouchableOpacity>
 				<TouchableOpacity
 					style={[
@@ -128,70 +157,115 @@ export default function TopUpCoins() {
 					]}
 					onPress={() => setSelectedTab("subscriptions")}
 				>
-					<Text
-						style={[
-							styles.toggleText,
-							selectedTab === "subscriptions" && styles.toggleTextActive,
-						]}
+					<BodyText
+						style={
+							selectedTab === "subscriptions"
+								? [styles.toggleText, styles.toggleTextActive]
+								: styles.toggleText
+						}
 					>
 						Subscriptions
-					</Text>
+					</BodyText>
 				</TouchableOpacity>
 			</View>
 
 			{/* Cards */}
 			{selectedTab === "oneTime"
-				? oneTimePacks.map((item) => renderOneTimeCard(item))
-				: subscriptions.map((item) => renderSubscriptionCard(item))}
+				? MOCK_ONE_TIME_PACKS.map((item) => renderOneTimeCard(item))
+				: MOCK_SUBSCRIPTIONS.map((item) => renderSubscriptionCard(item))}
 		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
+	container: {
+		padding: 16,
+	},
+	header: {
+		alignItems: "center",
+		marginBottom: 24,
+	},
+	headerTitle: {
+		marginBottom: 4,
+	},
+	balanceText: {
+		fontSize: 12,
+	},
+	toggleContainer: {
+		flexDirection: "row",
+		backgroundColor: "#f0f0f0",
+		borderRadius: 30,
+		padding: 4,
+		marginBottom: 20,
+	},
 	toggleButton: {
 		flex: 1,
-		paddingVertical: 8,
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 8,
 		alignItems: "center",
-		marginRight: 8,
+		paddingVertical: 8,
+		borderRadius: 30,
 	},
 	toggleButtonActive: {
-		backgroundColor: "#000",
-		borderColor: "#000",
+		backgroundColor: "#fff",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.05,
+		shadowRadius: 2,
+		elevation: 1,
 	},
 	toggleText: {
-		color: "#333",
-		fontSize: 12,
+		fontSize: 14,
 		fontWeight: "500",
+		color: "#666",
 	},
 	toggleTextActive: {
-		color: "#fff",
+		color: "#000",
+		fontWeight: "600",
 	},
 	card: {
 		flexDirection: "row",
 		alignItems: "center",
 		padding: 12,
-		borderRadius: 12,
+		borderRadius: 16,
 		borderWidth: 1,
-		borderColor: "#eee",
 		marginBottom: 10,
-		backgroundColor: "#fff",
 	},
-	popularCard: {
-		borderColor: "#f59e0b",
-		backgroundColor: "#fffbeb",
+	cardTitleRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 2,
+	},
+	cardTitle: {
+		fontSize: 14,
+		fontWeight: "600",
 	},
 	popularBadge: {
-		backgroundColor: "#f59e0b",
-		borderRadius: 4,
+		borderRadius: 99,
 		paddingHorizontal: 6,
 		paddingVertical: 2,
 		marginLeft: 8,
 	},
-	vipCard: {
-		backgroundColor: "#f3e8ff",
-		borderColor: "#9f7aea",
+	cardSubtitle: {
+		fontSize: 12,
+		color: "#666",
+	},
+	balanceRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	balanceLabel: {
+		fontSize: 12,
+	},
+	balanceAmount: {
+		fontSize: 12,
+		fontWeight: "600",
+	},
+	iconContainer: {
+		width: 40,
+		height: 40,
+		borderRadius: 12,
+		alignItems: "center",
+		justifyContent: "center",
+		marginRight: 12,
 	},
 });

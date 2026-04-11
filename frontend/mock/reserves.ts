@@ -21,7 +21,7 @@ export const MOCK_RESERVES: Reserve[] = [
 		title: "Seaside Condo Reservation",
 		location: "Pattaya, Jomtien",
 		status: "Approved",
-		price: "5,600,000",
+		price: "5.6M",
 		coins: 5,
 		agentImage: "http://localhost:3000/uploads/agents/agent1.jpg",
 		agentName: "U Kyaw Zin",

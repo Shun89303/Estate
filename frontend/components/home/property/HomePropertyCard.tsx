@@ -11,7 +11,7 @@ export default function HomePropertyCard({ property }: { property: Property }) {
 
 	return (
 		<TouchableOpacity
-			onPress={() => router.push(`/buySell/${property.id}`)}
+			onPress={() => router.push(`/property/buySell/${property.id}`)}
 			activeOpacity={0.8}
 			style={styles.cardContainer}
 		>

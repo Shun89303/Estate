@@ -1,12 +1,13 @@
 export interface Review {
 	id: number;
-	video: string; // original video URL
-	thumbnail: string; // new thumbnail image URL
+	video: string;
+	thumbnail: string;
 	profile_image: string;
 	title: string;
 	name: string;
 	property_name: string;
 	rating: number;
+	duration: string;
 }
 
 export const MOCK_REVIEWS: Review[] = [
@@ -14,33 +15,36 @@ export const MOCK_REVIEWS: Review[] = [
 		id: 1,
 		video:
 			"http://localhost:3000/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4",
-		thumbnail: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2", // sample thumbnail
+		thumbnail: "http://localhost:3000/uploads/buySell/one/oneCover.jpg",
 		profile_image: "https://randomuser.me/api/portraits/men/10.jpg",
 		title: "Very smooth condo purchase!",
 		name: "Somchai",
 		property_name: "Sukhumvit 24 Condo",
 		rating: 5,
+		duration: "2:30",
 	},
 	{
 		id: 2,
 		video:
 			"http://localhost:3000/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4",
-		thumbnail: "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
+		thumbnail: "http://localhost:3000/uploads/buySell/two/twoCover.jpg",
 		profile_image: "https://randomuser.me/api/portraits/women/12.jpg",
 		title: "Agent was extremely helpful",
 		name: "Nok",
 		property_name: "Bangna House",
 		rating: 4,
+		duration: "1:45",
 	},
 	{
 		id: 3,
 		video:
 			"http://localhost:3000/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4",
-		thumbnail: "https://images.unsplash.com/photo-1505691723518-36a5c32b8721",
+		thumbnail: "http://localhost:3000/uploads/buySell/three/threeCover.jpg",
 		profile_image: "https://randomuser.me/api/portraits/men/15.jpg",
 		title: "Fast process and great support",
 		name: "Arthit",
 		property_name: "Sathorn Penthouse",
 		rating: 5,
+		duration: "3:10",
 	},
 ];

@@ -8,7 +8,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
+import {
+	MOCK_BUSINESS,
+	BusinessProperty,
+	BusinessPropertyType,
+} from "@/mock/business";
 import { PropertyMap } from "@/components/common/PropertyMap";
 import MediaCarousel from "@/components/common/MediaCarousel";
 import NotFound from "@/components/common/NotFound";
@@ -20,29 +24,45 @@ import {
 } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
 import {
-	Calendar,
+	MapPin,
+	Maximize,
 	Users,
-	Shield,
+	Calendar,
 	MessageCircle,
 	Coins,
-	MapPin,
 } from "lucide-react-native";
-import globalStyles from "@/styles/styles";
-import { formatPrice } from "@/utils/formatPrice";
 import { maskPhoneNumber } from "@/utils/maskPhoneNumber";
+import globalStyles from "@/styles/styles";
 
-export default function RoomRentDetails() {
+// Emoji mapping for business types
+const typeEmoji: Record<BusinessPropertyType, string> = {
+	OFFICE: "🏢",
+	CO_WORKING: "💻",
+	SHOP_RETAIL: "🛍️",
+	WAREHOUSE: "📦",
+	RESTAURANT: "🍽️",
+	EVENT_VENUE: "🎪",
+};
+
+export default function BusinessDetails() {
 	const router = useRouter();
 	const { id } = useLocalSearchParams<{ id: string }>();
-	const [property, setProperty] = useState<RoomRentProperty | undefined>();
+	const [property, setProperty] = useState<BusinessProperty | undefined>();
 	const colors = useTheme();
 
 	useEffect(() => {
-		const found = MOCK_ROOM_RENT.find((r) => r.id.toString() === id);
+		const found = MOCK_BUSINESS.find((p) => p.id.toString() === id);
 		setProperty(found);
 	}, [id]);
 
-	if (!property) return <NotFound title="Room Not Found" />;
+	if (!property) return <NotFound title="Business Space Not Found" />;
+
+	const pricingUnit = property.pricing.type === "MONTHLY" ? "mo" : "day";
+	const formattedPrice = `฿${property.pricing.amount.toLocaleString()}/${pricingUnit}`;
+	const amenitiesList = Object.entries(property.amenities)
+		.filter(([, value]) => value === true)
+		.map(([key]) => key);
+	const displayType = `${typeEmoji[property.type]} ${property.type.replace("_", " ")}`;
 
 	return (
 		<SafeAreaView
@@ -51,13 +71,12 @@ export default function RoomRentDetails() {
 			<ScrollView>
 				<MediaCarousel
 					cover={property.media.cover}
-					images={property.media.images}
+					images={property.media.photos}
 					videos={property.media.videos}
 					onLike={() => console.log("Like")}
 					onShare={() => console.log("Share")}
 				/>
 
-				{/* PROPERTY INFO */}
 				<View style={styles.section}>
 					<View style={styles.infoRow}>
 						<View
@@ -67,16 +86,9 @@ export default function RoomRentDetails() {
 							]}
 						>
 							<SmallTitle style={{ color: colors.primaryGold }}>
-								{property.propertyType}
+								{displayType}
 							</SmallTitle>
 						</View>
-						{property.isNew && (
-							<SmallTitle
-								style={{ color: colors.primaryRed, fontWeight: "bold" }}
-							>
-								NEW
-							</SmallTitle>
-						)}
 						<BodyText
 							style={{ color: colors.textSecondary, marginLeft: "auto" }}
 						>
@@ -86,7 +98,6 @@ export default function RoomRentDetails() {
 
 					<NormalTitle style={styles.title}>{property.title}</NormalTitle>
 
-					{/* Address with pin */}
 					<View style={styles.locationRow}>
 						<MapPin size={14} color={colors.primaryGold} />
 						<BodyText style={styles.location}>
@@ -94,78 +105,54 @@ export default function RoomRentDetails() {
 						</BodyText>
 					</View>
 
-					{/* Combined Price & Available container */}
-					<View style={[styles.combinedBox, { backgroundColor: "#fff" }]}>
-						{/* Price part */}
-						<View style={styles.priceInnerBox}>
-							<View style={{ flex: 1 }}>
-								<PageTitle
-									style={{
-										marginBottom: 0,
-										fontSize: 20,
-										color: colors.primaryGold,
-									}}
-								>
-									฿{formatPrice(property.price.rent)}/mo
-								</PageTitle>
-								<BodyText style={styles.priceSubtitle}>per month</BodyText>
+					{/* Single white container box */}
+					<View style={[styles.detailsBox, { backgroundColor: "#fff" }]}>
+						{/* Price */}
+						<PageTitle
+							style={{
+								marginBottom: 8,
+								fontSize: 24,
+								color: colors.primaryGold,
+							}}
+						>
+							{formattedPrice}
+						</PageTitle>
+
+						{/* Specs row (area, capacity, min lease) */}
+						<View style={styles.specsRow}>
+							<View style={styles.specItem}>
+								<Maximize size={16} color={colors.primaryGray} />
+								<BodyText>{property.areaSqm} sqm</BodyText>
 							</View>
-							<View style={{ flex: 1 }}>
-								<NormalTitle style={styles.priceTitle}>
-									Deposit: ฿{formatPrice(property.price.deposit)}
-								</NormalTitle>
-								<BodyText style={styles.priceSubtitle}>
-									Min {property.price.minContractMonths} months contract
-								</BodyText>
+							<View style={styles.specItem}>
+								<Users size={16} color={colors.primaryGray} />
+								<BodyText>{property.capacity} capacity</BodyText>
+							</View>
+							<View style={styles.specItem}>
+								<Calendar size={16} color={colors.primaryGray} />
+								<BodyText>{property.minLeaseMonths} mo min</BodyText>
 							</View>
 						</View>
 
-						{/* Available from */}
-						<View style={styles.availableRow}>
-							<Calendar size={14} color={colors.primaryGold} />
-							<BodyText>
-								Available from: {property.price.availableFrom}
-							</BodyText>
+						{/* Deposit & min lease text */}
+						<View style={styles.depositRow}>
+							<NormalTitle
+								style={{
+									fontWeight: "600",
+									color: colors.primaryGray,
+								}}
+							>
+								Deposit: ฿{property.pricing.deposit.toLocaleString()}
+							</NormalTitle>
 						</View>
 					</View>
 
-					{/* Roommate Info Box */}
-					{property.roommateInfo && (
-						<View style={[styles.infoBox, { backgroundColor: "#fff" }]}>
-							<NormalTitle style={styles.infoTitle}>Roommate Info</NormalTitle>
-							<View style={styles.roommateRow}>
-								<Users size={16} color={colors.primaryGold} />
-								<BodyText>
-									{property.roommateInfo.occupiedSpots} of{" "}
-									{property.roommateInfo.totalSpots} spots taken
-								</BodyText>
-								{property.roommateInfo.preferences && (
-									<View
-										style={[
-											styles.preferencePill,
-											{ backgroundColor: colors.secondaryMute },
-										]}
-									>
-										<BodyText style={{ color: colors.primaryGold }}>
-											{property.roommateInfo.preferences}
-										</BodyText>
-									</View>
-								)}
-							</View>
-						</View>
-					)}
-
-					{/* Amenities */}
-					<View style={styles.simpleBox}>
-						<NormalTitle style={styles.infoTitle}>Amenities</NormalTitle>
-						<ScrollView
-							horizontal
-							showsHorizontalScrollIndicator={false}
-							contentContainerStyle={styles.amenitiesRow}
-						>
-							{Object.keys(property.amenities)
-								.filter((k) => property.amenities[k])
-								.map((amenity, idx) => (
+					{/* Amenities as pills (horizontal) */}
+					{amenitiesList.length > 0 && (
+						<View style={styles.amenitiesSection}>
+							<NormalTitle style={styles.infoTitle}>Amenities</NormalTitle>
+							<View style={styles.amenitiesRow}>
+								{amenitiesList.map((item, idx) => (
 									<View
 										key={idx}
 										style={[
@@ -174,31 +161,19 @@ export default function RoomRentDetails() {
 										]}
 									>
 										<BodyText style={{ color: colors.textPrimary }}>
-											{amenity}
+											{item}
 										</BodyText>
 									</View>
 								))}
-						</ScrollView>
-					</View>
-
-					{/* House Rules (column with icons) */}
-					<View style={styles.simpleBox}>
-						<NormalTitle style={styles.infoTitle}>House Rules</NormalTitle>
-						{Object.keys(property.houseRules)
-							.filter((k) => property.houseRules[k])
-							.map((rule, idx) => (
-								<View key={idx} style={styles.ruleRow}>
-									<Shield size={14} color={colors.primaryGold} />
-									<BodyText>{rule}</BodyText>
-								</View>
-							))}
-					</View>
+							</View>
+						</View>
+					)}
 
 					{/* About */}
-					{property.description && (
+					{property.about && (
 						<View style={styles.simpleBox}>
 							<NormalTitle style={styles.infoTitle}>About</NormalTitle>
-							<BodyText>{property.description}</BodyText>
+							<BodyText>{property.about}</BodyText>
 						</View>
 					)}
 
@@ -219,23 +194,23 @@ export default function RoomRentDetails() {
 						/>
 					</View>
 
-					{/* Agent Box */}
+					{/* Contact Agent */}
 					<View style={[styles.agentBox, { backgroundColor: "#fff" }]}>
 						<Image
-							source={{ uri: property.agent.profileImage }}
+							source={{ uri: property.contact.profileImage }}
 							style={styles.agentImage}
 						/>
 						<View style={styles.agentInfo}>
 							<NormalTitle style={styles.agentName}>
-								{property.agent.name}
+								{property.contact.name}
 							</NormalTitle>
-							<BodyText>{maskPhoneNumber(property.agent.phone)}</BodyText>
+							<BodyText>{maskPhoneNumber(property.contact.phone)}</BodyText>
 						</View>
 					</View>
 				</View>
 			</ScrollView>
 
-			{/* BOTTOM CTA */}
+			{/* Bottom CTA */}
 			<View style={styles.ctaRow}>
 				<TouchableOpacity
 					style={[
@@ -246,7 +221,19 @@ export default function RoomRentDetails() {
 							borderWidth: 1,
 						},
 					]}
-					onPress={() => router.push("/booking")}
+					onPress={() =>
+						router.push({
+							pathname: "/booking/[id]",
+							params: {
+								id: property.id,
+								image: property.media.cover,
+								title: property.title,
+								location: property.location.address,
+								bedrooms: 0,
+								price: 0,
+							},
+						})
+					}
 				>
 					<MessageCircle size={18} color={colors.textPrimary} />
 					<BodyText style={{ color: colors.textPrimary }}>
@@ -258,7 +245,7 @@ export default function RoomRentDetails() {
 				>
 					<Coins size={18} color="#fff" />
 					<BodyText style={{ color: "#fff" }}>
-						Reserve {property.reserveCoins} coins
+						Reserve {property.reserveCoins} Coins
 					</BodyText>
 				</TouchableOpacity>
 			</View>
@@ -286,59 +273,49 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 6,
-		marginBottom: 4,
+		marginBottom: 8,
 	},
 	location: { fontSize: 14, flexShrink: 1 },
-	combinedBox: {
+	detailsBox: {
+		padding: 16,
 		borderRadius: 16,
+		marginVertical: 8,
 		...globalStyles.shadows,
 	},
-	priceInnerBox: {
+	specsRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		padding: 16,
+		gap: 16,
+		marginBottom: 12,
 	},
-	priceTitle: { fontWeight: "600", marginBottom: 2 },
-	priceSubtitle: { fontSize: 12 },
-	availableRow: {
+	specItem: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 6,
-		padding: 12,
 	},
-	infoBox: {
-		padding: 16,
-		borderRadius: 16,
-		gap: 8,
-		...globalStyles.shadows,
+	depositRow: {
+		marginTop: 4,
 	},
-	roommateRow: {
+	amenitiesSection: { gap: 8 },
+	amenitiesRow: {
 		flexDirection: "row",
-		alignItems: "center",
 		flexWrap: "wrap",
 		gap: 8,
 	},
-	preferencePill: {
-		paddingHorizontal: 10,
-		paddingVertical: 4,
+	amenityPill: {
+		paddingHorizontal: 12,
+		paddingVertical: 6,
 		borderRadius: 20,
 	},
-	simpleBox: {
-		gap: 8,
-	},
 	infoTitle: { fontWeight: "600", fontSize: 18, marginBottom: 4 },
-	ruleRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 8,
-		marginVertical: 2,
-	},
+	simpleBox: { gap: 8 },
 	agentBox: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 12,
 		padding: 16,
 		borderRadius: 16,
+		marginVertical: 8,
 		...globalStyles.shadows,
 	},
 	agentImage: { width: 60, height: 60, borderRadius: 12 },
@@ -359,15 +336,5 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		borderRadius: 15,
 		gap: 8,
-	},
-	amenitiesRow: {
-		flexDirection: "row",
-		gap: 8,
-	},
-	amenityPill: {
-		paddingHorizontal: 12,
-		paddingVertical: 6,
-		borderRadius: 20,
-		marginRight: 8,
 	},
 });

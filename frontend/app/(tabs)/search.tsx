@@ -291,7 +291,7 @@ export default function Search() {
 						longitude: p.location.longitude,
 						title: p.title,
 						description: p.location.address,
-						onPress: () => router.push(`/buySell/${p.id}`),
+						onPress: () => router.push(`/property/buySell/${p.id}`),
 					}))}
 					style={styles.map}
 				/>

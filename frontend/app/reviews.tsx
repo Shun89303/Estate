@@ -1,22 +1,28 @@
-import { useRouter } from "expo-router";
 import {
 	View,
-	Text,
 	Pressable,
 	StyleSheet,
 	FlatList,
 	Image,
+	Text,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MOCK_REVIEWS, Review } from "@/mock/reviews";
 import { useState, useEffect } from "react";
 import { VideoView, useVideoPlayer } from "expo-video";
+import BackButton from "@/components/common/BackButton";
+import { useTheme } from "@/hooks/useTheme";
+import {
+	BodyText,
+	NormalTitle,
+	PageTitle,
+} from "@/components/atoms/Typography";
+import globalStyles from "@/styles/styles";
 
 export default function Reviews() {
-	const router = useRouter();
+	const colors = useTheme();
 	const [activeVideoId, setActiveVideoId] = useState<number | null>(null);
 
-	// Get the current video URL based on activeVideoId
 	const currentReview = MOCK_REVIEWS.find((r) => r.id === activeVideoId);
 	const currentVideoUrl = currentReview?.video || "";
 
@@ -24,7 +30,6 @@ export default function Reviews() {
 		player.loop = true;
 	});
 
-	// Play when the player is ready and we have a new video
 	useEffect(() => {
 		if (currentVideoUrl) {
 			player
@@ -38,8 +43,7 @@ export default function Reviews() {
 		const isPlayingVideo = activeVideoId === item.id;
 
 		return (
-			<View style={styles.card}>
-				{/* Video / Thumbnail */}
+			<View style={[styles.card, { backgroundColor: colors.background }]}>
 				<View style={styles.thumbnailContainer}>
 					{isPlayingVideo ? (
 						<VideoView
@@ -59,11 +63,13 @@ export default function Reviews() {
 							/>
 							<View style={styles.overlay} />
 							<Text style={styles.playIcon}>▶</Text>
+							<View style={styles.durationBadge}>
+								<BodyText style={styles.durationText}>{item.duration}</BodyText>
+							</View>
 						</Pressable>
 					)}
 				</View>
 
-				{/* Content */}
 				<View style={styles.cardContent}>
 					<View style={styles.profileRow}>
 						<Image
@@ -71,17 +77,24 @@ export default function Reviews() {
 							style={styles.profileImage}
 						/>
 						<View style={{ flex: 1 }}>
-							<Text style={styles.title}>{item.title}</Text>
-							<Text style={styles.name}>{item.name}</Text>
+							<NormalTitle numberOfLines={1} style={styles.title}>
+								{item.title}
+							</NormalTitle>
+							<View style={styles.namePropertyRow}>
+								<BodyText style={styles.name}>{item.name}</BodyText>
+								<BodyText style={styles.dot}>•</BodyText>
+								<BodyText style={styles.propertyName}>
+									{item.property_name}
+								</BodyText>
+							</View>
+							<View style={styles.starsRow}>
+								{Array.from({ length: 5 }).map((_, i) => (
+									<Text key={i} style={styles.star}>
+										{i < item.rating ? "★" : "☆"}
+									</Text>
+								))}
+							</View>
 						</View>
-					</View>
-					<Text style={styles.property}>{item.property_name}</Text>
-					<View style={styles.starsRow}>
-						{Array.from({ length: 5 }).map((_, i) => (
-							<Text key={i} style={styles.star}>
-								{i < item.rating ? "★" : "☆"}
-							</Text>
-						))}
 					</View>
 				</View>
 			</View>
@@ -89,22 +102,24 @@ export default function Reviews() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			{/* Back */}
-			<Pressable onPress={() => router.back()}>
-				<Text style={styles.backText}>Back</Text>
-			</Pressable>
+		<SafeAreaView
+			style={[styles.container, { backgroundColor: colors.background }]}
+		>
+			<View style={styles.headerRow}>
+				<BackButton />
+				<View style={styles.headerTextContainer}>
+					<PageTitle style={styles.header}>Customer Reviews</PageTitle>
+					<BodyText style={styles.subHeader}>
+						Real stories from Myanmar buyers
+					</BodyText>
+				</View>
+			</View>
 
-			{/* Title */}
-			<Text style={styles.header}>Customer Reviews</Text>
-			<Text style={styles.subHeader}>Real stories from Myanmar buyers</Text>
-
-			{/* List */}
 			<FlatList
 				data={MOCK_REVIEWS}
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={renderItem}
-				contentContainerStyle={{ paddingBottom: 20 }}
+				contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 10 }}
 				showsVerticalScrollIndicator={false}
 			/>
 		</SafeAreaView>
@@ -115,31 +130,32 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 16,
-		backgroundColor: "#fff",
 	},
-	backText: {
-		fontSize: 14,
-		color: "#007bff",
-		marginBottom: 12,
+	headerRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
+		marginBottom: 16,
+	},
+	headerTextContainer: {
+		flex: 1,
 	},
 	header: {
-		fontSize: 20,
-		fontWeight: "700",
-		marginBottom: 4,
+		marginBottom: 2,
 	},
 	subHeader: {
-		fontSize: 13,
-		color: "#555",
-		marginBottom: 16,
+		fontSize: 12,
 	},
 	card: {
 		marginBottom: 16,
-		borderRadius: 10,
-		backgroundColor: "#f9f9f9",
-		overflow: "hidden",
+		borderRadius: 12,
+		...globalStyles.shadows,
 	},
 	thumbnailContainer: {
 		position: "relative",
+		borderTopLeftRadius: 12,
+		borderTopRightRadius: 12,
+		overflow: "hidden",
 	},
 	thumbnailPressable: {
 		position: "relative",
@@ -170,24 +186,21 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		marginBottom: 8,
+		gap: 10,
 	},
 	profileImage: {
 		width: 40,
 		height: 40,
 		borderRadius: 20,
-		marginRight: 10,
 	},
 	title: {
-		fontSize: 14,
-		fontWeight: "600",
+		marginBottom: 2,
 	},
 	name: {
 		fontSize: 12,
-		color: "#555",
 	},
 	property: {
 		fontSize: 12,
-		color: "#777",
 		marginBottom: 6,
 	},
 	starsRow: {
@@ -197,5 +210,33 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: "#f5a623",
 		marginRight: 2,
+	},
+	durationBadge: {
+		position: "absolute",
+		bottom: 8,
+		right: 8,
+		backgroundColor: "rgba(0,0,0,0.7)",
+		paddingHorizontal: 8,
+		paddingVertical: 2,
+		borderRadius: 99,
+	},
+	durationText: {
+		color: "#fff",
+		fontSize: 10,
+		fontWeight: "500",
+	},
+	namePropertyRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		flexWrap: "wrap",
+		marginBottom: 6,
+	},
+	dot: {
+		marginHorizontal: 4,
+		fontSize: 12,
+	},
+	propertyName: {
+		fontSize: 12,
+		color: "#666",
 	},
 });

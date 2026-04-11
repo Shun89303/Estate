@@ -213,7 +213,19 @@ export default function OwnerDetails() {
 							borderWidth: 1,
 						},
 					]}
-					onPress={() => router.push("/booking")}
+					onPress={() =>
+						router.push({
+							pathname: "/booking/[id]",
+							params: {
+								id: property.id,
+								image: property.media.cover,
+								title: property.title,
+								location: property.location.address,
+								bedrooms: property.bedrooms,
+								price: property.price,
+							},
+						})
+					}
 				>
 					<MessageCircle size={18} color={colors.textPrimary} />
 					<BodyText style={{ color: colors.textPrimary }}>

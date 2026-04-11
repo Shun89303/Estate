@@ -2,8 +2,10 @@ export const lightColors = {
 	appBackground: "#F3F4F7",
 	background: "#fff",
 	text: "#000000",
+	primaryPurple: "#9D59EF",
 	primaryGold: "#BF8F5B",
 	primaryGray: "#727683",
+	primaryOrange: "#F59E0B",
 	primaryGreen: "#4CA154",
 	secondaryGold: "#FEF3E8",
 	secondaryGray: "#ABADB5",
@@ -13,7 +15,7 @@ export const lightColors = {
 	darkRed: "#FBECEB",
 	primaryBackground: "#FDF6EB",
 	border: "#E3D8CA",
-	surface: "#F9F4EE",
+	surface: "#FFF",
 	elevated: "#FFFFFF",
 	textPrimary: "#131620",
 	textSecondary: "#727683",
@@ -31,8 +33,10 @@ export const darkColors = {
 	appBackground: "hsla(225, 15%, 12%, 1.00)",
 	background: "#121212",
 	text: "#ffffff",
+	primaryPurple: "#9D59EF",
 	primaryGold: "#BF8F5B",
 	primaryGray: "#727683",
+	primaryOrange: "#F59E0B",
 	primaryGreen: "#4CA154",
 	secondaryGold: "#FEF3E8",
 	secondaryGray: "#ABADB5",
@@ -42,7 +46,7 @@ export const darkColors = {
 	darkRed: "#FBECEB",
 	primaryBackground: "#FDF6EB",
 	border: "#E3D8CA",
-	surface: "#F9F4EE",
+	surface: "#FFF",
 	elevated: "#FFFFFF",
 	textPrimary: "#131620",
 	textSecondary: "#727683",
@@ -64,3 +68,10 @@ const themes = {
 };
 
 export default themes;
+
+// Color discovery:
+// gold bg color = primaryGold + 10,
+// gold border color = primaryGold + 50
+// gold icon bg color = primaryGold + 20
+// gray border color = primaryGray + 50
+// gray bg color = primaryGray + 10

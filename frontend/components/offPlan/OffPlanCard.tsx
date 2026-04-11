@@ -28,7 +28,7 @@ export default function OffPlanCard({
 		<TouchableOpacity
 			style={[styles.card, { backgroundColor: colors.background }]}
 			activeOpacity={0.8}
-			onPress={() => router.push(`/offPlan/${property.id}`)}
+			onPress={() => router.push(`/property/offPlan/${property.id}`)}
 		>
 			{/* Upper section with image and overlays */}
 			<View style={styles.imageContainer}>
