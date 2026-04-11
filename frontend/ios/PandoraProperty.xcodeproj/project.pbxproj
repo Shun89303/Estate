@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		126340F2CD0DF1390E602CB4 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 890B575BC7B816CEFB3D3DE5 /* ExpoModulesProvider.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		17929C01AA0AAE2A88720CC9 /* libPods-PandoraProperty.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F7C487BC060AC0FF634C98EB /* libPods-PandoraProperty.a */; };
+		2B4C9C2C226F5E9FD9DE2E13 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF35371085CEAC74120B801 /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		8A13999B77C60320A77885A0 /* libPods-PandoraProperty.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57A7B0AAC00FC656305DC61F /* libPods-PandoraProperty.a */; };
+		9ABABF460F6AE593E2FC2CB1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = ADA00790B2149B20BD268B3A /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		EDFA3CF0D52650794275918A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BBA7DF8A0455D10C3B49C74C /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -20,16 +20,16 @@
 		13B07F961A680F5B00A75B9A /* PandoraProperty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PandoraProperty.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = PandoraProperty/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PandoraProperty/Info.plist; sourceTree = "<group>"; };
-		57A7B0AAC00FC656305DC61F /* libPods-PandoraProperty.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PandoraProperty.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		890B575BC7B816CEFB3D3DE5 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-PandoraProperty/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		9945B43D201A3463B25A6555 /* Pods-PandoraProperty.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PandoraProperty.debug.xcconfig"; path = "Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty.debug.xcconfig"; sourceTree = "<group>"; };
+		60C191617C558424B9837D30 /* Pods-PandoraProperty.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PandoraProperty.release.xcconfig"; path = "Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = PandoraProperty/SplashScreen.storyboard; sourceTree = "<group>"; };
+		ADA00790B2149B20BD268B3A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = PandoraProperty/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		BBA7DF8A0455D10C3B49C74C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = PandoraProperty/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D297B3DA7BA969BEC5D71651 /* Pods-PandoraProperty.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PandoraProperty.debug.xcconfig"; path = "Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty.debug.xcconfig"; sourceTree = "<group>"; };
+		DAF35371085CEAC74120B801 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-PandoraProperty/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		ED94E44C004FF27EDA9FC820 /* Pods-PandoraProperty.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PandoraProperty.release.xcconfig"; path = "Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty.release.xcconfig"; sourceTree = "<group>"; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = PandoraProperty/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* PandoraProperty-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "PandoraProperty-Bridging-Header.h"; path = "PandoraProperty/PandoraProperty-Bridging-Header.h"; sourceTree = "<group>"; };
+		F7C487BC060AC0FF634C98EB /* libPods-PandoraProperty.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PandoraProperty.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A13999B77C60320A77885A0 /* libPods-PandoraProperty.a in Frameworks */,
+				17929C01AA0AAE2A88720CC9 /* libPods-PandoraProperty.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,26 +53,16 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				BBA7DF8A0455D10C3B49C74C /* PrivacyInfo.xcprivacy */,
+				ADA00790B2149B20BD268B3A /* PrivacyInfo.xcprivacy */,
 			);
 			name = PandoraProperty;
-			sourceTree = "<group>";
-		};
-		2AC7AFFAB37AC11B31157AC9 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				9945B43D201A3463B25A6555 /* Pods-PandoraProperty.debug.xcconfig */,
-				ED94E44C004FF27EDA9FC820 /* Pods-PandoraProperty.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				57A7B0AAC00FC656305DC61F /* libPods-PandoraProperty.a */,
+				F7C487BC060AC0FF634C98EB /* libPods-PandoraProperty.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -91,8 +81,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				2AC7AFFAB37AC11B31157AC9 /* Pods */,
-				C510FEE9DFD9E0479A8A5B47 /* ExpoModulesProviders */,
+				BE1BDDD8BBDFAEF4EFCE422D /* Pods */,
+				AEE8265FC92FC8B6423DA2F7 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -107,12 +97,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8C4470354556CA3774ACA00B /* PandoraProperty */ = {
+		8C64D811085D690D639F32F6 /* PandoraProperty */ = {
 			isa = PBXGroup;
 			children = (
-				890B575BC7B816CEFB3D3DE5 /* ExpoModulesProvider.swift */,
+				DAF35371085CEAC74120B801 /* ExpoModulesProvider.swift */,
 			);
 			name = PandoraProperty;
+			sourceTree = "<group>";
+		};
+		AEE8265FC92FC8B6423DA2F7 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				8C64D811085D690D639F32F6 /* PandoraProperty */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -124,12 +122,14 @@
 			path = PandoraProperty/Supporting;
 			sourceTree = "<group>";
 		};
-		C510FEE9DFD9E0479A8A5B47 /* ExpoModulesProviders */ = {
+		BE1BDDD8BBDFAEF4EFCE422D /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8C4470354556CA3774ACA00B /* PandoraProperty */,
+				D297B3DA7BA969BEC5D71651 /* Pods-PandoraProperty.debug.xcconfig */,
+				60C191617C558424B9837D30 /* Pods-PandoraProperty.release.xcconfig */,
 			);
-			name = ExpoModulesProviders;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "PandoraProperty" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				7643E3DBA35080005446D1ED /* [Expo] Configure project */,
+				444CD4EADC2554611D75BD56 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				AE5B89FBA9232A2644EA5D28 /* [CP] Embed Pods Frameworks */,
+				666A62EE5A42AE1F941339F6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				EDFA3CF0D52650794275918A /* PrivacyInfo.xcprivacy in Resources */,
+				9ABABF460F6AE593E2FC2CB1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,7 +242,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7643E3DBA35080005446D1ED /* [Expo] Configure project */ = {
+		444CD4EADC2554611D75BD56 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -265,6 +265,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-PandoraProperty/expo-configure-project.sh\"\n";
+		};
+		666A62EE5A42AE1F941339F6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -306,28 +328,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AE5B89FBA9232A2644EA5D28 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PandoraProperty/Pods-PandoraProperty-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -336,7 +336,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				126340F2CD0DF1390E602CB4 /* ExpoModulesProvider.swift in Sources */,
+				2B4C9C2C226F5E9FD9DE2E13 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,7 +345,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9945B43D201A3463B25A6555 /* Pods-PandoraProperty.debug.xcconfig */;
+			baseConfigurationReference = D297B3DA7BA969BEC5D71651 /* Pods-PandoraProperty.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -381,7 +381,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ED94E44C004FF27EDA9FC820 /* Pods-PandoraProperty.release.xcconfig */;
+			baseConfigurationReference = 60C191617C558424B9837D30 /* Pods-PandoraProperty.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
