@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export type ContentCategory =
 	| "investment guide"
 	| "how-to"
@@ -70,14 +72,14 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		type: "article",
 		title: "Top 5 Areas to Buy Property in Bangkok",
 		postedBy: "Somchai Property Expert",
-		authorProfileImage: "http://localhost:3000/uploads/owners/owner6.jpg",
+		authorProfileImage: `${API_BASE_URL}/uploads/owners/owner6.jpg`,
 		date: "April 2, 2025",
 		likes: 124,
 		category: "investment guide",
 		saved: true,
 		read: true,
 		forYou: true,
-		imageUrl: "http://localhost:3000/uploads/contents/one/oneCover.jpg",
+		imageUrl: `${API_BASE_URL}/uploads/contents/one/oneCover.jpg`,
 		content:
 			"Discover the most popular neighborhoods for Myanmar investors looking to buy condos and houses in Bangkok. From the bustling Sukhumvit corridor to the serene riverside developments, we break down each area's investment potential, rental yields, and lifestyle benefits.\n\nThailand's property market continues to attract international buyers, especially from Myanmar. With competitive pricing, modern infrastructure, and excellent rental yields, investing in Thai real estate has become one of the smartest financial decisions for Myanmar nationals.",
 		keyTakeaways: {
@@ -104,14 +106,14 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		type: "article",
 		title: "Understanding Thai Property Laws for Foreign Buyers",
 		postedBy: "Legal Team",
-		authorProfileImage: "http://localhost:3000/uploads/owners/owner5.jpg",
+		authorProfileImage: `${API_BASE_URL}/uploads/owners/owner5.jpg`,
 		date: "March 20, 2025",
 		likes: 89,
 		category: "legal",
 		saved: false,
 		read: false,
 		forYou: false,
-		imageUrl: "http://localhost:3000/uploads/contents/two/twoCover.jpg",
+		imageUrl: `${API_BASE_URL}/uploads/contents/two/twoCover.jpg`,
 		content:
 			"Navigating property ownership laws in Thailand can be tricky for foreigners. This guide explains the legal framework, ownership structures, and key considerations before buying.\n\nForeigners cannot own land directly, but there are legal ways to acquire a house or land through leasehold structures or setting up a Thai company. Condominiums are easier: foreign ownership is allowed up to 49% of total unit area in a building.",
 		keyTakeaways: {
@@ -138,7 +140,7 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		type: "video",
 		title: "Virtual Tour: Luxury Condo in Sukhumvit 39",
 		postedBy: "Property Vision Team",
-		authorProfileImage: "http://localhost:3000/uploads/owners/owner4.jpg",
+		authorProfileImage: `${API_BASE_URL}/uploads/owners/owner4.jpg`,
 		date: "March 28, 2025",
 		likes: 267,
 		category: "property tour",
@@ -146,8 +148,8 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		read: true,
 		forYou: true,
 		duration: "3:45",
-		videoUrl: "http://localhost:3000/uploads/contents/three/threeVideo.mp4",
-		thumbnailUrl: "http://localhost:3000/uploads/contents/three/threeCover.jpg",
+		videoUrl: `${API_BASE_URL}/uploads/contents/three/threeVideo.mp4`,
+		thumbnailUrl: `${API_BASE_URL}/uploads/contents/three/threeCover.jpg`,
 		content:
 			"Walk through a fully furnished 2-bedroom condo with panoramic city views, pool, and gym. Learn about the building amenities and neighborhood highlights.",
 		cta: {
@@ -184,7 +186,7 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		type: "video",
 		title: "How to Get a Thai Elite Visa for Property Investors",
 		postedBy: "Visa & Immigration Desk",
-		authorProfileImage: "http://localhost:3000/uploads/owners/owner3.jpg",
+		authorProfileImage: `${API_BASE_URL}/uploads/owners/owner3.jpg`,
 		date: "March 15, 2025",
 		likes: 143,
 		category: "visa & immigration",
@@ -192,8 +194,8 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		read: false,
 		forYou: true,
 		duration: "5:10",
-		videoUrl: "http://localhost:3000/uploads/contents/four/fourVideo.mp4",
-		thumbnailUrl: "http://localhost:3000/uploads/contents/four/fourCover.jpg",
+		videoUrl: `${API_BASE_URL}/uploads/contents/four/fourVideo.mp4`,
+		thumbnailUrl: `${API_BASE_URL}/uploads/contents/four/fourCover.jpg`,
 		content:
 			"Thai Elite Visa allows long-term stay (5-20 years) with multiple benefits. This video explains the application process, costs, and how it connects to property investment.",
 		cta: {
@@ -230,7 +232,7 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		type: "video",
 		title: "How to Transfer Money from Myanmar to Thailand",
 		postedBy: "Financial Desk",
-		authorProfileImage: "http://localhost:3000/uploads/owners/owner2.jpg",
+		authorProfileImage: `${API_BASE_URL}/uploads/owners/owner2.jpg`,
 		date: "April 5, 2025",
 		likes: 98,
 		category: "how-to",
@@ -238,8 +240,8 @@ export const MOCK_CONTENTS: ContentItem[] = [
 		read: false,
 		forYou: true,
 		duration: "6:20",
-		videoUrl: "http://localhost:3000/uploads/contents/five/fiveVideo.mp4",
-		thumbnailUrl: "http://localhost:3000/uploads/contents/five/fiveCover.jpg",
+		videoUrl: `${API_BASE_URL}/uploads/contents/five/fiveVideo.mp4`,
+		thumbnailUrl: `${API_BASE_URL}/uploads/contents/five/fiveCover.jpg`,
 		content:
 			"Step-by-step guide covering bank wire transfers, official exchange channels, and compliance requirements. Learn about transfer limits, fees, and how to document your funds for property purchases in Thailand.\n\nWatch this comprehensive guide to understand the process of buying property in Thailand as a Myanmar national. Our experts cover everything from initial search to final ownership transfer.",
 		cta: {
@@ -253,9 +255,8 @@ export const MOCK_CONTENTS: ContentItem[] = [
 			{
 				id: 3,
 				title: "Virtual Tour: Luxury Condo in Sukhumvit 39",
-				thumbnailUrl:
-					"http://localhost:3000/uploads/contents/three/threeCover.jpg",
-				videoUrl: "http://localhost:3000/uploads/contents/three/threeVideo.mp4",
+				thumbnailUrl: `${API_BASE_URL}/uploads/contents/three/threeCover.jpg`,
+				videoUrl: `${API_BASE_URL}/uploads/contents/three/threeVideo.mp4`,
 				duration: "3:45",
 				postedBy: "Pandora Team",
 				date: "April 10, 2025",
@@ -263,9 +264,8 @@ export const MOCK_CONTENTS: ContentItem[] = [
 			{
 				id: 6,
 				title: "How to Get a Thai Elite Visa for Property Investors",
-				thumbnailUrl:
-					"http://localhost:3000/uploads/contents/four/fourCover.jpg",
-				videoUrl: "http://localhost:3000/uploads/contents/four/fourVideo.mp4",
+				thumbnailUrl: `${API_BASE_URL}/uploads/contents/four/fourCover.jpg`,
+				videoUrl: `${API_BASE_URL}/uploads/contents/four/fourVideo.mp4`,
 				duration: "5:10",
 				postedBy: "Legal Team",
 				date: "March 25, 2025",

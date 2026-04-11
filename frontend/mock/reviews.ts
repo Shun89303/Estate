@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export interface Review {
 	id: number;
 	video: string;
@@ -13,9 +15,8 @@ export interface Review {
 export const MOCK_REVIEWS: Review[] = [
 	{
 		id: 1,
-		video:
-			"http://localhost:3000/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4",
-		thumbnail: "http://localhost:3000/uploads/buySell/one/oneCover.jpg",
+		video: `${API_BASE_URL}/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4`,
+		thumbnail: `${API_BASE_URL}/uploads/buySell/one/oneCover.jpg`,
 		profile_image: "https://randomuser.me/api/portraits/men/10.jpg",
 		title: "Very smooth condo purchase!",
 		name: "Somchai",
@@ -25,9 +26,8 @@ export const MOCK_REVIEWS: Review[] = [
 	},
 	{
 		id: 2,
-		video:
-			"http://localhost:3000/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4",
-		thumbnail: "http://localhost:3000/uploads/buySell/two/twoCover.jpg",
+		video: `${API_BASE_URL}/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4`,
+		thumbnail: `${API_BASE_URL}/uploads/buySell/two/twoCover.jpg`,
 		profile_image: "https://randomuser.me/api/portraits/women/12.jpg",
 		title: "Agent was extremely helpful",
 		name: "Nok",
@@ -37,9 +37,8 @@ export const MOCK_REVIEWS: Review[] = [
 	},
 	{
 		id: 3,
-		video:
-			"http://localhost:3000/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4",
-		thumbnail: "http://localhost:3000/uploads/buySell/three/threeCover.jpg",
+		video: `${API_BASE_URL}/uploads/properties/buy/condo_sukhumvit24/videos/condo_sukhumvit24_video.mp4`,
+		thumbnail: `${API_BASE_URL}/uploads/buySell/three/threeCover.jpg`,
 		profile_image: "https://randomuser.me/api/portraits/men/15.jpg",
 		title: "Fast process and great support",
 		name: "Arthit",

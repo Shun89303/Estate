@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export type BusinessPropertyType =
 	| "OFFICE"
 	| "CO_WORKING"
@@ -82,9 +84,9 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		id: 1,
 		uniqueCode: "PP-B2401",
 		media: {
-			cover: "http://localhost:3000/uploads/business/one/oneCover.jpg",
-			photos: ["http://localhost:3000/uploads/business/one/oneGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/business/one/oneVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/business/one/oneCover.jpg`,
+			photos: [`${API_BASE_URL}/uploads/business/one/oneGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/business/one/oneVideo.mp4`],
 		},
 		type: "OFFICE",
 		title: "Private Office at Silom",
@@ -109,7 +111,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		},
 		contact: {
 			name: "John Doe",
-			profileImage: "http://localhost:3000/uploads/owners/owner1.jpg",
+			profileImage: `${API_BASE_URL}/uploads/owners/owner1.jpg`,
 			phone: "+66 89 123 4567",
 		},
 		reserveCoins: 5,
@@ -118,9 +120,9 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		id: 2,
 		uniqueCode: "PP-B2402",
 		media: {
-			cover: "http://localhost:3000/uploads/business/two/twoCover.jpg",
-			photos: ["http://localhost:3000/uploads/business/two/twoGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/business/two/twoVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/business/two/twoCover.jpg`,
+			photos: [`${API_BASE_URL}/uploads/business/two/twoGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/business/two/twoVideo.mp4`],
 		},
 		type: "CO_WORKING",
 		title: "Co-Working Space at Asoke",
@@ -139,7 +141,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		contact: {
 			name: "Jane Smith",
 			phone: "+66 89 123 4567",
-			profileImage: "http://localhost:3000/uploads/owners/owner2.jpg",
+			profileImage: `${API_BASE_URL}/uploads/owners/owner2.jpg`,
 		},
 		reserveCoins: 3,
 	},
@@ -147,11 +149,9 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		id: 3,
 		uniqueCode: "PP-B2403",
 		media: {
-			cover: "http://localhost:3000/uploads/business/three/threeCover.jpg",
-			photos: [
-				"http://localhost:3000/uploads/business/three/threeGallery1.jpg",
-			],
-			videos: ["http://localhost:3000/uploads/business/three/threeVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/business/three/threeCover.jpg`,
+			photos: [`${API_BASE_URL}/uploads/business/three/threeGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/business/three/threeVideo.mp4`],
 		},
 		type: "SHOP_RETAIL",
 		title: "Retail Shop at Chatuchak",
@@ -170,7 +170,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		contact: {
 			name: "Somsak Chai",
 			phone: "+66 89 123 4567",
-			profileImage: "http://localhost:3000/uploads/owners/owner3.jpg",
+			profileImage: `${API_BASE_URL}/uploads/owners/owner3.jpg`,
 		},
 		reserveCoins: 2,
 	},
@@ -178,9 +178,9 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		id: 4,
 		uniqueCode: "PP-B2404",
 		media: {
-			cover: "http://localhost:3000/uploads/business/four/fourCover.jpg",
-			photos: ["http://localhost:3000/uploads/business/four/fourGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/business/four/fourVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/business/four/fourCover.jpg`,
+			photos: [`${API_BASE_URL}/uploads/business/four/fourGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/business/four/fourVideo.mp4`],
 		},
 		type: "WAREHOUSE",
 		title: "Warehouse in Bangna",
@@ -198,7 +198,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		contact: {
 			name: "Nattapong Lee",
 			phone: "+66 89 123 4567",
-			profileImage: "http://localhost:3000/uploads/owners/owner4.jpg",
+			profileImage: `${API_BASE_URL}/uploads/owners/owner4.jpg`,
 		},
 		reserveCoins: 6,
 	},
@@ -206,9 +206,9 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		id: 5,
 		uniqueCode: "PP-B2405",
 		media: {
-			cover: "http://localhost:3000/uploads/business/five/fiveCover.jpg",
-			photos: ["http://localhost:3000/uploads/business/five/fiveGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/business/five/fiveVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/business/five/fiveCover.jpg`,
+			photos: [`${API_BASE_URL}/uploads/business/five/fiveGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/business/five/fiveVideo.mp4`],
 		},
 		type: "RESTAURANT",
 		title: "Rooftop Restaurant at Thonglor",
@@ -232,7 +232,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		contact: {
 			name: "Kanya Wong",
 			phone: "+66 89 123 4567",
-			profileImage: "http://localhost:3000/uploads/owners/owner5.jpg",
+			profileImage: `${API_BASE_URL}/uploads/owners/owner5.jpg`,
 		},
 		reserveCoins: 8,
 	},
@@ -240,9 +240,9 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		id: 6,
 		uniqueCode: "PP-B2406",
 		media: {
-			cover: "http://localhost:3000/uploads/business/six/sixCover.jpg",
-			photos: ["http://localhost:3000/uploads/business/six/sixGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/business/six/sixVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/business/six/sixCover.jpg`,
+			photos: [`${API_BASE_URL}/uploads/business/six/sixGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/business/six/sixVideo.mp4`],
 		},
 		type: "EVENT_VENUE",
 		title: "Event Hall at Ratchada",
@@ -261,7 +261,7 @@ export const MOCK_BUSINESS: BusinessProperty[] = [
 		contact: {
 			name: "Arthit Chai",
 			phone: "+66 89 123 4567",
-			profileImage: "http://localhost:3000/uploads/owners/owner6.jpg",
+			profileImage: `${API_BASE_URL}/uploads/owners/owner6.jpg`,
 		},
 		reserveCoins: 10,
 	},

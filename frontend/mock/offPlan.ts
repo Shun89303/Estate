@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export type UnitStatus = "Available" | "Reserved" | "Sold";
 
 export interface UnitType {
@@ -94,9 +96,9 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 		uniqueCode: "PP-O2401",
 
 		media: {
-			cover: "http://localhost:3000/uploads/offPlan/one/oneCover.jpg",
-			images: ["http://localhost:3000/uploads/offPlan/one/oneGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/offPlan/one/oneVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/offPlan/one/oneCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/offPlan/one/oneGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/offPlan/one/oneVideo.mp4`],
 		},
 
 		title: "The Horizon Sukhumvit 48",
@@ -160,7 +162,7 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 
 		developer: {
 			name: "Origin Property",
-			image: "http://localhost:3000/uploads/offPlan/one/oneDev.jpg",
+			image: `${API_BASE_URL}/uploads/offPlan/one/oneDev.jpg`,
 			bio: "Origin Property is a leading Thai developer listed on the Stock Exchange of Thailand, known for quality condominiums near BTS/MRT stations",
 			establishedYear: 2009,
 			projectsCompleted: 85,
@@ -201,9 +203,9 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 		uniqueCode: "PP-O2402",
 
 		media: {
-			cover: "http://localhost:3000/uploads/offPlan/two/twoCover.jpg",
-			images: ["http://localhost:3000/uploads/offPlan/two/twoGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/offPlan/two/twoVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/offPlan/two/twoCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/offPlan/two/twoGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/offPlan/two/twoVideo.mp4`],
 		},
 
 		title: "Skyline Residences Rama 9",
@@ -267,7 +269,7 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 
 		developer: {
 			name: "Sansiri",
-			image: "http://localhost:3000/uploads/offPlan/two/twoDev.jpg",
+			image: `${API_BASE_URL}/uploads/offPlan/two/twoDev.jpg`,
 			bio: "Sansiri is one of Thailand’s most established real estate developers, known for high-quality residential projects and strong design standards across Bangkok and major cities.",
 			establishedYear: 1984,
 			projectsCompleted: 120,
@@ -300,9 +302,9 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 		uniqueCode: "PP-O2403",
 
 		media: {
-			cover: "http://localhost:3000/uploads/offPlan/three/threeCover.jpg",
-			images: ["http://localhost:3000/uploads/offPlan/three/threeGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/offPlan/three/threeVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/offPlan/three/threeCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/offPlan/three/threeGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/offPlan/three/threeVideo.mp4`],
 		},
 
 		title: "Green Valley Bangna",
@@ -366,7 +368,7 @@ export const MOCK_OFFPLAN: OffPlanProperty[] = [
 
 		developer: {
 			name: "AP Thailand",
-			image: "http://localhost:3000/uploads/offPlan/three/threeDev.jpg",
+			image: `${API_BASE_URL}/uploads/offPlan/three/threeDev.jpg`,
 			bio: "AP Thailand is a major property developer focused on urban living solutions, delivering a wide range of residential projects with strong emphasis on accessibility and modern lifestyle.",
 			establishedYear: 1991,
 			projectsCompleted: 150,

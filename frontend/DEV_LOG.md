@@ -394,23 +394,6 @@ different phone, different tablet
 
 booking process: reusable + initial look
 
-<!--  -->
-
-off plan, buy business, owner direct - business pov, wants to start app with just this 3 first, others disabled: Boss wants to be able to disable features from admin dashboard
-
-think frontend by connecting backend and admin dashboard, agent dashboard aka connecting with the bigger picture
-
-list my questions
-
-screen by screen, gather resources and confirm first before coding whether or not you can use these or not, only after confirmed start coding
-dev lifecycle should be gather resources first and only after that start coding with concrete resources.
-
-need to ask senior to tell me about what he wants and needs so that his life will be easier to integrate backend
-
-and then explain what I have been doing for frontend
-
-explain that since I'm a junior, I am certain that I will be making a lot of mistakes but I will also fix all those mistakes carefully
-
 List:
 
 <!-- Current objective:  -->
@@ -418,15 +401,10 @@ List:
 agent/owner login process: hardest
 implement new property type
 implement new app name: insert brand image
-CRUD user
 i18n language setup
 layout
 styling proper
 different phone, different tablet
-
-<!-- Boss's meeting objectives: -->
-
-Admin dashboard: I should think everything by connecting to this but also to backend and db
 
 <!--  -->
 

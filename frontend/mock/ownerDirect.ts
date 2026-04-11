@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export type PropertyType = "CONDO" | "HOUSE" | "TOWNHOUSE" | "PENTHOUSE";
 
 export interface PropertyMedia {
@@ -67,9 +69,9 @@ export const MOCK_OWNERDIRECT: Property[] = [
 		id: 1,
 		uniqueCode: "PP-C2401",
 		media: {
-			cover: "http://localhost:3000/uploads/buySell/three/threeCover.jpg",
-			images: ["http://localhost:3000/uploads/buySell/three/threeGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/buySell/three/threeVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/buySell/three/threeCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/buySell/three/threeGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/buySell/three/threeVideo.mp4`],
 		},
 		price: 9500000,
 		type: "TOWNHOUSE",
@@ -106,9 +108,9 @@ export const MOCK_OWNERDIRECT: Property[] = [
 		id: 2,
 		uniqueCode: "PP-H2402",
 		media: {
-			cover: "http://localhost:3000/uploads/buySell/one/oneCover.jpg",
-			images: ["http://localhost:3000/uploads/buySell/one/oneGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/buySell/one/oneVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/buySell/one/oneCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/buySell/one/oneGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/buySell/one/oneVideo.mp4`],
 		},
 		price: 8500000,
 		type: "CONDO",
@@ -145,9 +147,9 @@ export const MOCK_OWNERDIRECT: Property[] = [
 		id: 3,
 		uniqueCode: "PP-T2405",
 		media: {
-			cover: "http://localhost:3000/uploads/buySell/two/twoCover.jpg",
-			images: ["http://localhost:3000/uploads/buySell/two/twoGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/buySell/two/twoVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/buySell/two/twoCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/buySell/two/twoGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/buySell/two/twoVideo.mp4`],
 		},
 		price: 12500000,
 		type: "HOUSE",

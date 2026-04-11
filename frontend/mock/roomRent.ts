@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export interface PropertyMedia {
 	cover: string; // single main image
 	images: string[]; // gallery images
@@ -59,9 +61,9 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		propertyType: "SINGLE ROOM",
 		isNew: true,
 		media: {
-			cover: "http://localhost:3000/uploads/roomRent/one/oneCover.jpg",
-			images: ["http://localhost:3000/uploads/roomRent/one/oneGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/roomRent/one/oneVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/roomRent/one/oneCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/roomRent/one/oneGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/roomRent/one/oneVideo.mp4`],
 		},
 		location: {
 			address: "Thonglor Soi 13, Watthana",
@@ -94,7 +96,7 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		description:
 			"Bright and clean private room in a shared apartment. 5-minute walk to BTS Thonglor. Quiet neighborhood.",
 		agent: {
-			profileImage: "http://localhost:3000/uploads/agents/agent1.jpg",
+			profileImage: `${API_BASE_URL}/uploads/agents/agent1.jpg`,
 			name: "John Doe",
 			phone: "+66 89 123 4567",
 		},
@@ -107,9 +109,9 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		propertyType: "STUDIO",
 		isNew: false,
 		media: {
-			cover: "http://localhost:3000/uploads/roomRent/two/twoCover.jpg",
-			images: ["http://localhost:3000/uploads/roomRent/two/twoGallery1.jpg"],
-			videos: ["http://localhost:3000/uploads/roomRent/two/twoVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/roomRent/two/twoCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/roomRent/two/twoGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/roomRent/two/twoVideo.mp4`],
 		},
 		location: {
 			address: "Sukhumvit Soi 21, Khlong Toei",
@@ -135,7 +137,7 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		description:
 			"Compact studio apartment in the heart of Sukhumvit. Ideal for single professionals.",
 		agent: {
-			profileImage: "http://localhost:3000/uploads/agents/agent2.jpg",
+			profileImage: `${API_BASE_URL}/uploads/agents/agent2.jpg`,
 			name: "Jane Smith",
 			phone: "+66 89 123 4567",
 		},
@@ -148,11 +150,9 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		propertyType: "MASTER ROOM",
 		isNew: true,
 		media: {
-			cover: "http://localhost:3000/uploads/roomRent/three/threeCover.jpg",
-			images: [
-				"http://localhost:3000/uploads/roomRent/three/threeGallery1.jpg",
-			],
-			videos: ["http://localhost:3000/uploads/roomRent/three/threeVideo.mp4"],
+			cover: `${API_BASE_URL}/uploads/roomRent/three/threeCover.jpg`,
+			images: [`${API_BASE_URL}/uploads/roomRent/three/threeGallery1.jpg`],
+			videos: [`${API_BASE_URL}/uploads/roomRent/three/threeVideo.mp4`],
 		},
 		location: {
 			address: "Rama 9 Soi 45, Huai Khwang",
@@ -185,7 +185,7 @@ export const MOCK_ROOM_RENT: RoomRentProperty[] = [
 		description:
 			"Spacious master room with private bathroom in a shared apartment. Close to Rama 9 MRT.",
 		agent: {
-			profileImage: "http://localhost:3000/uploads/agents/agent3.jpg",
+			profileImage: `${API_BASE_URL}/uploads/agents/agent3.jpg`,
 			name: "Somchai Lee",
 			phone: "+66 89 123 4567",
 		},
