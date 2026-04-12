@@ -394,7 +394,16 @@ different phone, different tablet
 
 booking process: reusable + initial look
 
-List:
+<!--  -->
+
+Final thoughts:
+
+Use expo dev client
+I will create theme and metrics files, centralized service layer, add loading / error states
+
+<!--  -->
+
+Apr-12-2026
 
 <!-- Current objective:  -->
 
@@ -406,9 +415,5 @@ layout
 styling proper
 different phone, different tablet
 
-<!--  -->
-
-Final thoughts:
-
-Use expo dev client
-I will create theme and metrics files, centralized service layer, add loading / error states
+ongoing: profile/login page
+TextChip

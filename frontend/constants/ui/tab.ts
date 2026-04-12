@@ -1,6 +1,6 @@
 // src/constants/ui/tab.ts
 
-import { metrics } from "@/utils/metrics";
+import { metrics } from "@/utils/oldMetrics";
 
 export const tabUI = {
 	// Container
