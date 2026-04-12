@@ -1,5 +1,5 @@
 import { View, FlatList, StyleSheet } from "react-native";
-import SectionHeader from "../common/SectionHeader";
+import SectionHeader from "../common/utils/SectionHeader";
 import { MOCK_REVIEWS } from "@/mock/reviews";
 import ReviewCard from "./review/ReviewCard";
 import { useRouter } from "expo-router";

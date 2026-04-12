@@ -6,14 +6,14 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import TopUpCoins from "@/components/profile/TopUpCoins";
 import { requireAuth } from "@/utils/requireAuth";
 import { useAuthStore } from "@/stores/authStore";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import {
 	BodyText,
 	NormalTitle,
 	PageTitle,
 	SmallTitle,
 } from "@/components/atoms/Typography";
-import NotificationBell from "@/components/common/NotificationBell";
+import NotificationBell from "@/components/common/utils/NotificationBell";
 import { useTheme } from "@/hooks/useTheme";
 import {
 	ChevronRight,

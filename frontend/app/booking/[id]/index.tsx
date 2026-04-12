@@ -13,14 +13,14 @@ import {
 } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import {
 	BodyText,
 	NormalTitle,
 	PageTitle,
 } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
-import StepProgressBar from "@/components/common/StepProgressBar";
+import StepProgressBar from "@/components/common/utils/StepProgressBar";
 import {
 	CalendarDays,
 	Eye,
@@ -269,7 +269,7 @@ export default function Booking() {
 								layout="second"
 								onChangeFormattedText={setPhoneNumber}
 								containerStyle={{
-									backgroundColor: colors.background,
+									backgroundColor: colors.appBackground,
 									width: "100%",
 									height: 50,
 									marginBottom: 16,
@@ -279,7 +279,7 @@ export default function Booking() {
 								withShadow={false}
 								autoFocus
 								textContainerStyle={{
-									backgroundColor: colors.surface,
+									backgroundColor: colors.appBackground,
 									paddingVertical: 0,
 									borderWidth: 1,
 									borderColor: colors.primaryGray + 50,
@@ -292,7 +292,7 @@ export default function Booking() {
 									borderRadius: 15,
 									width: "30%",
 								}}
-								placeholder="9 xxx xxx xxx"
+								placeholder="xxx xxx xxx"
 							/>
 
 							{/* Password input with eye icon */}

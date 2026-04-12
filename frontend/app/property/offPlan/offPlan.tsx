@@ -1,12 +1,12 @@
 import { FlatList, StyleSheet, View } from "react-native";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import { BodyText, PageTitle } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
 import { MOCK_OFFPLAN } from "@/mock/offPlan";
 import { SafeAreaView } from "react-native-safe-area-context";
 import OffPlanCard from "@/components/offPlan/OffPlanCard";
 import globalStyles from "@/styles/styles";
-import EmptyState from "@/components/common/EmptyState";
+import EmptyState from "@/components/common/state/EmptyState";
 
 export default function OffPlan() {
 	const colors = useTheme();

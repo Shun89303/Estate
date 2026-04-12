@@ -7,7 +7,7 @@ import {
 	Notification,
 	NotificationType,
 } from "@/mock/notifications";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import { CheckCheck, X } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { BodyText, NormalTitle } from "@/components/atoms/Typography";

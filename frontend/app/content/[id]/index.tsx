@@ -21,9 +21,9 @@ import {
 } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
 import { ChevronRight, Clock, Dot, Heart } from "lucide-react-native";
-import BackButton from "@/components/common/BackButton";
-import HeartButton from "@/components/common/HeartButton";
-import BookmarkButton from "@/components/common/BookmarkButton";
+import BackButton from "@/components/common/navigation/BackButton";
+import HeartButton from "@/components/common/dataEntry/HeartButton";
+import BookmarkButton from "@/components/common/dataEntry/BookmarkButton";
 
 const { width: screenWidth } = Dimensions.get("window");
 

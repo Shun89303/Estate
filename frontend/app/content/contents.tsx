@@ -4,10 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { MOCK_CONTENTS } from "@/mock/contents";
 import ContentCard from "@/components/home/content/ContentCard";
-import EmptyState from "@/components/common/EmptyState";
-import BackButton from "@/components/common/BackButton";
-import FilterButton from "@/components/common/FilterButton";
-import FilterSection from "@/components/common/FilterSection";
+import EmptyState from "@/components/common/state/EmptyState";
+import BackButton from "@/components/common/navigation/BackButton";
+import FilterButton from "@/components/common/utils/FilterButton";
+import FilterSection from "@/components/common/utils/FilterSection";
 import { BodyText, PageTitle } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
 

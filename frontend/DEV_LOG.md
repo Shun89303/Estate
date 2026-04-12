@@ -407,7 +407,8 @@ Apr-12-2026
 
 <!-- Current objective:  -->
 
-agent/owner login process: hardest
+<!-- agent/owner login process: hardest -->
+
 implement new property type
 implement new app name: insert brand image
 i18n language setup
@@ -417,3 +418,7 @@ different phone, different tablet
 
 ongoing: profile/login page
 TextChip
+
+<!-- Completion -->
+
+agent/owner login process: completed(applied reusable components, metrics, styles)

@@ -2,7 +2,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MOCK_CONSULTATIONS } from "@/mock/consultations";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import {
 	BodyText,
 	NormalTitle,

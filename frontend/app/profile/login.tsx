@@ -4,8 +4,8 @@ import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Title from "@/components/common/typography/Title";
 import BodyText from "@/components/common/typography/BodyText";
-import TextChip from "@/components/common/TextChip";
-import GoogleButton from "@/components/common/GoogleButton";
+import TextChip from "@/components/common/typography/TextChip";
+import GoogleButton from "@/components/common/utils/GoogleButton";
 import { lightColors } from "@/theme/light";
 import { spacing, scaleSize } from "@/utils/metrics";
 

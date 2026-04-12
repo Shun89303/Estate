@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import SectionHeader from "../common/SectionHeader";
+import SectionHeader from "../common/utils/SectionHeader";
 import { MOCK_CONTENTS } from "@/mock/contents";
 import { useRouter } from "expo-router";
 import HomeContentCard from "./content/HomeContentCard";

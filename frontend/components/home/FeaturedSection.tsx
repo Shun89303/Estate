@@ -1,5 +1,5 @@
 import { FlatList, View, StyleSheet } from "react-native";
-import SectionHeader from "../common/SectionHeader";
+import SectionHeader from "../common/utils/SectionHeader";
 import { useRouter } from "expo-router";
 import { MOCK_BUYSELL } from "@/mock/buySell";
 import HomePropertyCard from "./property/HomePropertyCard";

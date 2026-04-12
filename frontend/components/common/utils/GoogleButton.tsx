@@ -2,7 +2,7 @@ import { TouchableOpacity, StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { lightColors } from "@/theme/light";
 import { spacing, scaleSize } from "@/utils/metrics";
-import SubTitle from "./typography/SubTitle";
+import SubTitle from "../typography/SubTitle";
 
 interface GoogleButtonProps {
 	onPress: () => void;

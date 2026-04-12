@@ -9,7 +9,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import { BodyText, PageTitle } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
 import { User, Camera } from "lucide-react-native";

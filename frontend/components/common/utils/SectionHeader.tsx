@@ -1,6 +1,6 @@
 import { View, StyleSheet, Pressable } from "react-native";
 import { ChevronRight } from "lucide-react-native";
-import { BodyText, NormalTitle, SmallTitle } from "../atoms/Typography";
+import { BodyText, NormalTitle, SmallTitle } from "../../atoms/Typography";
 
 export default function SectionHeader({
 	title,

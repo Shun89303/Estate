@@ -10,13 +10,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRef, useMemo, useState } from "react";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import { BodyText, PageTitle, SmallTitle } from "@/components/atoms/Typography";
 import { Coins, EyeOff, Lock, LockOpen, Sparkles } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import OwnerDirectCard from "@/components/ownerDirect/OwnerDirectCard";
 import BuyCoins from "@/components/ownerDirect/BuyCoins";
-import EmptyState from "@/components/common/EmptyState";
+import EmptyState from "@/components/common/state/EmptyState";
 
 export default function OwnerDirect() {
 	const router = useRouter();

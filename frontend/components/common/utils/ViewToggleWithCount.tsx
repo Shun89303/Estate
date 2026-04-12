@@ -1,7 +1,7 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { List, Map as MapIcon } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
-import { BodyText } from "../atoms/Typography";
+import { BodyText } from "../../atoms/Typography";
 
 interface ViewToggleWithCountProps {
 	count: number;

@@ -7,10 +7,10 @@ import { lightColors } from "@/theme/light";
 import Title from "@/components/common/typography/Title";
 import SubTitle from "@/components/common/typography/SubTitle";
 import BodyText from "@/components/common/typography/BodyText";
-import StepIndicator from "@/components/common/StepIndicator";
-import NextButton from "@/components/common/NextButton";
+import StepIndicator from "@/components/common/utils/StepIndicator";
+import NextButton from "@/components/common/navigation/NextButton";
 import { API_BASE_URL } from "@/config/api";
-import SkipButton from "@/components/common/SkipButton";
+import SkipButton from "@/components/common/navigation/SkipButton";
 import { spacing, scaleSize, scaleVertical } from "@/utils/metrics";
 
 export default function AppAd() {

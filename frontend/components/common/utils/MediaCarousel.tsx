@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { VideoView, useVideoPlayer } from "expo-video";
 import { Heart, Share2, Image as ImageIcon } from "lucide-react-native";
-import BackButton from "./BackButton";
+import BackButton from "../navigation/BackButton";
 import { useTheme } from "@/hooks/useTheme";
-import { NormalTitle, SmallTitle, BodyText } from "../atoms/Typography";
+import { NormalTitle, SmallTitle, BodyText } from "../../atoms/Typography";
 
 export interface MediaCarouselProps {
 	cover: string;

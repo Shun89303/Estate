@@ -4,7 +4,7 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MOCK_SAVED_PROPERTIES } from "@/mock/savedProperties";
 import { Heart } from "lucide-react-native";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import {
 	BodyText,
 	NormalTitle,

@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MOCK_REVIEWS, Review } from "@/mock/reviews";
 import { useState, useEffect } from "react";
 import { VideoView, useVideoPlayer } from "expo-video";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import { useTheme } from "@/hooks/useTheme";
 import {
 	BodyText,

@@ -4,16 +4,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PropertyCard from "@/components/home/property/PropertyCard";
 import { useRouter } from "expo-router";
 import { MOCK_BUYSELL, Property } from "@/mock/buySell";
-import { PropertyMap } from "@/components/common/PropertyMap";
-import FilterSection from "@/components/common/FilterSection";
-import BackButton from "@/components/common/BackButton";
-import HorizontalTypeFilter from "@/components/common/HorizontalTypeFilter";
+import { PropertyMap } from "@/components/common/utils/PropertyMap";
+import FilterSection from "@/components/common/utils/FilterSection";
+import BackButton from "@/components/common/navigation/BackButton";
+import HorizontalTypeFilter from "@/components/common/utils/HorizontalTypeFilter";
 import { useTheme } from "@/hooks/useTheme";
-import ClearFiltersButton from "@/components/common/ClearFiltersButton";
-import SearchBar from "@/components/common/SearchBar";
-import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
-import EmptyState from "@/components/common/EmptyState";
-import FilterButton from "@/components/common/FilterButton";
+import ClearFiltersButton from "@/components/common/utils/ClearFiltersButton";
+import SearchBar from "@/components/common/utils/SearchBar";
+import ViewToggleWithCount from "@/components/common/utils/ViewToggleWithCount";
+import EmptyState from "@/components/common/state/EmptyState";
+import FilterButton from "@/components/common/utils/FilterButton";
 
 // Filter options
 const PURPOSES = [

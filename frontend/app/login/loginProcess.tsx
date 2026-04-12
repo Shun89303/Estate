@@ -1,21 +1,27 @@
+// app/profile/loginProcess.tsx
 import { useState, useRef } from "react";
 import { useRouter } from "expo-router";
-import {
-	View,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	Image,
-	StyleSheet,
-	ScrollView,
-} from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from "expo-image-picker";
+import * as ExpoImagePicker from "expo-image-picker";
 import PhoneInput from "react-native-phone-number-input";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
+import StepProgressBar from "@/components/common/utils/StepProgressBar";
+import NextButton from "@/components/common/navigation/NextButton";
+import SkipButton from "@/components/common/navigation/SkipButton";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { ImagePicker } from "@/components/common/utils/ImagePicker";
+import { PhoneNumberInput } from "@/components/common/dataEntry/PhoneNumberInput";
+import { ChipSelector } from "@/components/common/dataEntry/ChipSelector";
+import { TextArea } from "@/components/common/dataEntry/TextArea";
+import { SimpleTextInput } from "@/components/common/dataEntry/SimpleTextInput";
 
 export default function LoginProcess() {
 	const router = useRouter();
 	const [step, setStep] = useState(1);
+	const totalSteps = 3;
 
 	// Step 1 states
 	const [name, setName] = useState("");
@@ -30,17 +36,13 @@ export default function LoginProcess() {
 	const [languages, setLanguages] = useState<string[]>([]);
 	const [bio, setBio] = useState("");
 
-	const steps = 3;
-	const progress = step / steps;
-
 	const pickImage = async () => {
-		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+		const result = await ExpoImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 0.7,
 		});
-
 		if (!result.canceled) {
 			setPhotoUri(result.assets[0].uri);
 		}
@@ -50,11 +52,9 @@ export default function LoginProcess() {
 		if (step === 1 && !name.trim()) return;
 		if (step === 2 && !phone.trim()) return;
 		if (step === 3 && (!experience || languages.length === 0)) return;
-
-		if (step < steps) {
+		if (step < totalSteps) {
 			setStep(step + 1);
 		} else {
-			// Submit final data
 			router.push("/approval");
 		}
 	};
@@ -64,14 +64,6 @@ export default function LoginProcess() {
 			setStep(step - 1);
 		} else {
 			router.back();
-		}
-	};
-
-	const toggleLanguage = (lang: string) => {
-		if (languages.includes(lang)) {
-			setLanguages(languages.filter((l) => l !== lang));
-		} else {
-			setLanguages([...languages, lang]);
 		}
 	};
 
@@ -91,249 +83,136 @@ export default function LoginProcess() {
 		"Korean",
 	];
 
-	return (
-		<SafeAreaView style={{ flex: 1, padding: 16 }}>
-			<ScrollView
-				contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between" }}
-			>
-				{/* Header */}
-				<View>
-					{/* Step indicator */}
-					<Text style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
-						Step {step} of {steps}
-					</Text>
-					<View style={styles.stepBarContainer}>
-						<View style={[styles.stepBarProgress, { flex: progress }]} />
-						<View style={[styles.stepBarRemaining, { flex: 1 - progress }]} />
-					</View>
+	const isStep1Valid = name.trim() !== "";
+	const isStep2Valid = phone.trim() !== "";
+	const isStep3Valid = experience !== null && languages.length > 0;
 
-					{/* Step content */}
+	const buttonTitle = step === 3 ? "Submit for Approval" : "Continue →";
+
+	return (
+		<SafeAreaView
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
+		>
+			<ScrollView contentContainerStyle={styles.scrollContent}>
+				<View>
+					<StepProgressBar currentStep={step} totalSteps={totalSteps} />
+					<BodyText variant="small" style={styles.stepText}>
+						Step {step} of {totalSteps}
+					</BodyText>
+
 					{step === 1 && (
 						<>
-							<Text
-								style={{ fontSize: 16, fontWeight: "600", marginBottom: 4 }}
-							>
-								What’s your name?
-							</Text>
-							<Text style={{ fontSize: 14, color: "#666", marginBottom: 16 }}>
+							<Title variant="page" style={styles.stepTitle}>
+								What&apos;s your name?
+							</Title>
+							<BodyText variant="large" style={styles.stepSubtitle}>
 								This will be shown to clients
-							</Text>
+							</BodyText>
 
-							{/* Image picker */}
-							<TouchableOpacity
+							<ImagePicker
+								imageUri={photoUri}
 								onPress={pickImage}
-								style={{
-									width: 100,
-									height: 100,
-									borderRadius: 50,
-									backgroundColor: "#eee",
-									justifyContent: "center",
-									alignItems: "center",
-									marginBottom: 8,
-								}}
-							>
-								{photoUri ? (
-									<Image
-										source={{ uri: photoUri }}
-										style={{ width: 100, height: 100, borderRadius: 50 }}
-									/>
-								) : (
-									<Text style={{ color: "#666", textAlign: "center" }}>
-										Tap to upload photo
-									</Text>
-								)}
-							</TouchableOpacity>
+								backgroundColor={lightColors.mutedBackground}
+								iconColor={lightColors.bodyText}
+								dashedBorder
+								size={100}
+								borderRadius={25}
+								iconSize={40}
+							/>
+							<BodyText variant="normal" style={styles.uploadText}>
+								Tap to upload photo
+							</BodyText>
 
-							<Text style={{ fontWeight: "500", marginTop: 16 }}>
+							<Title variant="small" style={styles.inputLabel}>
 								Full Name
-							</Text>
-							<TextInput
+							</Title>
+							<SimpleTextInput
 								placeholder="Your full name"
 								value={name}
 								onChangeText={setName}
-								style={{
-									borderWidth: 1,
-									borderColor: "#ccc",
-									borderRadius: 8,
-									paddingHorizontal: 12,
-									paddingVertical: 8,
-									marginTop: 8,
-								}}
 							/>
 						</>
 					)}
 
 					{step === 2 && (
 						<>
-							<Text
-								style={{ fontSize: 16, fontWeight: "600", marginBottom: 4 }}
-							>
+							<Title variant="page" style={styles.stepTitle}>
 								Your phone number
-							</Text>
-							<Text style={{ fontSize: 14, color: "#666", marginBottom: 16 }}>
+							</Title>
+							<BodyText variant="large" style={styles.stepSubtitle}>
 								So clients can reach you
-							</Text>
+							</BodyText>
 
-							<PhoneInput
+							<PhoneNumberInput
 								ref={phoneInputRef}
-								defaultValue={phone}
-								defaultCode="MM"
-								layout="first"
-								onChangeFormattedText={setPhone}
-								containerStyle={{
-									width: "100%",
-									borderRadius: 8,
-									borderWidth: 1,
-									borderColor: "#ccc",
-									marginTop: 8,
-								}}
-								textContainerStyle={{ paddingVertical: 0, borderRadius: 8 }}
-								countryPickerProps={{ renderFlagButton: undefined }}
+								defaultCountry="TH"
+								value={phone}
+								onChangePhoneNumber={setPhone}
+								layout="second"
+								containerStyle={styles.phoneContainer}
+								textContainerStyle={styles.phoneTextContainer}
 							/>
 						</>
 					)}
 
 					{step === 3 && (
 						<>
-							<Text
-								style={{ fontSize: 16, fontWeight: "600", marginBottom: 4 }}
-							>
+							<Title variant="page" style={styles.stepTitle}>
 								About you
-							</Text>
-							<Text style={{ fontSize: 14, color: "#666", marginBottom: 16 }}>
+							</Title>
+							<BodyText variant="large" style={styles.stepSubtitle}>
 								Help clients know your expertise
-							</Text>
+							</BodyText>
 
-							{/* Experience */}
-							<Text style={{ fontWeight: "500", marginBottom: 8 }}>
+							{/* Experience (single select) */}
+							<Title variant="small" style={styles.inputLabel}>
 								Experience
-							</Text>
-							<View
-								style={{
-									flexDirection: "row",
-									flexWrap: "wrap",
-									marginBottom: 16,
-								}}
-							>
-								{experienceOptions.map((exp) => (
-									<TouchableOpacity
-										key={exp}
-										onPress={() => setExperience(exp)}
-										style={{
-											paddingVertical: 8,
-											paddingHorizontal: 12,
-											borderRadius: 8,
-											borderWidth: 1,
-											borderColor: experience === exp ? "#000" : "#ccc",
-											backgroundColor: experience === exp ? "#000" : "#fff",
-											marginRight: 8,
-											marginBottom: 8,
-										}}
-									>
-										<Text
-											style={{ color: experience === exp ? "#fff" : "#000" }}
-										>
-											{exp}
-										</Text>
-									</TouchableOpacity>
-								))}
-							</View>
+							</Title>
+							<ChipSelector
+								options={experienceOptions}
+								selected={experience}
+								onSelect={(value) => setExperience(value as string)}
+								mode="single"
+							/>
 
-							{/* Languages */}
-							<Text style={{ fontWeight: "500", marginBottom: 8 }}>
+							{/* Languages (multiple select) */}
+							<Title variant="small" style={styles.inputLabel}>
 								Languages
-							</Text>
-							<View
-								style={{
-									flexDirection: "row",
-									flexWrap: "wrap",
-									marginBottom: 16,
-								}}
-							>
-								{languageOptions.map((lang) => {
-									const selected = languages.includes(lang);
-									return (
-										<TouchableOpacity
-											key={lang}
-											onPress={() => toggleLanguage(lang)}
-											style={{
-												paddingVertical: 8,
-												paddingHorizontal: 12,
-												borderRadius: 8,
-												borderWidth: 1,
-												borderColor: selected ? "#000" : "#ccc",
-												backgroundColor: selected ? "#000" : "#fff",
-												marginRight: 8,
-												marginBottom: 8,
-											}}
-										>
-											<Text style={{ color: selected ? "#fff" : "#000" }}>
-												{lang}
-											</Text>
-										</TouchableOpacity>
-									);
-								})}
-							</View>
+							</Title>
+							<ChipSelector
+								options={languageOptions}
+								selected={languages}
+								onSelect={(value) => setLanguages(value as string[])}
+								mode="multiple"
+							/>
 
-							{/* Short Bio */}
-							<Text style={{ fontWeight: "500", marginBottom: 8 }}>
+							<Title variant="small" style={styles.inputLabel}>
 								Short Bio (optional)
-							</Text>
-							<TextInput
+							</Title>
+							<TextArea
 								placeholder="Tell clients about yourself…"
 								value={bio}
 								onChangeText={setBio}
-								multiline
 								numberOfLines={5}
-								style={{
-									borderWidth: 1,
-									borderColor: "#ccc",
-									borderRadius: 8,
-									padding: 12,
-									textAlignVertical: "top",
-									marginBottom: 16,
-								}}
 							/>
 						</>
 					)}
 				</View>
 
-				{/* Footer buttons */}
-				<View>
-					<TouchableOpacity
+				<View style={styles.footer}>
+					<NextButton
 						onPress={nextStep}
+						title={buttonTitle}
 						disabled={
-							(step === 1 && !name.trim()) ||
-							(step === 2 && !phone.trim()) ||
-							(step === 3 && (!experience || languages.length === 0))
+							(step === 1 && !isStep1Valid) ||
+							(step === 2 && !isStep2Valid) ||
+							(step === 3 && !isStep3Valid)
 						}
-						style={{
-							backgroundColor:
-								(step === 1 && !name.trim()) ||
-								(step === 2 && !phone.trim()) ||
-								(step === 3 && (!experience || languages.length === 0))
-									? "#ccc"
-									: "#000",
-							paddingVertical: 12,
-							borderRadius: 8,
-							alignItems: "center",
-							marginBottom: step >= 2 ? 12 : 0,
-						}}
-					>
-						<Text style={{ color: "#fff", fontWeight: "600" }}>
-							{step === 3 ? "Submit for Approval" : "Continue"}
-						</Text>
-					</TouchableOpacity>
-
-					{/* Back button only for step 2 and onward */}
-					{step >= 2 && (
-						<TouchableOpacity
-							onPress={backStep}
-							style={{ alignItems: "center" }}
-						>
-							<Text style={{ color: "#666", fontWeight: "500" }}>Back</Text>
-						</TouchableOpacity>
-					)}
+					/>
+					{step >= 2 && <SkipButton onPress={backStep} title="Back" />}
 				</View>
 			</ScrollView>
 		</SafeAreaView>
@@ -341,18 +220,89 @@ export default function LoginProcess() {
 }
 
 const styles = StyleSheet.create({
-	stepBarContainer: {
+	container: {
+		flex: 1,
+	},
+	scrollContent: {
+		flexGrow: 1,
+		justifyContent: "space-between",
+		padding: spacing.lg,
+	},
+	stepText: {
+		marginBottom: spacing.md,
+	},
+	stepTitle: {
+		marginBottom: spacing.sm,
+	},
+	stepSubtitle: {
+		marginBottom: spacing.xl,
+	},
+	uploadText: {
+		textAlign: "center",
+		color: lightColors.bodyText,
+		marginTop: spacing.lg,
+		marginBottom: spacing.md,
+	},
+	inputLabel: {
+		marginTop: spacing.md,
+		marginBottom: spacing.xs,
+	},
+	input: {
+		borderWidth: scaleSize(1),
+		borderRadius: scaleSize(8),
+		paddingHorizontal: spacing.md,
+		paddingVertical: spacing.sm,
+		fontSize: moderateScale(14),
+		backgroundColor: "#fff",
+	},
+	phoneContainer: {
+		width: "100%",
+		borderRadius: scaleSize(8),
+		marginTop: spacing.md,
+		backgroundColor: lightColors.entireAppBackground,
+	},
+	phoneTextContainer: {
+		paddingVertical: 0,
+		borderRadius: scaleSize(8),
+	},
+	optionsRow: {
 		flexDirection: "row",
-		height: 8,
-		borderRadius: 4,
-		backgroundColor: "#eee",
-		marginBottom: 24,
-		overflow: "hidden",
+		flexWrap: "wrap",
+		marginBottom: spacing.md,
+		alignItems: "center",
 	},
-	stepBarProgress: {
-		backgroundColor: "#000",
+	optionChip: {
+		paddingVertical: spacing.sm,
+		paddingHorizontal: spacing.md,
+		borderRadius: scaleSize(10),
+		marginRight: spacing.sm,
+		marginBottom: spacing.sm,
+		backgroundColor: "#fff",
 	},
-	stepBarRemaining: {
-		backgroundColor: "transparent",
+	optionChipSelected: {
+		backgroundColor: lightColors.brand,
+		borderColor: lightColors.brand,
+	},
+	optionText: {
+		color: lightColors.bigTitleText,
+		marginBottom: 0,
+	},
+	optionTextSelected: {
+		color: "#fff",
+	},
+	textArea: {
+		borderWidth: scaleSize(1),
+		borderRadius: scaleSize(8),
+		padding: spacing.md,
+		textAlignVertical: "top", // Ensures cursor starts at top
+		marginBottom: spacing.md,
+		backgroundColor: lightColors.entireAppBackground,
+		fontSize: moderateScale(14),
+		minHeight: scaleSize(120), // Makes it "huge" (adjust as needed)
+		// Optional: allow it to grow with content (remove if fixed height preferred)
+		// height: scaleSize(120),      // Fixed height – uncomment if you want exact size
+	},
+	footer: {
+		marginTop: spacing.xl,
 	},
 });

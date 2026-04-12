@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import { Search } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
-import { NormalTitle, BodyText } from "../atoms/Typography";
+import { NormalTitle, BodyText } from "../../atoms/Typography";
 
 interface EmptyStateProps {
 	title?: string;

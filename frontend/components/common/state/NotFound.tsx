@@ -1,8 +1,8 @@
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Frown } from "lucide-react-native";
-import BackButton from "./BackButton";
-import { PageTitle, BodyText } from "../atoms/Typography";
+import BackButton from "../navigation/BackButton";
+import { PageTitle, BodyText } from "../../atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
 
 interface NotFoundProps {

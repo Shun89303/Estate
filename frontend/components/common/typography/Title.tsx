@@ -9,7 +9,7 @@ type TitleVariant = "page" | "normal" | "small";
 interface TitleProps {
 	children: ReactNode;
 	variant?: TitleVariant;
-	style?: TextStyle;
+	style?: TextStyle | (TextStyle | false | null | undefined)[];
 	numberOfLines?: number;
 	allowFontScaling?: boolean;
 	maxFontSizeMultiplier?: number;
@@ -29,13 +29,26 @@ export default function Title({
 		small: styles.smallTitle,
 	};
 
+	let styleArray: TextStyle[] = [
+		variantStyles[variant],
+		{ color: lightColors.bigTitleText },
+	];
+
+	if (style) {
+		if (Array.isArray(style)) {
+			// Filter out falsy values (false, null, undefined)
+			const validStyles = style.filter((s): s is TextStyle => !!s);
+			styleArray.push(...validStyles);
+		} else {
+			styleArray.push(style);
+		}
+	}
+
+	const finalStyle = StyleSheet.flatten(styleArray);
+
 	return (
 		<Text
-			style={[
-				variantStyles[variant],
-				{ color: lightColors.bigTitleText },
-				style,
-			]}
+			style={finalStyle}
 			numberOfLines={numberOfLines}
 			allowFontScaling={allowFontScaling}
 			maxFontSizeMultiplier={maxFontSizeMultiplier}

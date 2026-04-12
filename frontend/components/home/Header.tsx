@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import { PageTitle } from "../atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
-import NotificationBell from "../common/NotificationBell";
+import NotificationBell from "../common/utils/NotificationBell";
 
 export default function Header() {
 	const colors = useTheme();

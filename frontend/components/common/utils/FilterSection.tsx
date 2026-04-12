@@ -1,6 +1,6 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { BodyText, SmallTitle } from "../atoms/Typography";
+import { BodyText, SmallTitle } from "../../atoms/Typography";
 
 export default function FilterSection({
 	title,

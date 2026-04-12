@@ -2,15 +2,15 @@ import { View, StyleSheet, FlatList } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowDownCircle, ArrowUpCircle, Coins } from "lucide-react-native";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import {
 	BodyText,
 	NormalTitle,
 	PageTitle,
 } from "@/components/atoms/Typography";
 import { useTheme } from "@/hooks/useTheme";
-import FilterSection from "@/components/common/FilterSection";
-import EmptyState from "@/components/common/EmptyState";
+import FilterSection from "@/components/common/utils/FilterSection";
+import EmptyState from "@/components/common/state/EmptyState";
 import globalStyles from "@/styles/styles";
 import { MOCK_COIN_HISTORY } from "@/mock/coinHistory";
 

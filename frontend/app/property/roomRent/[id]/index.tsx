@@ -9,9 +9,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { MOCK_ROOM_RENT, RoomRentProperty } from "@/mock/roomRent";
-import { PropertyMap } from "@/components/common/PropertyMap";
-import MediaCarousel from "@/components/common/MediaCarousel";
-import NotFound from "@/components/common/NotFound";
+import { PropertyMap } from "@/components/common/utils/PropertyMap";
+import MediaCarousel from "@/components/common/utils/MediaCarousel";
+import NotFound from "@/components/common/state/NotFound";
 import {
 	BodyText,
 	NormalTitle,

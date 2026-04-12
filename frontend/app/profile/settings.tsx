@@ -1,7 +1,7 @@
 import { View, Pressable, Switch, StyleSheet } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/navigation/BackButton";
 import { useTheme } from "@/hooks/useTheme";
 import {
 	BodyText,

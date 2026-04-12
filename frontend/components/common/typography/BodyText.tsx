@@ -9,7 +9,7 @@ type BodyTextVariant = "small" | "normal" | "large";
 interface BodyTextProps {
 	children: ReactNode;
 	variant?: BodyTextVariant;
-	style?: TextStyle;
+	style?: TextStyle | (TextStyle | false | null | undefined)[];
 	numberOfLines?: number;
 	allowFontScaling?: boolean;
 	maxFontSizeMultiplier?: number;
@@ -29,13 +29,28 @@ export default function BodyText({
 		large: styles.largeBody,
 	};
 
+	// Build an array of style objects
+	let styleArray: TextStyle[] = [
+		variantStyles[variant],
+		{ color: lightColors.bodyText || "#717684" },
+	];
+
+	if (style) {
+		if (Array.isArray(style)) {
+			// Filter out falsy values and assert the type is TextStyle[]
+			const validStyles = style.filter((s): s is TextStyle => !!s);
+			styleArray.push(...validStyles);
+		} else {
+			styleArray.push(style);
+		}
+	}
+
+	// Flatten to a single style object
+	const finalStyle = StyleSheet.flatten(styleArray);
+
 	return (
 		<Text
-			style={[
-				variantStyles[variant],
-				{ color: lightColors.bodyText || "#717684" },
-				style,
-			]}
+			style={finalStyle}
 			numberOfLines={numberOfLines}
 			allowFontScaling={allowFontScaling}
 			maxFontSizeMultiplier={maxFontSizeMultiplier}
@@ -47,21 +62,21 @@ export default function BodyText({
 
 const styles = StyleSheet.create({
 	smallBody: {
-		fontSize: fontSizes.xs, // 10dp scaled
+		fontSize: fontSizes.xs,
 		fontWeight: "normal",
-		marginBottom: spacing.xs, // 4dp
+		marginBottom: spacing.xs,
 		lineHeight: moderateScale(14),
 	},
 	normalBody: {
-		fontSize: fontSizes.sm, // 12dp scaled
+		fontSize: fontSizes.sm,
 		fontWeight: "normal",
-		marginBottom: spacing.xs, // 4dp
+		marginBottom: spacing.xs,
 		lineHeight: moderateScale(18),
 	},
 	largeBody: {
-		fontSize: fontSizes.md, // 14dp scaled
+		fontSize: fontSizes.md,
 		fontWeight: "normal",
-		marginBottom: spacing.xs, // 4dp
+		marginBottom: spacing.xs,
 		lineHeight: moderateScale(22),
 	},
 });

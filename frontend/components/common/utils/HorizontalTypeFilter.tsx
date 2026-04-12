@@ -1,7 +1,7 @@
 // components/common/HorizontalTypeFilter.tsx
 import { ScrollView, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { SmallTitle } from "../atoms/Typography";
+import { SmallTitle } from "../../atoms/Typography";
 
 export default function HorizontalTypeFilter() {
 	const router = useRouter();

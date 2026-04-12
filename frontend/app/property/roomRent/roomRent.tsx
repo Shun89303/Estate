@@ -3,18 +3,18 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { MOCK_ROOM_RENT } from "@/mock/roomRent";
-import { PropertyMap } from "@/components/common/PropertyMap";
-import FilterSection from "@/components/common/FilterSection";
-import BackButton from "@/components/common/BackButton";
+import { PropertyMap } from "@/components/common/utils/PropertyMap";
+import FilterSection from "@/components/common/utils/FilterSection";
+import BackButton from "@/components/common/navigation/BackButton";
 import { PageTitle } from "@/components/atoms/Typography";
-import ClearFiltersButton from "@/components/common/ClearFiltersButton";
-import FilterButton from "@/components/common/FilterButton";
-import SearchBar from "@/components/common/SearchBar";
+import ClearFiltersButton from "@/components/common/utils/ClearFiltersButton";
+import FilterButton from "@/components/common/utils/FilterButton";
+import SearchBar from "@/components/common/utils/SearchBar";
 import { useTheme } from "@/hooks/useTheme";
-import ViewToggleWithCount from "@/components/common/ViewToggleWithCount";
+import ViewToggleWithCount from "@/components/common/utils/ViewToggleWithCount";
 import globalStyles from "@/styles/styles";
 import RoomCard from "@/components/roomRent/RoomCard";
-import EmptyState from "@/components/common/EmptyState";
+import EmptyState from "@/components/common/state/EmptyState";
 
 const PROPERTY_TYPES = [
 	"All",
