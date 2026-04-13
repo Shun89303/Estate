@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
@@ -11,8 +12,13 @@ export default function RootLayout() {
 		<GestureHandlerRootView
 			style={{ flex: 1, backgroundColor: color.appBackground }}
 		>
-			<StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-			<Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)" />
+			<BottomSheetModalProvider>
+				<StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+				<Stack
+					screenOptions={{ headerShown: false }}
+					initialRouteName="(tabs)"
+				/>
+			</BottomSheetModalProvider>
 		</GestureHandlerRootView>
 	);
 }

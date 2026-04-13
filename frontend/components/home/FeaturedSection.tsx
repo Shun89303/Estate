@@ -3,6 +3,7 @@ import SectionHeader from "../common/utils/SectionHeader";
 import { useRouter } from "expo-router";
 import { MOCK_BUYSELL } from "@/mock/buySell";
 import HomePropertyCard from "./property/HomePropertyCard";
+import { spacing, scaleSize } from "@/utils/metrics";
 
 export default function FeaturedSection() {
 	const data = MOCK_BUYSELL.slice(0, 3);
@@ -31,10 +32,10 @@ export default function FeaturedSection() {
 
 const styles = StyleSheet.create({
 	container: {
-		marginBottom: 16,
+		marginBottom: spacing.lg, // 16
 	},
 	listContent: {
-		paddingHorizontal: 16,
-		gap: 12,
+		paddingHorizontal: spacing.lg, // 16
+		gap: scaleSize(12), // spacing.md = 12
 	},
 });

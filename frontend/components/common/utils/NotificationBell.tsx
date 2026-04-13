@@ -1,9 +1,9 @@
-// components/common/NotificationBell.tsx
 import { Pressable, View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Bell } from "lucide-react-native";
-import { useTheme } from "@/hooks/useTheme";
 import globalStyles from "@/styles/styles";
+import { spacing, scaleSize } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
 
 interface NotificationBellProps {
 	onPress?: () => void; // optional override
@@ -19,7 +19,6 @@ export default function NotificationBell({
 	size = 20,
 }: NotificationBellProps) {
 	const router = useRouter();
-	const colors = useTheme();
 
 	const handlePress = () => {
 		if (onPress) {
@@ -38,7 +37,13 @@ export default function NotificationBell({
 				<Bell size={size} color={iconColor} />
 				{hasUnread && (
 					<View
-						style={[styles.redDot, { backgroundColor: colors.primaryRed }]}
+						style={[
+							styles.redDot,
+							{
+								backgroundColor: lightColors.danger,
+								borderColor: lightColors.background,
+							},
+						]}
 					/>
 				)}
 			</View>
@@ -48,26 +53,20 @@ export default function NotificationBell({
 
 const styles = StyleSheet.create({
 	iconButton: {
-		backgroundColor: "#fff",
-		padding: 8,
-		borderRadius: 10,
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
+		backgroundColor: lightColors.background,
+		padding: spacing.sm,
+		borderRadius: scaleSize(10),
 	},
 	bellWrapper: {
 		position: "relative",
 	},
 	redDot: {
 		position: "absolute",
-		top: -2,
-		right: -2,
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		borderWidth: 1,
-		borderColor: "#fff",
+		top: -scaleSize(2),
+		right: -scaleSize(2),
+		width: scaleSize(8),
+		height: scaleSize(8),
+		borderRadius: scaleSize(4),
+		borderWidth: scaleSize(1),
 	},
 });

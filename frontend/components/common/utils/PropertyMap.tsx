@@ -1,6 +1,6 @@
-// components/PropertyMap.tsx
 import MapView, { Marker, Region } from "react-native-maps";
 import { View, StyleSheet } from "react-native";
+import { scaleSize } from "@/utils/metrics";
 
 interface MapMarker {
 	id: string | number;
@@ -22,7 +22,6 @@ export function PropertyMap({
 	initialRegion,
 	style,
 }: PropertyMapProps) {
-	// If no region is provided, calculate a region that fits all markers
 	const getDefaultRegion = (): Region => {
 		if (markers.length === 0) {
 			return {
@@ -40,7 +39,6 @@ export function PropertyMap({
 				longitudeDelta: 0.01,
 			};
 		}
-		// Calculate bounding box for multiple markers
 		let minLat = markers[0].latitude,
 			maxLat = markers[0].latitude;
 		let minLng = markers[0].longitude,
@@ -63,7 +61,7 @@ export function PropertyMap({
 
 	return (
 		<View style={[styles.container, style]}>
-			<MapView style={styles.map} initialRegion={region}>
+			{/* <MapView style={styles.map} initialRegion={region}>
 				{markers.map((marker) => (
 					<Marker
 						key={marker.id}
@@ -76,12 +74,18 @@ export function PropertyMap({
 						onPress={marker.onPress}
 					/>
 				))}
-			</MapView>
+			</MapView> */}
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { overflow: "hidden", borderRadius: 12 },
-	map: { width: "100%", height: "100%" },
+	container: {
+		overflow: "hidden",
+		borderRadius: scaleSize(12),
+	},
+	map: {
+		width: "100%",
+		height: "100%",
+	},
 });

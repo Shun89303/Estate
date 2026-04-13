@@ -1,5 +1,9 @@
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+// components/common/utils/ClearFiltersButton.tsx
+import { TouchableOpacity, StyleSheet } from "react-native";
 import { X } from "lucide-react-native";
+import BodyText from "../typography/BodyText";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 interface ClearFiltersButtonProps {
 	onPress: () => void;
@@ -11,13 +15,15 @@ interface ClearFiltersButtonProps {
 export default function ClearFiltersButton({
 	onPress,
 	label = "Clear all filters",
-	iconColor = "#d9534f",
-	textColor = "#d9534f",
+	iconColor = lightColors.brand,
+	textColor = lightColors.brand,
 }: ClearFiltersButtonProps) {
 	return (
 		<TouchableOpacity style={styles.button} onPress={onPress}>
-			<X size={18} color={iconColor} />
-			<Text style={[styles.text, { color: textColor }]}>{label}</Text>
+			<X size={moderateScale(18)} color={iconColor} />
+			<BodyText variant="large" style={{ color: textColor, marginBottom: 0 }}>
+				{label}
+			</BodyText>
 		</TouchableOpacity>
 	);
 }
@@ -27,15 +33,11 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		marginTop: 8,
-		paddingVertical: 8,
-		borderRadius: 20,
+		marginTop: spacing.sm,
+		paddingVertical: scaleSize(8),
+		borderRadius: scaleSize(20),
 		alignSelf: "flex-start",
-		paddingHorizontal: 12,
-		gap: 4,
-	},
-	text: {
-		fontSize: 14,
-		fontWeight: "500",
+		paddingHorizontal: spacing.md,
+		gap: scaleSize(4),
 	},
 });

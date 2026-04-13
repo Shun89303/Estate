@@ -1,11 +1,12 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { List, Map as MapIcon } from "lucide-react-native";
-import { useTheme } from "@/hooks/useTheme";
-import { BodyText } from "../../atoms/Typography";
+import BodyText from "@/components/common/typography/BodyText";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 interface ViewToggleWithCountProps {
 	count: number;
-	countLabel?: string; // e.g., "properties found", "rooms found"
+	countLabel?: string;
 	viewMode: "list" | "map";
 	onViewModeChange: (mode: "list" | "map") => void;
 	countStyle?: object;
@@ -20,20 +21,16 @@ export default function ViewToggleWithCount({
 	countStyle,
 	containerStyle,
 }: ViewToggleWithCountProps) {
-	const colors = useTheme();
-
 	return (
 		<View style={[styles.container, containerStyle]}>
-			<BodyText style={countStyle}>
+			<BodyText variant="normal" style={countStyle}>
 				{count} {countLabel}
 			</BodyText>
 
 			<View
 				style={[
 					styles.toggleContainer,
-					{
-						backgroundColor: colors.primaryMute,
-					},
+					{ backgroundColor: lightColors.mutedBackground },
 				]}
 			>
 				<TouchableOpacity
@@ -43,10 +40,7 @@ export default function ViewToggleWithCount({
 					]}
 					onPress={() => onViewModeChange("list")}
 				>
-					<List
-						size={18}
-						color={viewMode === "list" ? colors.textPrimary : "#666"}
-					/>
+					<List size={moderateScale(18)} color={lightColors.bigTitleText} />
 				</TouchableOpacity>
 				<TouchableOpacity
 					style={[
@@ -55,10 +49,7 @@ export default function ViewToggleWithCount({
 					]}
 					onPress={() => onViewModeChange("map")}
 				>
-					<MapIcon
-						size={18}
-						color={viewMode === "map" ? colors.textPrimary : "#666"}
-					/>
+					<MapIcon size={moderateScale(18)} color={lightColors.bigTitleText} />
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -70,27 +61,22 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		paddingHorizontal: 16,
-		paddingVertical: 10,
+		paddingHorizontal: spacing.lg,
+		paddingVertical: scaleSize(10),
 	},
 	toggleContainer: {
 		flexDirection: "row",
-		borderRadius: 30,
-		padding: 4,
+		borderRadius: scaleSize(30),
+		padding: scaleSize(4),
 	},
 	toggleButton: {
 		flexDirection: "row",
 		alignItems: "center",
-		paddingHorizontal: 16,
-		paddingVertical: 6,
-		borderRadius: 30,
+		paddingHorizontal: spacing.sm,
+		paddingVertical: scaleSize(6),
+		borderRadius: scaleSize(30),
 	},
 	toggleButtonActive: {
-		backgroundColor: "#fff",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
+		backgroundColor: lightColors.background,
 	},
 });

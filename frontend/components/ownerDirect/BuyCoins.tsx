@@ -1,18 +1,20 @@
-import { useTheme } from "@/hooks/useTheme";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import { BodyText, SmallTitle } from "../atoms/Typography";
 import { Coins } from "lucide-react-native";
+import Title from "../common/typography/Title";
+import BodyText from "../common/typography/BodyText";
+import SubTitle from "../common/typography/SubTitle";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { useUserStore } from "@/stores/userStore";
+import { BottomSheetView } from "@gorhom/bottom-sheet";
 
-export default function BuyCoins({
-	currentBalance,
-	onAddCoins,
-	onClose,
-}: {
-	currentBalance: number;
-	onAddCoins: (amount: number) => void;
+interface BuyCoinsProps {
 	onClose: () => void;
-}) {
-	const colors = useTheme();
+}
+
+export default function BuyCoins({ onClose }: BuyCoinsProps) {
+	const { addCoins, coins } = useUserStore();
+
 	const oneTimePacks = [
 		{ title: "10 Coins", subtitle: "฿9.9/coin", value: "฿99", coins: 10 },
 		{
@@ -28,41 +30,17 @@ export default function BuyCoins({
 	];
 
 	const handlePurchase = (coins: number) => {
-		onAddCoins(coins);
+		addCoins(coins);
 		onClose();
 	};
 
 	return (
-		<View style={styles.container}>
-			<View
-				style={{
-					alignItems: "center",
-				}}
-			>
-				<SmallTitle style={styles.headerTitle}>Buy Coins</SmallTitle>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-					}}
-				>
-					<BodyText
-						style={{
-							marginBottom: 16,
-						}}
-					>
-						Current balance:
-					</BodyText>
-					<BodyText
-						style={{
-							marginBottom: 16,
-							color: colors.primaryGold,
-							fontWeight: "700",
-						}}
-					>
-						{" "}
-						{currentBalance} coins
-					</BodyText>
+		<BottomSheetView style={styles.container}>
+			<View style={styles.header}>
+				<Title>Buy Coins</Title>
+				<View style={styles.balanceRow}>
+					<BodyText variant="large">Current balance:</BodyText>
+					<SubTitle> {coins} coins</SubTitle>
 				</View>
 			</View>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -72,63 +50,55 @@ export default function BuyCoins({
 						style={[
 							styles.card,
 							{
-								backgroundColor: colors.secondaryGray + 10,
-								borderColor: colors.primaryGray + 80,
+								backgroundColor: lightColors.mutedBackgroundWeaker,
+								borderColor: lightColors.mutedBorder,
 							},
 							item.popular && {
-								borderColor: colors.primaryGold,
-								backgroundColor: colors.primaryGold + 15,
+								borderColor: lightColors.brand,
+								backgroundColor: lightColors.brandBG,
 							},
 						]}
 						onPress={() => handlePurchase(item.coins)}
 					>
-						<Coins size={20} color={colors.primaryGold} />
+						<Coins size={moderateScale(20)} color={lightColors.brand} />
 						<View style={styles.cardInfo}>
 							<View style={styles.cardTitleRow}>
-								<SmallTitle style={styles.title}>{item.title}</SmallTitle>
+								<Title>{item.title}</Title>
 								{item.popular && (
 									<View style={styles.popularBadge}>
-										<BodyText style={styles.popularBadgeText}>POPULAR</BodyText>
+										<SubTitle style={{ marginBottom: 0 }}>POPULAR</SubTitle>
 									</View>
 								)}
 							</View>
 						</View>
-						<SmallTitle
-							style={{
-								fontWeight: "700",
-								color: colors.primaryGold,
-							}}
-						>
-							{item.value}
-						</SmallTitle>
+						<SubTitle variant="large">{item.value}</SubTitle>
 					</TouchableOpacity>
 				))}
 			</ScrollView>
-		</View>
+		</BottomSheetView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 16,
+		padding: spacing.lg,
 	},
-	headerTitle: {
-		fontSize: 16,
-		fontWeight: "600",
-		marginBottom: 4,
+	header: {
+		alignItems: "center",
+		marginBottom: spacing.md,
+	},
+	balanceRow: {
+		flexDirection: "row",
+		alignItems: "center",
 	},
 	card: {
 		flexDirection: "row",
 		alignItems: "center",
-		padding: 12,
-		borderRadius: 12,
-		borderWidth: 1,
-		marginBottom: 10,
-		gap: 10,
-	},
-	coinIcon: {
-		marginRight: 12,
-		fontSize: 20,
+		padding: spacing.md,
+		borderRadius: scaleSize(12),
+		borderWidth: scaleSize(1),
+		marginBottom: spacing.sm,
+		gap: scaleSize(10),
 	},
 	cardInfo: {
 		flex: 1,
@@ -136,21 +106,13 @@ const styles = StyleSheet.create({
 	cardTitleRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		marginBottom: 2,
-	},
-	title: {
-		fontWeight: "700",
-		fontSize: 14,
+		marginBottom: scaleSize(2),
 	},
 	popularBadge: {
-		backgroundColor: "#f59e0b",
-		borderRadius: 4,
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		marginLeft: 8,
-	},
-	popularBadgeText: {
-		color: "#fff",
-		fontSize: 10,
+		backgroundColor: lightColors.brandBG,
+		borderRadius: scaleSize(99),
+		paddingHorizontal: scaleSize(6),
+		paddingVertical: scaleSize(2),
+		marginLeft: spacing.sm,
 	},
 });

@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
-import {
-	View,
-	Text,
-	Image,
-	StyleSheet,
-	Dimensions,
-	Pressable,
-} from "react-native";
+import { View, Image, StyleSheet, Dimensions, Pressable } from "react-native";
 import { VideoView, useVideoPlayer } from "expo-video";
 import { Review } from "@/mock/reviews";
-import { BodyText, SmallTitle } from "@/components/atoms/Typography";
+import { spacing, scaleSize } from "@/utils/metrics";
+import BodyText from "@/components/common/typography/BodyText";
+import Title from "@/components/common/typography/Title";
+import { lightColors } from "@/theme/light";
 
 const { width } = Dimensions.get("window");
 
@@ -37,7 +33,7 @@ export default function ReviewCard({ review }: { review: Review }) {
 				{isPlaying ? (
 					<VideoView
 						player={player}
-						style={styles.thumbnail}
+						style={[styles.thumbnail, styles.video]}
 						nativeControls
 						contentFit="cover"
 					/>
@@ -52,8 +48,15 @@ export default function ReviewCard({ review }: { review: Review }) {
 							style={styles.playIndicator}
 							onPress={() => setIsPlaying(true)}
 						>
-							<Text style={styles.playText}>▶</Text>
+							<BodyText variant="normal" style={styles.playText}>
+								▶
+							</BodyText>
 						</Pressable>
+						<View style={styles.durationBadge}>
+							<BodyText variant="small" style={styles.durationText}>
+								{review.duration}
+							</BodyText>
+						</View>
 					</>
 				)}
 			</View>
@@ -62,11 +65,11 @@ export default function ReviewCard({ review }: { review: Review }) {
 				<View style={styles.row}>
 					<Image source={{ uri: review.profile_image }} style={styles.avatar} />
 					<View style={styles.textColumn}>
-						<SmallTitle numberOfLines={1} style={styles.title}>
+						<Title variant="small" numberOfLines={1}>
 							{review.title}
-						</SmallTitle>
+						</Title>
 						<View style={styles.nameRatingRow}>
-							<BodyText>{review.name}</BodyText>
+							<BodyText style={{ marginBottom: 0 }}>{review.name}</BodyText>
 							<BodyText style={styles.dot}>•</BodyText>
 							<BodyText style={styles.stars}>
 								{"★".repeat(review.rating)}
@@ -83,19 +86,23 @@ export default function ReviewCard({ review }: { review: Review }) {
 const styles = StyleSheet.create({
 	card: {
 		width: width * 0.7,
-		borderRadius: 12,
+		borderRadius: scaleSize(12),
 		overflow: "hidden",
-		backgroundColor: "#fff",
-		marginRight: 16,
+		backgroundColor: lightColors.entireAppBackground,
+		marginRight: spacing.lg,
 	},
 	thumbnailWrapper: {
 		position: "relative",
 		width: "100%",
-		height: 200,
+		height: scaleSize(200),
 	},
 	thumbnail: {
 		width: "100%",
 		height: "100%",
+		borderRadius: scaleSize(12), // all four corners rounded
+	},
+	video: {
+		// additional video-specific styles if needed
 	},
 	overlay: {
 		position: "absolute",
@@ -104,43 +111,52 @@ const styles = StyleSheet.create({
 		right: 0,
 		bottom: 0,
 		backgroundColor: "rgba(0,0,0,0.3)",
+		borderRadius: scaleSize(12), // match image corners for overlay
 	},
 	playIndicator: {
 		position: "absolute",
 		top: "50%",
 		left: "50%",
-		transform: [{ translateX: -12 }, { translateY: -12 }],
-		backgroundColor: "rgba(0,0,0,0.6)",
-		width: 24,
-		height: 24,
-		borderRadius: 12,
+		transform: [{ translateX: -scaleSize(20) }, { translateY: -scaleSize(20) }],
+		backgroundColor: lightColors.background,
+		width: scaleSize(40),
+		height: scaleSize(40),
+		borderRadius: scaleSize(20),
 		justifyContent: "center",
 		alignItems: "center",
 	},
 	playText: {
-		color: "#fff",
-		fontSize: 14,
-		fontWeight: "bold",
+		color: lightColors.bigTitleText,
+		marginBottom: 0,
+	},
+	durationBadge: {
+		position: "absolute",
+		bottom: spacing.sm,
+		right: spacing.sm,
+		backgroundColor: "rgba(0,0,0,0.7)",
+		paddingHorizontal: spacing.sm,
+		paddingVertical: scaleSize(4),
+		borderRadius: scaleSize(6),
+	},
+	durationText: {
+		color: lightColors.background,
+		marginBottom: 0,
 	},
 	info: {
-		padding: 12,
+		padding: spacing.md,
 	},
 	row: {
 		flexDirection: "row",
 		alignItems: "flex-start",
 	},
 	avatar: {
-		width: 40,
-		height: 40,
-		borderRadius: 20,
-		marginRight: 12,
+		width: scaleSize(40),
+		height: scaleSize(40),
+		borderRadius: scaleSize(20),
+		marginRight: spacing.sm,
 	},
 	textColumn: {
 		flex: 1,
-	},
-	title: {
-		marginBottom: 4,
-		lineHeight: 18,
 	},
 	nameRatingRow: {
 		flexDirection: "row",
@@ -148,12 +164,11 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 	},
 	dot: {
-		marginHorizontal: 6,
-		color: "#999",
-		fontSize: 12,
+		marginHorizontal: scaleSize(6),
+		marginBottom: 0,
 	},
 	stars: {
 		color: "#FFD700",
-		fontSize: 12,
+		marginBottom: 0,
 	},
 });

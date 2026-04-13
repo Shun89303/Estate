@@ -7,7 +7,7 @@ import { MOCK_BUYSELL, Property } from "@/mock/buySell";
 import { PropertyMap } from "@/components/common/utils/PropertyMap";
 import FilterSection from "@/components/common/utils/FilterSection";
 import BackButton from "@/components/common/navigation/BackButton";
-import HorizontalTypeFilter from "@/components/common/utils/HorizontalTypeFilter";
+import HorizontalTypeFilter from "@/components/common/utils/PropertyTypeFilter";
 import { useTheme } from "@/hooks/useTheme";
 import ClearFiltersButton from "@/components/common/utils/ClearFiltersButton";
 import SearchBar from "@/components/common/utils/SearchBar";

@@ -15,21 +15,37 @@ import { BodyText, PageTitle, SmallTitle } from "@/components/atoms/Typography";
 import { Coins, EyeOff, Lock, LockOpen, Sparkles } from "lucide-react-native";
 import { useTheme } from "@/hooks/useTheme";
 import OwnerDirectCard from "@/components/ownerDirect/OwnerDirectCard";
-import BuyCoins from "@/components/ownerDirect/BuyCoins";
 import EmptyState from "@/components/common/state/EmptyState";
+import { useUserStore } from "@/stores/userStore";
+import { useCoinBalance } from "@/components/coin/useCoinBalance";
 
 export default function OwnerDirect() {
 	const router = useRouter();
 	const colors = useTheme();
+	const { coins: coinBalance, deductCoins } = useUserStore();
+	const { CoinButton, CoinBottomSheet } = useCoinBalance();
 
+	// selected property
 	const [selectedProperty, setSelectedProperty] = useState<Property | null>(
 		null,
 	);
+	// array of unlocked ids
 	const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
-	const [coinBalance, setCoinBalance] = useState(20);
+
+	// unlock property logic
+	const handleUnlock = () => {
+		if (!selectedProperty) return;
+		const cost = selectedProperty.unlockCoins;
+		const success = deductCoins(cost); // ✅ use store deduct
+		if (success) {
+			setUnlockedIds((prev) => [...prev, selectedProperty.id]);
+			bottomSheetRef.current?.close();
+		} else {
+			alert("Not enough coins. Please top up.");
+		}
+	};
 
 	const bottomSheetRef = useRef<BottomSheet>(null);
-	const topupSheetRef = useRef<BottomSheet>(null);
 	const snapPoints = useMemo(() => ["40%"], []);
 
 	const handleCardPress = (item: Property) => {
@@ -42,24 +58,6 @@ export default function OwnerDirect() {
 		}
 	};
 
-	const handleTopUpSheet = () => topupSheetRef.current?.expand();
-
-	const handleUnlock = () => {
-		if (!selectedProperty) return;
-		const cost = selectedProperty.unlockCoins;
-		if (coinBalance >= cost) {
-			setCoinBalance((prev) => prev - cost);
-			setUnlockedIds((prev) => [...prev, selectedProperty.id]);
-			bottomSheetRef.current?.close();
-		} else {
-			alert("Not enough coins. Please top up.");
-		}
-	};
-
-	const handleAddCoins = (amount: number) => {
-		setCoinBalance((prev) => prev + amount);
-	};
-
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			{/* HEADER */}
@@ -68,30 +66,7 @@ export default function OwnerDirect() {
 					<BackButton />
 					<PageTitle>Owner Direct</PageTitle>
 				</View>
-				<Pressable
-					style={[
-						styles.coins,
-						{
-							backgroundColor: colors.darkGold,
-							padding: 10,
-							borderWidth: 1,
-							borderRadius: 15,
-							borderColor: colors.primaryGold,
-						},
-					]}
-					onPress={handleTopUpSheet}
-				>
-					<Coins size={20} color={colors.primaryGold} />
-					<BodyText
-						style={{
-							marginLeft: 4,
-							color: colors.primaryGold,
-							fontWeight: "600",
-						}}
-					>
-						{coinBalance}
-					</BodyText>
-				</Pressable>
+				<CoinButton />
 			</View>
 
 			<ScrollView contentContainerStyle={{ padding: 16 }}>
@@ -227,22 +202,7 @@ export default function OwnerDirect() {
 					</BottomSheetView>
 				)}
 			</BottomSheet>
-
-			{/* TOP‑UP BOTTOM SHEET */}
-			<BottomSheet
-				ref={topupSheetRef}
-				index={-1}
-				snapPoints={snapPoints}
-				enablePanDownToClose
-			>
-				<BottomSheetView>
-					<BuyCoins
-						currentBalance={coinBalance}
-						onAddCoins={handleAddCoins}
-						onClose={() => topupSheetRef.current?.close()}
-					/>
-				</BottomSheetView>
-			</BottomSheet>
+			<CoinBottomSheet />
 		</SafeAreaView>
 	);
 }

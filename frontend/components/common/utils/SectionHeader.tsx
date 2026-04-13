@@ -1,6 +1,10 @@
 import { View, StyleSheet, Pressable } from "react-native";
 import { ChevronRight } from "lucide-react-native";
-import { BodyText, NormalTitle, SmallTitle } from "../../atoms/Typography";
+import Title from "../typography/Title";
+import BodyText from "../typography/BodyText";
+import SubTitle from "../typography/SubTitle";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 export default function SectionHeader({
 	title,
@@ -15,14 +19,22 @@ export default function SectionHeader({
 		<View style={styles.container}>
 			{/* LEFT: Title + Subtitle */}
 			<View style={styles.left}>
-				<NormalTitle>{title}</NormalTitle>
-				{subtitle && <BodyText style={styles.subtitle}>{subtitle}</BodyText>}
+				<Title variant="normal" style={{ marginBottom: 0 }}>
+					{title}
+				</Title>
+				{subtitle && (
+					<BodyText variant="normal" style={styles.subtitle}>
+						{subtitle}
+					</BodyText>
+				)}
 			</View>
 
 			{/* RIGHT: See All + Chevron */}
 			<Pressable onPress={onPress} style={styles.right}>
-				<SmallTitle style={styles.seeAllText}>See All</SmallTitle>
-				<ChevronRight size={16} color="#D4AF37" />
+				<SubTitle variant="small" style={{ marginBottom: 0 }}>
+					See All
+				</SubTitle>
+				<ChevronRight size={moderateScale(16)} color={lightColors.brand} />
 			</Pressable>
 		</View>
 	);
@@ -33,23 +45,18 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		paddingHorizontal: 16,
-		marginBottom: 8,
+		paddingHorizontal: spacing.lg, // was 16
+		marginBottom: spacing.sm, // was 8
 	},
 	left: {
 		flex: 1,
 	},
 	subtitle: {
-		fontSize: 12,
-		color: "#666",
-		marginTop: 2,
+		marginTop: scaleSize(2), // was 2
 	},
 	right: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 4,
-	},
-	seeAllText: {
-		color: "#D4AF37", // dark gold
+		gap: scaleSize(4), // was 4
 	},
 });

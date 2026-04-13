@@ -422,3 +422,48 @@ TextChip
 <!-- Completion -->
 
 agent/owner login process: completed(applied reusable components, metrics, styles)
+
+<!--  -->
+
+Apr-13-2026
+
+<!-- Todo list -->
+
+Implement Buy Business property
+
+<!-- Update Home page -->
+
+Create Buy Business display page
+Create route : DONE
+back button : DONE
+title : DONE
+star: shortlist button DONE
+buy coins DONE
+filter button DONE
+Search bar DONE
+filter section DONE
+view toggle with count DONE
+Property cards vertical display list DONE
+Buy Business display card
+Property map DONE
+
+Create mock data DONE
+Create Buy Business property display card DONE initial version 1
+Create Buy Business details page
+
+<!-- Completed -->
+
+Home page update: applied metrics, styling, Buy Business initial without route
+
+Created reusable components and zustand stores preparation for buy business page.
+buy business page initial setup
+short list design
+
+<!-- Next -->
+
+buy business locked design
+unlock sheet design
+recently unlocked design
+buy business unlocked design
+buy business unlocked card  
+compare

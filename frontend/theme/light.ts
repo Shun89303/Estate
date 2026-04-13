@@ -2,8 +2,11 @@ export const lightColors = {
 	entireAppBackground: "#f3f4f7",
 	background: "#fff",
 	mutedBackground: "hsl(225, 15%, 88%)",
+	mutedBackgroundWeaker: "hsla(225, 15%, 93%, 0.5)",
 	brand: "hsla(30, 52%, 55%, 1.00)",
+	quarterWeakBrand: "hsla(30, 52%, 55%, .25)",
 	brandBG: "hsla(29.75, 51.97%, 55.1%, 0.10196078431372549)",
+	brandBorder: "hsla(30, 52%, 55%, 0.2)",
 	bigTitleText: "#121621",
 	subTitleText: "hsla(30, 52%, 55%, 1.00)",
 	bodyText: "#717684",
@@ -11,4 +14,5 @@ export const lightColors = {
 	mutedBorder: "hsl(225, 15%, 88%)",
 	danger: "hsla(0, 84%, 55%, 1.00)",
 	dangerBackground: "hsla(0, 84%, 55%, 0.1)",
+	success: "#4CA154",
 };

@@ -1,8 +1,10 @@
 import { useRouter } from "expo-router";
 import { View, StyleSheet, Pressable } from "react-native";
 import { Search } from "lucide-react-native";
-import { BodyText } from "../atoms/Typography";
 import globalStyles from "@/styles/styles";
+import BodyText from "../common/typography/BodyText";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 export default function SearchBar() {
 	const router = useRouter();
@@ -13,8 +15,8 @@ export default function SearchBar() {
 			onPress={() => router.push("/(tabs)/search")}
 		>
 			<View style={[styles.fakeInput, globalStyles.shadows]}>
-				<Search size={18} color="#888" />
-				<BodyText style={styles.placeholder}>
+				<Search size={moderateScale(18)} color={lightColors.bodyText} />
+				<BodyText variant="large" style={styles.placeholder}>
 					Search by location or name...
 				</BodyText>
 			</View>
@@ -24,20 +26,20 @@ export default function SearchBar() {
 
 const styles = StyleSheet.create({
 	container: {
-		paddingHorizontal: 16,
-		marginBottom: 12,
+		paddingHorizontal: spacing.lg,
+		marginBottom: spacing.md,
 	},
 	fakeInput: {
 		flexDirection: "row",
 		alignItems: "center",
-		backgroundColor: "#fff",
-		borderRadius: 15,
-		paddingVertical: 10,
-		paddingHorizontal: 16,
-		gap: 8,
+		backgroundColor: lightColors.background,
+		borderRadius: scaleSize(15),
+		paddingVertical: scaleSize(10),
+		paddingHorizontal: spacing.lg,
+		gap: scaleSize(8),
 	},
 	placeholder: {
-		color: "#888",
 		flex: 1,
+		marginBottom: 0,
 	},
 });

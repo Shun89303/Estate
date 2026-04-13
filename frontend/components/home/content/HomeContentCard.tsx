@@ -1,13 +1,13 @@
-import {
-	BodyText,
-	NormalTitle,
-	SmallTitle,
-} from "@/components/atoms/Typography";
+// components/content/HomeContentCard.tsx
 import { ContentItem } from "@/mock/contents";
-import { Ionicons } from "@expo/vector-icons";
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useTheme } from "@/hooks/useTheme";
 import globalStyles from "@/styles/styles";
+import { lightColors } from "@/theme/light";
+import { FileText, Play } from "lucide-react-native";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
+import SubTitle from "@/components/common/typography/SubTitle";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 export default function HomeContentCard({
 	item,
@@ -17,15 +17,13 @@ export default function HomeContentCard({
 	onPress?: () => void;
 }) {
 	const isArticle = item.type === "article";
-	const colors = useTheme();
 
 	return (
 		<TouchableOpacity
-			style={[styles.card, { backgroundColor: colors.background }]}
+			style={[styles.card, { backgroundColor: lightColors.background }]}
 			activeOpacity={0.7}
 			onPress={onPress}
 		>
-			{/* Left: Media - centered rectangle */}
 			<View style={styles.cardLeft}>
 				{isArticle ? (
 					<View style={styles.imageWrapper}>
@@ -33,43 +31,44 @@ export default function HomeContentCard({
 						<View
 							style={[
 								styles.fileIconOverlay,
-								{ backgroundColor: colors.primaryGold },
+								{ backgroundColor: lightColors.brand },
 							]}
 						>
-							<Ionicons name="document-text-outline" size={20} color="#fff" />
+							<FileText
+								size={moderateScale(20)}
+								color={lightColors.background}
+							/>
 						</View>
 					</View>
 				) : (
 					<View style={styles.imageWrapper}>
 						<Image source={{ uri: item.thumbnailUrl }} style={styles.image} />
 						<View style={styles.videoOverlay}>
-							<Ionicons name="play-circle" size={40} color="#fff" />
+							<Play
+								size={moderateScale(30)}
+								color="transparent"
+								fill={lightColors.background}
+							/>
 						</View>
-						{/* Optional: show duration if needed (commented out for now) */}
-						{/* <View style={styles.durationBadge}>
-							<BodyText style={styles.durationText}>{item.duration}</BodyText>
-						</View> */}
 					</View>
 				)}
 			</View>
 
-			{/* Right: Content Info */}
 			<View style={styles.cardRight}>
-				{/* Category */}
-				<SmallTitle style={[styles.typeText, { color: colors.primaryGold }]}>
-					{item.category.toUpperCase()}
-				</SmallTitle>
-
-				{/* Title */}
-				<NormalTitle style={styles.cardTitle} numberOfLines={2}>
+				<SubTitle variant="small">{item.category.toUpperCase()}</SubTitle>
+				<Title variant="small" style={{ marginBottom: 0 }} numberOfLines={2}>
 					{item.title}
-				</NormalTitle>
-
-				{/* Meta row: postedBy • date */}
+				</Title>
 				<View style={styles.metaRow}>
-					<BodyText>{item.postedBy}</BodyText>
-					<BodyText>•</BodyText>
-					<BodyText>{item.date}</BodyText>
+					<BodyText variant="small" style={{}}>
+						{item.postedBy}
+					</BodyText>
+					<BodyText variant="small" style={{}}>
+						•
+					</BodyText>
+					<BodyText variant="small" style={{}}>
+						{item.date}
+					</BodyText>
 				</View>
 			</View>
 		</TouchableOpacity>
@@ -79,20 +78,20 @@ export default function HomeContentCard({
 const styles = StyleSheet.create({
 	card: {
 		flexDirection: "row",
-		marginBottom: 16,
-		borderRadius: 12,
+		marginBottom: spacing.lg,
+		borderRadius: scaleSize(12),
 		...globalStyles.shadows,
 	},
 	cardLeft: {
-		width: 110,
+		width: scaleSize(110),
 		justifyContent: "center",
 		alignItems: "center",
-		paddingVertical: 12,
+		paddingVertical: spacing.md,
 	},
 	imageWrapper: {
-		width: 90,
-		height: 90,
-		borderRadius: 12,
+		width: scaleSize(90),
+		height: scaleSize(90),
+		borderRadius: scaleSize(12),
 		overflow: "hidden",
 		position: "relative",
 	},
@@ -103,10 +102,10 @@ const styles = StyleSheet.create({
 	},
 	fileIconOverlay: {
 		position: "absolute",
-		top: 6,
-		left: 6,
-		padding: 4,
-		borderRadius: 99,
+		top: scaleSize(6),
+		left: scaleSize(6),
+		padding: scaleSize(4),
+		borderRadius: scaleSize(10),
 	},
 	videoOverlay: {
 		position: "absolute",
@@ -120,35 +119,28 @@ const styles = StyleSheet.create({
 	},
 	durationBadge: {
 		position: "absolute",
-		bottom: 6,
-		right: 6,
+		bottom: scaleSize(6),
+		right: scaleSize(6),
 		backgroundColor: "rgba(0,0,0,0.7)",
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		borderRadius: 4,
+		paddingHorizontal: scaleSize(6),
+		paddingVertical: scaleSize(2),
+		borderRadius: scaleSize(4),
 	},
 	durationText: {
-		color: "#fff",
-		fontSize: 10,
+		color: lightColors.background,
+		fontSize: moderateScale(10),
 		fontWeight: "500",
 	},
 	cardRight: {
 		flex: 1,
-		padding: 10,
-		paddingRight: 16,
+		padding: spacing.sm,
+		paddingRight: spacing.lg,
 		justifyContent: "space-between",
-	},
-	typeText: {
-		letterSpacing: 0.5,
-		marginBottom: 4,
-	},
-	cardTitle: {
-		lineHeight: 20,
-		marginBottom: 8,
 	},
 	metaRow: {
 		flexDirection: "row",
 		flexWrap: "wrap",
 		alignItems: "center",
+		gap: scaleSize(5),
 	},
 });

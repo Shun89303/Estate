@@ -184,7 +184,7 @@ export default function Business() {
 						longitude: p.location.longitude,
 						title: p.title,
 						description: p.location.address,
-						onPress: () => router.push(`/business/${p.id}`),
+						onPress: () => router.push(`/property/business/${p.id}`),
 					}))}
 					style={{ flex: 1 }}
 				/>

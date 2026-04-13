@@ -1,7 +1,10 @@
 import { useRouter } from "expo-router";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { ChevronRight } from "lucide-react-native";
-import { BodyText, NormalTitle } from "@/components/atoms/Typography";
+import Title from "../common/typography/Title";
+import BodyText from "../common/typography/BodyText";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 export default function ConsultationCTA() {
 	const router = useRouter();
@@ -10,17 +13,33 @@ export default function ConsultationCTA() {
 		<View style={styles.container}>
 			<TouchableOpacity
 				style={styles.button}
-				onPress={() => router.push("/booking")}
+				onPress={() => router.push("/")}
 				activeOpacity={0.8}
 			>
 				<View style={styles.row}>
 					<View style={styles.textColumn}>
-						<NormalTitle style={styles.mainText}>
+						<Title
+							style={{
+								color: lightColors.background,
+								marginBottom: 0,
+							}}
+						>
 							Book free consultation
-						</NormalTitle>
-						<BodyText style={styles.subText}>Talk to our agent today</BodyText>
+						</Title>
+						<BodyText
+							style={{
+								color: lightColors.background,
+								marginLeft: spacing.md,
+								marginBottom: 0,
+							}}
+						>
+							Talk to our agent today
+						</BodyText>
 					</View>
-					<ChevronRight size={20} color="#fff" />
+					<ChevronRight
+						size={moderateScale(20)}
+						color={lightColors.background}
+					/>
 				</View>
 			</TouchableOpacity>
 		</View>
@@ -29,13 +48,13 @@ export default function ConsultationCTA() {
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 16,
+		padding: spacing.lg,
 	},
 	button: {
-		backgroundColor: "#da9a0fff",
-		paddingVertical: 14,
-		paddingHorizontal: 20,
-		borderRadius: 20,
+		backgroundColor: lightColors.brand,
+		paddingVertical: scaleSize(14),
+		paddingHorizontal: scaleSize(20),
+		borderRadius: scaleSize(20),
 	},
 	row: {
 		flexDirection: "row",
@@ -44,13 +63,5 @@ const styles = StyleSheet.create({
 	},
 	textColumn: {
 		flex: 1,
-	},
-	mainText: {
-		color: "#fff",
-		marginBottom: 4,
-	},
-	subText: {
-		color: "rgba(255,255,255,0.8)",
-		marginLeft: 12,
 	},
 });

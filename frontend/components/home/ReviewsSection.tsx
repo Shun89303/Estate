@@ -3,6 +3,7 @@ import SectionHeader from "../common/utils/SectionHeader";
 import { MOCK_REVIEWS } from "@/mock/reviews";
 import ReviewCard from "./review/ReviewCard";
 import { useRouter } from "expo-router";
+import { spacing } from "@/utils/metrics";
 
 export default function ReviewsSection() {
 	const router = useRouter();
@@ -20,16 +21,15 @@ export default function ReviewsSection() {
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={(item) => item.id.toString()}
-				renderItem={({ item }) => (
-					<View style={{ marginLeft: 16 }}>
-						<ReviewCard review={item} />
-					</View>
-				)}
+				renderItem={({ item }) => <ReviewCard review={item} />}
+				contentContainerStyle={{
+					paddingHorizontal: spacing.md,
+				}}
 			/>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { marginBottom: 16 },
+	container: { marginBottom: spacing.lg },
 });

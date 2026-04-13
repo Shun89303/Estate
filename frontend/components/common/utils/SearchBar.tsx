@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 import { Search as SearchIcon } from "lucide-react-native";
-import { useTheme } from "@/hooks/useTheme";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 
 interface SearchBarProps {
 	placeholder?: string;
@@ -22,7 +23,6 @@ export default function SearchBar({
 	containerStyle,
 	inputStyle,
 }: SearchBarProps) {
-	const colors = useTheme();
 	const [isFocused, setIsFocused] = useState(false);
 
 	const handleFocus = () => {
@@ -39,17 +39,22 @@ export default function SearchBar({
 		<View
 			style={[
 				styles.container,
-				isFocused && { borderColor: colors.border, borderWidth: 2 },
 				containerStyle,
 				{
-					backgroundColor: colors.primaryMute,
+					backgroundColor: lightColors.mutedBackgroundWeaker,
+					borderColor: lightColors.border,
+				},
+				isFocused && {
+					borderColor: lightColors.quarterWeakBrand,
+					borderWidth: scaleSize(3),
 				},
 			]}
 		>
-			<SearchIcon size={18} color="#888" />
+			<SearchIcon size={moderateScale(18)} color={lightColors.bodyText} />
 			<TextInput
 				placeholder={placeholder}
-				style={[styles.input, inputStyle]}
+				placeholderTextColor={lightColors.bodyText}
+				style={[styles.input, { color: lightColors.bigTitleText }, inputStyle]}
 				value={value}
 				onChangeText={onChangeText}
 				onFocus={handleFocus}
@@ -64,16 +69,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: "row",
 		alignItems: "center",
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 8,
-		paddingHorizontal: 10,
-		height: 40,
-		gap: 8,
+		borderWidth: scaleSize(1),
+		borderRadius: scaleSize(8),
+		paddingHorizontal: spacing.sm,
+		height: scaleSize(40),
+		gap: scaleSize(8),
 	},
 	input: {
 		flex: 1,
 		height: "100%",
 		padding: 0,
+		fontSize: moderateScale(14),
 	},
 });

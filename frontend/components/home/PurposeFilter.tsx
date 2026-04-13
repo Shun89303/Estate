@@ -1,11 +1,19 @@
 import { ScrollView, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import { useTheme } from "@/hooks/useTheme";
-import { NormalTitle } from "../atoms/Typography";
+import SubTitle from "../common/typography/SubTitle";
+import { spacing, scaleSize } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
 
 export default function PurposeFilter() {
 	const router = useRouter();
-	const colors = useTheme();
+
+	const purposes = [
+		{ emoji: "🏪", label: "Buy Business", route: "/(tabs)/search" },
+		{ emoji: "📈", label: "For Investment", route: "/(tabs)/search" },
+		{ emoji: "🏠", label: "For Living", route: "/(tabs)/search" },
+		{ emoji: "🔑", label: "For Rent", route: "/(tabs)/search" },
+		{ emoji: "🛂", label: "For Long Stay Visa", route: "/(tabs)/search" },
+	];
 
 	return (
 		<ScrollView
@@ -14,81 +22,27 @@ export default function PurposeFilter() {
 			style={styles.container}
 			contentContainerStyle={styles.contentContainer}
 		>
-			<Pressable
-				onPress={() => router.push("/(tabs)/search")}
-				style={[
-					styles.item,
-					{
-						backgroundColor: colors.primaryBackground,
-						borderColor: colors.border,
-					},
-				]}
-			>
-				<NormalTitle
-					style={{
-						color: colors.primaryGold,
-					}}
+			{purposes.map((purpose, index) => (
+				<Pressable
+					key={index}
+					onPress={() => router.push(purpose.route as any)}
+					style={[
+						styles.item,
+						{
+							backgroundColor: lightColors.brandBG,
+							borderColor: lightColors.brandBorder,
+						},
+					]}
 				>
-					📈 For Investment
-				</NormalTitle>
-			</Pressable>
-
-			<Pressable
-				onPress={() => router.push("/(tabs)/search")}
-				style={[
-					styles.item,
-					{
-						backgroundColor: colors.primaryBackground,
-						borderColor: colors.border,
-					},
-				]}
-			>
-				<NormalTitle
-					style={{
-						color: colors.primaryGold,
-					}}
-				>
-					🏠 For Living
-				</NormalTitle>
-			</Pressable>
-
-			<Pressable
-				onPress={() => router.push("/(tabs)/search")}
-				style={[
-					styles.item,
-					{
-						backgroundColor: colors.primaryBackground,
-						borderColor: colors.border,
-					},
-				]}
-			>
-				<NormalTitle
-					style={{
-						color: colors.primaryGold,
-					}}
-				>
-					🔑 For Rent
-				</NormalTitle>
-			</Pressable>
-
-			<Pressable
-				onPress={() => router.push("/(tabs)/search")}
-				style={[
-					styles.item,
-					{
-						backgroundColor: colors.primaryBackground,
-						borderColor: colors.border,
-					},
-				]}
-			>
-				<NormalTitle
-					style={{
-						color: colors.primaryGold,
-					}}
-				>
-					🛂 For Long Stay Visa
-				</NormalTitle>
-			</Pressable>
+					<SubTitle
+						style={{
+							marginBottom: 0,
+						}}
+					>
+						{purpose.emoji} {purpose.label}
+					</SubTitle>
+				</Pressable>
+			))}
 		</ScrollView>
 	);
 }
@@ -96,16 +50,16 @@ export default function PurposeFilter() {
 const styles = StyleSheet.create({
 	container: {
 		flexGrow: 0,
-		marginVertical: 20, // pushes elements below
+		marginVertical: spacing.md,
 	},
 	contentContainer: {
-		paddingHorizontal: 16,
-		gap: 10,
+		paddingHorizontal: spacing.lg,
+		gap: scaleSize(10),
 	},
 	item: {
-		borderWidth: 1,
-		paddingVertical: 8,
-		paddingHorizontal: 14,
-		borderRadius: 15, // pill shape for modern look
+		borderWidth: scaleSize(1),
+		paddingVertical: spacing.sm,
+		paddingHorizontal: spacing.md,
+		borderRadius: scaleSize(15),
 	},
 });

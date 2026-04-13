@@ -3,6 +3,7 @@ import SectionHeader from "../common/utils/SectionHeader";
 import { MOCK_CONTENTS } from "@/mock/contents";
 import { useRouter } from "expo-router";
 import HomeContentCard from "./content/HomeContentCard";
+import { spacing } from "@/utils/metrics";
 
 export default function ContentsSection() {
 	const data = MOCK_CONTENTS.slice(0, 3);
@@ -17,7 +18,7 @@ export default function ContentsSection() {
 			/>
 
 			{data.map((content) => (
-				<View key={content.id} style={{ paddingHorizontal: 16 }}>
+				<View key={content.id} style={{ paddingHorizontal: spacing.lg }}>
 					<HomeContentCard
 						item={content}
 						onPress={() => router.push("/content/contents")}
@@ -29,5 +30,5 @@ export default function ContentsSection() {
 }
 
 const styles = StyleSheet.create({
-	container: { marginBottom: 16 },
+	container: { marginBottom: spacing.md },
 });

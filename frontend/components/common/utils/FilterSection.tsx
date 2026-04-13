@@ -1,23 +1,15 @@
-import { useTheme } from "@/hooks/useTheme";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { BodyText, SmallTitle } from "../../atoms/Typography";
+import {
+	ScrollView,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+	TextStyle,
+} from "react-native";
+import BodyText from "@/components/common/typography/BodyText";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize } from "@/utils/metrics";
 
-export default function FilterSection({
-	title,
-	options,
-	selected,
-	onSelect,
-	titleColor,
-	showsHorizontalScrollIndicator,
-	borderRadius = 10,
-	inactiveBgColor,
-	activeBgColor,
-	inactiveTextColor,
-	activeTextColor,
-	borderWidth = 0,
-	inactiveBorderColor,
-	activeBorderColor,
-}: {
+interface FilterSectionProps {
 	title?: string;
 	options: string[];
 	selected: string;
@@ -32,30 +24,46 @@ export default function FilterSection({
 	borderWidth?: number;
 	inactiveBorderColor?: string;
 	activeBorderColor?: string;
-}) {
-	const colors = useTheme();
-	const defaultInactiveBg = colors.primaryGray + "20";
-	const defaultActiveBg = colors.primaryGold;
-	const defaultInactiveText = "black";
-	const defaultActiveText = "#fff";
+}
+
+export default function FilterSection({
+	title,
+	options,
+	selected,
+	onSelect,
+	titleColor,
+	showsHorizontalScrollIndicator = false,
+	borderRadius = scaleSize(10),
+	inactiveBgColor,
+	activeBgColor,
+	inactiveTextColor,
+	activeTextColor,
+	borderWidth = 0,
+	inactiveBorderColor,
+	activeBorderColor,
+}: FilterSectionProps) {
+	const defaultInactiveBg = lightColors.mutedBackground;
+	const defaultActiveBg = lightColors.brand;
+	const defaultInactiveText = lightColors.bigTitleText;
+	const defaultActiveText = lightColors.background;
+
+	// Compute title style to avoid array type issues
+	const titleStyle: TextStyle = {
+		marginBottom: scaleSize(6),
+		textTransform: "uppercase",
+		color: titleColor || lightColors.bodyText,
+	};
 
 	return (
 		<View style={styles.filterSection}>
 			{title && (
-				<SmallTitle
-					style={{
-						fontWeight: "bold",
-						marginBottom: 6,
-						color: titleColor ? titleColor : colors.primaryGray,
-						textTransform: "uppercase",
-					}}
-				>
+				<BodyText variant="large" style={titleStyle}>
 					{title}
-				</SmallTitle>
+				</BodyText>
 			)}
 			<ScrollView
 				horizontal
-				showsHorizontalScrollIndicator={showsHorizontalScrollIndicator ?? false}
+				showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
 			>
 				{options.map((opt) => (
 					<TouchableOpacity
@@ -67,23 +75,26 @@ export default function FilterSection({
 									selected === opt
 										? (activeBgColor ?? defaultActiveBg)
 										: (inactiveBgColor ?? defaultInactiveBg),
-								borderRadius,
-								borderWidth,
+								borderRadius: borderRadius,
+								borderWidth: scaleSize(borderWidth),
 								borderColor:
 									selected === opt
-										? (activeBorderColor ?? (borderWidth ? "#ccc" : undefined))
+										? (activeBorderColor ??
+											(borderWidth ? lightColors.border : undefined))
 										: (inactiveBorderColor ??
-											(borderWidth ? "#ccc" : undefined)),
+											(borderWidth ? lightColors.border : undefined)),
 							},
 						]}
 						onPress={() => onSelect(opt)}
 					>
 						<BodyText
-							style={[
-								selected === opt
-									? { color: activeTextColor ?? defaultActiveText }
-									: { color: inactiveTextColor ?? defaultInactiveText },
-							]}
+							style={{
+								color:
+									selected === opt
+										? (activeTextColor ?? defaultActiveText)
+										: (inactiveTextColor ?? defaultInactiveText),
+								marginBottom: 0,
+							}}
 						>
 							{opt}
 						</BodyText>
@@ -96,11 +107,11 @@ export default function FilterSection({
 
 const styles = StyleSheet.create({
 	filterSection: {
-		marginBottom: 12,
+		marginBottom: spacing.md,
 	},
 	filterBtn: {
-		paddingVertical: 6,
-		paddingHorizontal: 12,
-		marginRight: 8,
+		paddingVertical: scaleSize(6),
+		paddingHorizontal: spacing.sm,
+		marginRight: spacing.sm,
 	},
 });
