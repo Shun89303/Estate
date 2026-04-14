@@ -405,19 +405,7 @@ I will create theme and metrics files, centralized service layer, add loading / 
 
 Apr-12-2026
 
-<!-- Current objective:  -->
-
 <!-- agent/owner login process: hardest -->
-
-implement new property type
-implement new app name: insert brand image
-i18n language setup
-layout
-styling proper
-different phone, different tablet
-
-ongoing: profile/login page
-TextChip
 
 <!-- Completion -->
 
@@ -459,11 +447,37 @@ Created reusable components and zustand stores preparation for buy business page
 buy business page initial setup
 short list design
 
+<!--  -->
+
+Apr-14-2026
+
+<!-- To do -->
+
+complete final version of buy business property
+
+<!-- goal objective:  -->
+
+implement new property type
+i18n language setup
+layout
+styling proper
+different phone, different tablet
+auth gates inside uis
+zustand stores
+
 <!-- Next -->
+
+compare
+
+<!-- Completed -->
 
 buy business locked design
 unlock sheet design
 recently unlocked design
-buy business unlocked design
-buy business unlocked card  
-compare
+buy business unlocked card
+
+when recently unlocked has 2 items, inside viewToggleWithCount will appear a new button "Compare"
+If clicked Compare, a third list because inside viewToggleWithCount is a toggle between vertical card list vs map, but with this new Compare button, a third vertical list will appear and show cards and each card can be clicked.
+And for the compare feature to work, user must have at least 2 unlocked cards.
+Maximum 3 cards can be compared, minimum 2 cards can be compared.
+after user selected 2 cards or 3 cards, and after clicking the confirmation Compare button, a bottom sheet modal will pop up showing the data comparison between user selected 2 or 3 cards.

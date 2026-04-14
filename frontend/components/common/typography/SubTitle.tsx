@@ -1,5 +1,4 @@
-// components/atoms/SubTitle.tsx
-import { Text, StyleSheet, TextStyle } from "react-native";
+import { Text, StyleSheet, TextStyle, StyleProp } from "react-native";
 import { ReactNode } from "react";
 import { fontSizes, spacing, moderateScale } from "@/utils/metrics";
 import { lightColors } from "@/theme/light";
@@ -9,7 +8,7 @@ type SubTitleVariant = "small" | "normal" | "large";
 interface SubTitleProps {
 	children: ReactNode;
 	variant?: SubTitleVariant;
-	style?: TextStyle;
+	style?: StyleProp<TextStyle>;
 	numberOfLines?: number;
 	allowFontScaling?: boolean;
 	maxFontSizeMultiplier?: number;
@@ -29,13 +28,15 @@ export default function SubTitle({
 		large: styles.largeSubtitle,
 	};
 
+	const combinedStyle = StyleSheet.flatten([
+		variantStyles[variant],
+		{ color: lightColors.subTitleText || "hsla(30, 52%, 55%, 1.00)" },
+		style,
+	]);
+
 	return (
 		<Text
-			style={[
-				variantStyles[variant],
-				{ color: lightColors.subTitleText || "hsla(30, 52%, 55%, 1.00)" },
-				style,
-			]}
+			style={combinedStyle}
 			numberOfLines={numberOfLines}
 			allowFontScaling={allowFontScaling}
 			maxFontSizeMultiplier={maxFontSizeMultiplier}
@@ -47,19 +48,19 @@ export default function SubTitle({
 
 const styles = StyleSheet.create({
 	smallSubtitle: {
-		fontSize: fontSizes.sm, // 12dp scaled
+		fontSize: fontSizes.sm,
 		fontWeight: "500",
 		marginBottom: spacing.xs,
 		lineHeight: moderateScale(16),
 	},
 	normalSubtitle: {
-		fontSize: fontSizes.md, // 14dp scaled
+		fontSize: fontSizes.md,
 		fontWeight: "500",
 		marginBottom: spacing.xs,
 		lineHeight: moderateScale(20),
 	},
 	largeSubtitle: {
-		fontSize: fontSizes.lg, // 16dp scaled
+		fontSize: fontSizes.lg,
 		fontWeight: "500",
 		marginBottom: spacing.xs,
 		lineHeight: moderateScale(24),

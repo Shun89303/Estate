@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
@@ -11,7 +11,6 @@ import FilterButton from "@/components/common/utils/FilterButton";
 import SearchBar from "@/components/common/utils/SearchBar";
 import FilterSection from "@/components/common/utils/FilterSection";
 import ViewToggleWithCount from "@/components/common/utils/ViewToggleWithCount";
-import PropertyList from "@/components/common/dataEntry/PropertyList";
 import { PropertyMap } from "@/components/common/utils/PropertyMap";
 import BuyBusinessCard from "@/components/buyBusiness/BuyBusinessCard";
 import { useCoinBalance } from "@/components/coin/useCoinBalance";
@@ -19,41 +18,33 @@ import { useUserStore } from "@/stores/userStore";
 
 // Data and types
 import { MOCK_BUY_BUSINESS, BuyBusiness } from "@/mock/buyBusiness";
-import { spacing, scaleSize } from "@/utils/metrics";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { lightColors } from "@/theme/light";
-import { Coins, EyeOff, Lock, LockOpen } from "lucide-react-native";
+import {
+	ChartColumn,
+	Coins,
+	EyeOff,
+	Lock,
+	LockOpen,
+} from "lucide-react-native";
 import BodyText from "@/components/common/typography/BodyText";
 import ClearFiltersButton from "@/components/common/utils/ClearFiltersButton";
 import { useShortlist } from "@/components/shortlist/useShortlist";
-
-// Helper to get emoji for business type
-// const getTypeEmoji = (type: BuyBusiness["type"]) => {
-// 	switch (type) {
-// 		case "Restaurant":
-// 			return "🍽️";
-// 		case "Cafe":
-// 			return "☕";
-// 		case "Hotel":
-// 			return "🏨";
-// 		case "Spa/Massage":
-// 			return "💆";
-// 		case "Retail":
-// 			return "🛍️";
-// 		case "Franchise":
-// 			return "🏪";
-// 		default:
-// 			return "";
-// 	}
-// };
+import SubTitle from "@/components/common/typography/SubTitle";
+import formatPriceShort from "@/utils/formatPriceShort";
+import BuyBusinessUnlockedCard from "@/components/buyBusiness/BuyBusinessUnlockedCard";
 
 export default function BuyBusinessPage() {
 	const router = useRouter();
+	// coin ui
 	const {
 		CoinButton,
 		CoinBottomSheet,
 		closeSheet: closeCoin,
 	} = useCoinBalance();
+	// coin store
 	const { coins: coinBalance, deductCoins } = useUserStore();
+	// shortlist ui
 	const {
 		ShortlistButton,
 		ShortlistBottomSheet,
@@ -70,11 +61,16 @@ export default function BuyBusinessPage() {
 
 	// Unlock state
 	const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
+	const unlockedBusinesses = useMemo(() => {
+		return MOCK_BUY_BUSINESS.filter((item) =>
+			unlockedIds.includes(item.uniqueCode),
+		);
+	}, [unlockedIds]);
 	const [selectedProperty, setSelectedProperty] = useState<BuyBusiness | null>(
 		null,
 	);
 	const unlockModalRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ["50%"], []);
+	const snapPoints = useMemo(() => ["70%"], []);
 
 	const closeAllSheets = () => {
 		closeCoin();
@@ -107,7 +103,6 @@ export default function BuyBusinessPage() {
 	const filteredData = useMemo(() => {
 		let filtered = [...MOCK_BUY_BUSINESS];
 
-		// Search
 		if (searchQuery.trim()) {
 			filtered = filtered.filter(
 				(item) =>
@@ -116,7 +111,6 @@ export default function BuyBusinessPage() {
 			);
 		}
 
-		// Type filter (always active)
 		if (selectedType !== "All") {
 			const typeWithoutEmoji = selectedType
 				.replace(/[🍽️☕🏨💆🛍️🏪]/g, "")
@@ -124,14 +118,12 @@ export default function BuyBusinessPage() {
 			filtered = filtered.filter((item) => item.type === typeWithoutEmoji);
 		}
 
-		// Location filter (only when visible)
 		if (showFilters && selectedLocation !== "All") {
 			filtered = filtered.filter((item) =>
 				item.location.toLowerCase().includes(selectedLocation.toLowerCase()),
 			);
 		}
 
-		// Price filter (only when visible)
 		if (showFilters && selectedPrice !== "Any") {
 			filtered = filtered.filter((item) => {
 				const price = item.price;
@@ -162,7 +154,6 @@ export default function BuyBusinessPage() {
 			title: item.title,
 			description: `฿${item.price.toLocaleString()}`,
 			onPress: () => {
-				// If unlocked, navigate; else open unlock sheet
 				const isUnlocked = unlockedIds.includes(item.uniqueCode);
 				if (isUnlocked) {
 					router.push(`/`);
@@ -174,7 +165,6 @@ export default function BuyBusinessPage() {
 		}));
 	}, [filteredData, unlockedIds]);
 
-	// Count active filters (excluding type which is always visible)
 	const activeFilterCount =
 		(selectedLocation !== "All" ? 1 : 0) +
 		(selectedPrice !== "Any" ? 1 : 0) +
@@ -208,9 +198,104 @@ export default function BuyBusinessPage() {
 		}
 	};
 
+	// Render the header content for the main FlatList
+	const renderHeader = () => (
+		<>
+			<View style={{ backgroundColor: lightColors.background }}>
+				<SearchBar
+					placeholder="Search businesses for sale..."
+					value={searchQuery}
+					onChangeText={setSearchQuery}
+					containerStyle={styles.searchBar}
+				/>
+			</View>
+
+			{showFilters && (
+				<View style={styles.filtersContainer}>
+					<FilterSection
+						title="LOCATION"
+						options={locationOptions}
+						selected={selectedLocation}
+						onSelect={setSelectedLocation}
+					/>
+					<FilterSection
+						title="ASKING PRICE"
+						options={priceOptions}
+						selected={selectedPrice}
+						onSelect={setSelectedPrice}
+					/>
+					{(selectedLocation !== "All" ||
+						selectedPrice !== "Any" ||
+						selectedType !== "All") && (
+						<ClearFiltersButton
+							onPress={() => {
+								setSelectedLocation("All");
+								setSelectedPrice("Any");
+								setSelectedType("All");
+							}}
+						/>
+					)}
+				</View>
+			)}
+
+			<View style={styles.filtersContainer}>
+				<FilterSection
+					options={typeOptions}
+					selected={selectedType}
+					onSelect={setSelectedType}
+				/>
+			</View>
+
+			<ViewToggleWithCount
+				count={filteredData.length}
+				countLabel="businesses found"
+				viewMode={viewMode}
+				onViewModeChange={setViewMode}
+			/>
+
+			{/* Recently Unlocked Section */}
+			{unlockedBusinesses.length > 0 && (
+				<View style={styles.recentlyUnlockedSection}>
+					<View style={styles.recentlyUnlockedHeader}>
+						<View style={styles.recentlyUnlockedLeft}>
+							<LockOpen size={moderateScale(20)} color={lightColors.success} />
+							<Title variant="small" style={styles.recentlyUnlockedTitle}>
+								Recently Unlocked
+							</Title>
+						</View>
+						<BodyText variant="small" style={styles.recentlyUnlockedCount}>
+							{unlockedBusinesses.length} unlocked
+						</BodyText>
+					</View>
+					<FlatList
+						horizontal
+						data={unlockedBusinesses}
+						keyExtractor={(item) => item.uniqueCode}
+						renderItem={({ item }) => (
+							<BuyBusinessUnlockedCard
+								property={item}
+								onPress={() => router.push(`/`)}
+							/>
+						)}
+						showsHorizontalScrollIndicator={false}
+						contentContainerStyle={styles.recentlyUnlockedList}
+					/>
+				</View>
+			)}
+		</>
+	);
+
+	// Main card renderer
+	const renderCard = ({ item }: { item: BuyBusiness }) => (
+		<BuyBusinessCard
+			property={item}
+			isUnlocked={unlockedIds.includes(item.uniqueCode)}
+			onPress={() => handleCardPress(item)}
+		/>
+	);
+
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* Header Row */}
 			<View style={styles.header}>
 				<View style={styles.headerLeft}>
 					<BackButton />
@@ -229,82 +314,25 @@ export default function BuyBusinessPage() {
 				</View>
 			</View>
 
-			{/* Search Bar */}
-			<SearchBar
-				placeholder="Search businesses for sale..."
-				value={searchQuery}
-				onChangeText={setSearchQuery}
-				containerStyle={styles.searchBar}
-			/>
-
-			{/* Collapsible Filters (Location & Price) */}
-			{showFilters && (
-				<View style={styles.filtersContainer}>
-					<FilterSection
-						title="LOCATION"
-						options={locationOptions}
-						selected={selectedLocation}
-						onSelect={setSelectedLocation}
-					/>
-					<FilterSection
-						title="ASKING PRICE"
-						options={priceOptions}
-						selected={selectedPrice}
-						onSelect={setSelectedPrice}
-					/>
-					{/* Clear filters button - only shown if any filter is active */}
-					{(selectedLocation !== "All" ||
-						selectedPrice !== "Any" ||
-						selectedType !== "All") && (
-						<ClearFiltersButton
-							onPress={() => {
-								setSelectedLocation("All");
-								setSelectedPrice("Any");
-								setSelectedType("All");
-							}}
-						/>
-					)}
-				</View>
-			)}
-
-			{/* Always visible Type Filter */}
-			<View style={styles.filtersContainer}>
-				<FilterSection
-					options={typeOptions}
-					selected={selectedType}
-					onSelect={setSelectedType}
-				/>
-			</View>
-
-			{/* Count & Toggle */}
-			<ViewToggleWithCount
-				count={filteredData.length}
-				countLabel="businesses found"
-				viewMode={viewMode}
-				onViewModeChange={setViewMode}
-			/>
-
-			{/* List / Map View */}
 			{viewMode === "list" ? (
-				<PropertyList
+				<FlatList
 					data={filteredData}
 					keyExtractor={(item) => item.uniqueCode}
-					renderItem={(item) => (
-						<BuyBusinessCard
-							property={item}
-							isUnlocked={unlockedIds.includes(item.uniqueCode)}
-							onPress={() => handleCardPress(item)}
-						/>
-					)}
+					renderItem={renderCard}
+					ListHeaderComponent={renderHeader}
 					contentContainerStyle={styles.listContent}
+					showsVerticalScrollIndicator={false}
 				/>
 			) : (
-				<View style={styles.mapContainer}>
-					<PropertyMap markers={markers} />
-				</View>
+				<>
+					{/* Show top UI (except main list) above map */}
+					<View style={styles.mapTopContent}>{renderHeader()}</View>
+					<View style={styles.mapContainer}>
+						<PropertyMap markers={markers} />
+					</View>
+				</>
 			)}
 
-			{/* Unlock Bottom Sheet */}
 			<BottomSheetModal
 				ref={unlockModalRef}
 				snapPoints={snapPoints}
@@ -316,10 +344,10 @@ export default function BuyBusinessPage() {
 					<BottomSheetView style={styles.sheetContent}>
 						<View style={styles.sheetHeader}>
 							<View style={styles.lockIconContainer}>
-								<Lock size={30} color={lightColors.brand} />
+								<Lock size={moderateScale(30)} color={lightColors.brand} />
 							</View>
 							<Title variant="page" style={styles.sheetTitle}>
-								Unlock Contact Info
+								Unlock Business Info
 							</Title>
 							<BodyText variant="normal" style={styles.sheetSubtitle}>
 								{selectedProperty.title}
@@ -328,17 +356,74 @@ export default function BuyBusinessPage() {
 
 						<View style={styles.sheetBox}>
 							<View>
-								<BodyText variant="normal">Owner Name</BodyText>
-								<BodyText variant="normal">Phone Number</BodyText>
+								<View style={styles.financialHeader}>
+									<ChartColumn
+										size={moderateScale(15)}
+										color={lightColors.brand}
+									/>
+									<Title variant="small" style={styles.financialTitle}>
+										Financial Preview
+									</Title>
+								</View>
+								<BodyText variant="normal">Asking Price</BodyText>
+								<BodyText variant="normal">Monthly Revenue</BodyText>
+								<BodyText variant="normal">Monthly Profit</BodyText>
+								<BodyText variant="normal">Est. ROI</BodyText>
 							</View>
-							<View style={{ alignItems: "flex-end" }}>
+							<View style={styles.financialValues}>
+								<View style={styles.emptySpacer} />
+								<SubTitle variant="normal" style={styles.financialValue}>
+									฿{selectedProperty.price.toLocaleString()}
+								</SubTitle>
+								<SubTitle
+									variant="normal"
+									style={[
+										styles.financialValue,
+										{ color: lightColors.bigTitleText },
+									]}
+								>
+									฿{formatPriceShort(selectedProperty.monthlyRevenue)}/mo
+								</SubTitle>
+								<SubTitle
+									variant="normal"
+									style={[
+										styles.financialValue,
+										{ color: lightColors.success },
+									]}
+								>
+									฿{formatPriceShort(selectedProperty.monthlyProfit)}/mo
+								</SubTitle>
+								<SubTitle variant="normal" style={styles.financialValue}>
+									{selectedProperty.roiEst}% /yr
+								</SubTitle>
+							</View>
+						</View>
+
+						<View style={styles.sheetBox}>
+							<View>
+								<BodyText variant="normal">UNLOCK TO REVEAL</BodyText>
+								<BodyText variant="normal">Full Address</BodyText>
+								<BodyText variant="normal">Owner Contact</BodyText>
+							</View>
+							<View style={styles.revealValues}>
+								<View style={styles.emptySpacer} />
 								<View style={styles.hiddenRow}>
-									<EyeOff size={12} color={lightColors.bodyText} />
-									<BodyText variant="normal">Hidden</BodyText>
+									<EyeOff
+										size={moderateScale(12)}
+										color={lightColors.bigTitleText}
+									/>
+									<Title variant="small" style={styles.hiddenText}>
+										Hidden
+									</Title>
 								</View>
 								<View style={styles.hiddenRow}>
-									<EyeOff size={12} color={lightColors.bodyText} />
-									<BodyText variant="normal">Hidden</BodyText>
+									<EyeOff
+										size={moderateScale(12)}
+										color={lightColors.bigTitleText}
+									/>
+									<Title variant="small" style={styles.hiddenText}>
+										Hidden
+									</Title>
 								</View>
 							</View>
 						</View>
@@ -348,19 +433,18 @@ export default function BuyBusinessPage() {
 								<BodyText variant="normal">Cost</BodyText>
 								<BodyText variant="normal">Your Balance</BodyText>
 							</View>
-							<View style={{ alignItems: "flex-end" }}>
+							<View style={styles.costValues}>
 								<View style={styles.hiddenRow}>
-									<Coins size={12} color={lightColors.brand} />
-									<BodyText
-										variant="normal"
-										style={{ color: lightColors.brand }}
-									>
+									<Coins size={moderateScale(12)} color={lightColors.brand} />
+									<SubTitle variant="normal" style={{ marginBottom: 0 }}>
 										{selectedProperty.unlockCoins} Coins
-									</BodyText>
+									</SubTitle>
 								</View>
 								<View style={styles.hiddenRow}>
-									<Coins size={12} color={lightColors.brand} />
-									<BodyText variant="normal">{coinBalance} coins</BodyText>
+									<Coins size={moderateScale(12)} color={lightColors.brand} />
+									<Title variant="small" style={{ marginBottom: 0 }}>
+										{coinBalance} coins
+									</Title>
 								</View>
 							</View>
 						</View>
@@ -369,7 +453,7 @@ export default function BuyBusinessPage() {
 							style={[styles.unlockBtn, { backgroundColor: lightColors.brand }]}
 							onPress={handleUnlock}
 						>
-							<LockOpen size={12} color="#fff" />
+							<LockOpen size={moderateScale(12)} color="#fff" />
 							<BodyText variant="normal" style={styles.unlockBtnText}>
 								Unlock for {selectedProperty.unlockCoins} Coins
 							</BodyText>
@@ -395,6 +479,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingHorizontal: spacing.lg,
 		paddingVertical: spacing.sm,
+		backgroundColor: lightColors.background,
 	},
 	headerLeft: {
 		flexDirection: "row",
@@ -416,10 +501,10 @@ const styles = StyleSheet.create({
 	},
 	filtersContainer: {
 		paddingHorizontal: spacing.lg,
+		backgroundColor: lightColors.background,
 	},
 	listContent: {
 		paddingBottom: spacing.xl,
-		paddingHorizontal: spacing.lg,
 	},
 	mapContainer: {
 		flex: 1,
@@ -428,7 +513,6 @@ const styles = StyleSheet.create({
 		borderRadius: scaleSize(12),
 		overflow: "hidden",
 	},
-	// Bottom sheet styles
 	sheetContent: {
 		padding: spacing.lg,
 		gap: spacing.md,
@@ -438,7 +522,7 @@ const styles = StyleSheet.create({
 	},
 	lockIconContainer: {
 		backgroundColor: lightColors.brandBG,
-		padding: spacing.sm,
+		padding: spacing.lg,
 		borderRadius: scaleSize(99),
 		marginBottom: spacing.sm,
 	},
@@ -452,17 +536,43 @@ const styles = StyleSheet.create({
 	sheetBox: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		backgroundColor: lightColors.mutedBackground,
+		backgroundColor: lightColors.mutedBackgroundWeaker,
 		padding: spacing.md,
 		borderRadius: scaleSize(10),
 	},
 	sheetBoxTransparent: {
 		backgroundColor: "transparent",
 	},
+	financialHeader: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: spacing.sm,
+	},
+	financialTitle: {
+		marginBottom: 0,
+	},
+	financialValues: {
+		alignItems: "flex-end",
+	},
+	revealValues: {
+		alignItems: "flex-end",
+	},
+	costValues: {
+		alignItems: "flex-end",
+	},
+	emptySpacer: {
+		height: scaleSize(24), // aligns with first text line height of left column
+	},
 	hiddenRow: {
 		flexDirection: "row",
 		alignItems: "center",
 		gap: scaleSize(5),
+	},
+	hiddenText: {
+		marginBottom: 0,
+	},
+	financialValue: {
+		marginBottom: 0,
 	},
 	unlockBtn: {
 		paddingVertical: spacing.md,
@@ -476,5 +586,33 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 		color: "#fff",
 		marginBottom: 0,
+	},
+	recentlyUnlockedSection: {
+		marginTop: spacing.md,
+		marginBottom: spacing.md,
+	},
+	recentlyUnlockedHeader: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		paddingHorizontal: spacing.lg,
+		marginBottom: spacing.sm,
+	},
+	recentlyUnlockedLeft: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: spacing.sm,
+	},
+	recentlyUnlockedTitle: {
+		marginBottom: 0,
+	},
+	recentlyUnlockedCount: {
+		marginBottom: 0,
+	},
+	recentlyUnlockedList: {
+		paddingHorizontal: spacing.lg,
+	},
+	mapTopContent: {
+		// no extra padding – renderHeader already has its own margins
 	},
 });

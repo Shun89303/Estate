@@ -11,7 +11,7 @@ interface ShortlistButtonProps {
 
 export default function ShortlistButton({
 	item,
-	size = 24,
+	size = 20,
 }: ShortlistButtonProps) {
 	const { isShortlisted, toggleShortlist } = useShortlistStore();
 	const shortlisted = isShortlisted(item.id);

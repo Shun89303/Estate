@@ -8,7 +8,7 @@ export type BusinessType =
 	| "Retail"
 	| "Franchise";
 
-export interface BusinessContact {
+export interface OwnerContact {
 	name: string;
 	profileImage: string; // URL or local path
 	phone: string;
@@ -56,7 +56,7 @@ export interface BuyBusiness {
 	geoLocation: GeoLocation;
 
 	// Contact
-	businessContact: BusinessContact;
+	businessContact: OwnerContact;
 
 	// Coin system
 	reserveCoins: number; // coins required to reserve/view contact

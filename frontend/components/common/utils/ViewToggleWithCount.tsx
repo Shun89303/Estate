@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingHorizontal: spacing.lg,
 		paddingVertical: scaleSize(10),
+		backgroundColor: lightColors.background,
 	},
 	toggleContainer: {
 		flexDirection: "row",

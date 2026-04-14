@@ -1,6 +1,8 @@
-import { useTheme } from "@/hooks/useTheme";
+// components/buyBusiness/BuyBusinessCard.tsx
 import { Image, Pressable, StyleSheet, View } from "react-native";
-import { BodyText, NormalTitle, SmallTitle } from "../atoms/Typography";
+import BodyText from "@/components/common/typography/BodyText";
+import Title from "@/components/common/typography/Title";
+import SubTitle from "@/components/common/typography/SubTitle";
 import {
 	Calendar,
 	Coins,
@@ -10,8 +12,29 @@ import {
 	Users,
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { BuyBusiness } from "@/mock/buyBusiness";
 import ShortlistButton from "../shortlist/ShortlistButton";
+
+const getTypeEmoji = (type: BuyBusiness["type"]) => {
+	switch (type) {
+		case "Restaurant":
+			return "🍽️";
+		case "Cafe":
+			return "☕";
+		case "Hotel":
+			return "🏨";
+		case "Spa/Massage":
+			return "💆";
+		case "Retail":
+			return "🛍️";
+		case "Franchise":
+			return "🏪";
+		default:
+			return "";
+	}
+};
 
 export default function BuyBusinessCard({
 	property,
@@ -22,75 +45,96 @@ export default function BuyBusinessCard({
 	isUnlocked: boolean;
 	onPress: () => void;
 }) {
-	const colors = useTheme();
+	const typeWithEmoji = `${getTypeEmoji(property.type)} ${property.type}`;
 
 	return (
 		<Pressable onPress={onPress} style={styles.card}>
-			{/* Left: Square Image with OWNER badge */}
 			<View style={styles.imageContainer}>
-				<Image source={{ uri: property.coverImage }} style={styles.image} />
+				<Image
+					source={{ uri: property.coverImage }}
+					style={styles.image}
+					blurRadius={isUnlocked ? 0 : 10}
+				/>
+				{/* Dark overlay for locked state */}
+				{!isUnlocked && <View style={styles.darkOverlay} />}
+				{/* Type badge (always visible) */}
 				<View
-					style={[styles.typeBadge, { backgroundColor: colors.primaryGold }]}
+					style={[styles.typeBadge, { backgroundColor: lightColors.brand }]}
 				>
-					<SmallTitle style={styles.imageNewBadgeText}>
-						{property.type}
-					</SmallTitle>
+					<SubTitle style={styles.imageBadgeText}>{typeWithEmoji}</SubTitle>
 				</View>
-				<View style={[styles.shortListBadge, { backgroundColor: "#fff" }]}>
-					<ShortlistButton
-						item={{
-							id: property.id,
-							coverImage: property.coverImage,
-							title: property.title,
-							location: property.location,
-							monthlyProfit: property.monthlyProfit,
-							price: property.price,
-						}}
-					/>
-				</View>
+				{/* Lock overlay (only when locked) */}
+				{!isUnlocked && (
+					<View style={styles.lockOverlay}>
+						<View style={styles.lockCircle}>
+							<Lock size={moderateScale(24)} color="#fff" />
+						</View>
+					</View>
+				)}
+				{/* Shortlist badge (only when unlocked) */}
+				{isUnlocked && (
+					<View
+						style={[
+							styles.shortListBadge,
+							{ backgroundColor: lightColors.background },
+						]}
+					>
+						<ShortlistButton
+							item={{
+								id: property.id,
+								coverImage: property.coverImage,
+								title: property.title,
+								location: property.location,
+								monthlyProfit: property.monthlyProfit,
+								price: property.price,
+							}}
+						/>
+					</View>
+				)}
 			</View>
 
-			{/* Right: Info */}
 			<View style={styles.infoContainer}>
-				<View style={styles.headerRow}>
-					<SmallTitle
-						style={{ color: colors.primaryGold, textTransform: "uppercase" }}
-					>
-						{property.type}
-					</SmallTitle>
-				</View>
-
-				<NormalTitle numberOfLines={1} style={styles.title}>
+				<Title variant="small" numberOfLines={1}>
 					{property.title}
-				</NormalTitle>
+				</Title>
 
 				<View style={styles.locationRow}>
-					<MapPin size={12} color={colors.primaryGold} />
-					<BodyText style={styles.address} numberOfLines={1}>
+					<MapPin size={moderateScale(12)} color={lightColors.brand} />
+					<BodyText variant="small" style={styles.address} numberOfLines={1}>
 						{property.location}
 					</BodyText>
 				</View>
 
-				{/* Specs row (horizontal) */}
 				<View style={styles.specsRow}>
 					<View style={styles.specItem}>
-						<Users size={12} color={colors.textSecondary} />
-						<BodyText style={styles.specText}>{property.staffs}</BodyText>
+						<Users size={moderateScale(12)} color={lightColors.bodyText} />
+						<BodyText variant="small" style={{ marginBottom: 0 }}>
+							{property.staffs} staff
+						</BodyText>
 					</View>
 					<View style={styles.specItem}>
-						<Calendar size={12} color={colors.textSecondary} />
-						<BodyText style={styles.specText}>{property.years}</BodyText>
+						<Calendar size={moderateScale(12)} color={lightColors.bodyText} />
+						<BodyText variant="small" style={{ marginBottom: 0 }}>
+							{property.years} yr
+						</BodyText>
 					</View>
 				</View>
 
-				{/* Bottom row: unlock info + price */}
 				<View style={styles.bottomRow}>
 					<View style={styles.unlockRow}>
 						{isUnlocked ? (
 							<>
-								<LockOpen size={12} color={colors.primaryGreen} />
+								<LockOpen
+									size={moderateScale(12)}
+									color={lightColors.success}
+								/>
 								<BodyText
-									style={{ color: colors.primaryGreen, flexShrink: 1 }}
+									variant="small"
+									style={{
+										color: lightColors.success,
+										flexShrink: 1,
+										marginBottom: 0,
+									}}
 									numberOfLines={1}
 								>
 									Unlocked
@@ -100,22 +144,21 @@ export default function BuyBusinessCard({
 							<View
 								style={[
 									styles.unlockPill,
-									{
-										backgroundColor: colors.darkGold,
-									},
+									{ backgroundColor: lightColors.brandBG },
 								]}
 							>
-								<Lock size={12} color={colors.primaryGold} />
+								<Lock size={moderateScale(12)} color={lightColors.brand} />
 								<Coins
-									size={12}
-									color={colors.primaryGold}
-									style={{ marginLeft: 2 }}
+									size={moderateScale(12)}
+									color={lightColors.brand}
+									style={{ marginLeft: scaleSize(2) }}
 								/>
 								<BodyText
+									variant="small"
 									style={{
-										color: colors.primaryGold,
-										fontSize: 11,
-										marginLeft: 4,
+										color: lightColors.brand,
+										marginLeft: scaleSize(4),
+										marginBottom: 0,
 									}}
 									numberOfLines={1}
 								>
@@ -124,18 +167,9 @@ export default function BuyBusinessCard({
 							</View>
 						)}
 					</View>
-					<NormalTitle
-						style={{
-							fontSize: 16,
-							fontWeight: "bold",
-							color: colors.primaryGold,
-							flexShrink: 0,
-							marginLeft: 8,
-						}}
-						numberOfLines={1}
-					>
+					<SubTitle variant="normal" style={styles.price}>
 						฿{property.price.toLocaleString()}
-					</NormalTitle>
+					</SubTitle>
 				</View>
 			</View>
 		</Pressable>
@@ -145,14 +179,15 @@ export default function BuyBusinessCard({
 const styles = StyleSheet.create({
 	card: {
 		flexDirection: "row",
-		backgroundColor: "#fff",
-		borderRadius: 12,
-		marginBottom: 12,
+		backgroundColor: lightColors.background,
+		borderRadius: scaleSize(12),
+		marginBottom: spacing.md,
+		marginHorizontal: spacing.md,
 		overflow: "hidden",
 		...globalStyles.shadows,
 	},
 	imageContainer: {
-		width: 130,
+		width: scaleSize(130),
 		alignSelf: "stretch",
 		position: "relative",
 	},
@@ -161,71 +196,88 @@ const styles = StyleSheet.create({
 		width: "100%",
 		resizeMode: "cover",
 	},
+	darkOverlay: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: "rgba(0,0,0,0.4)",
+	},
 	typeBadge: {
 		position: "absolute",
-		top: 8,
-		left: 8,
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		borderRadius: 99,
+		top: scaleSize(8),
+		left: scaleSize(8),
+		paddingHorizontal: scaleSize(6),
+		paddingVertical: scaleSize(2),
+		borderRadius: scaleSize(99),
 	},
 	shortListBadge: {
 		position: "absolute",
-		top: 8,
-		right: 8,
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		borderRadius: 99,
+		top: scaleSize(8),
+		right: scaleSize(8),
+		paddingHorizontal: scaleSize(4),
+		paddingVertical: scaleSize(4),
+		borderRadius: scaleSize(99),
 	},
-	imageNewBadgeText: {
-		color: "#fff",
-		fontSize: 10,
+	imageBadgeText: {
+		color: lightColors.background,
+		fontSize: moderateScale(10),
 		fontWeight: "bold",
+		marginBottom: 0,
+	},
+	lockOverlay: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	lockCircle: {
+		width: scaleSize(48),
+		height: scaleSize(48),
+		borderRadius: scaleSize(24),
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	infoContainer: {
 		flex: 1,
-		padding: 10,
-		justifyContent: "space-between",
-		paddingVertical: 20,
+		padding: spacing.sm,
+		paddingVertical: spacing.lg,
 	},
 	headerRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		marginBottom: 4,
-	},
-	title: {
-		marginBottom: 4,
-		lineHeight: 20,
+		marginBottom: scaleSize(4),
 	},
 	locationRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		marginBottom: 8,
+		marginBottom: scaleSize(8),
 	},
 	address: {
-		marginLeft: 4,
-		fontSize: 12,
+		marginLeft: scaleSize(4),
 		flexShrink: 1,
+		marginBottom: 0,
 	},
 	specsRow: {
 		flexDirection: "row",
-		gap: 8,
-		marginBottom: 8,
+		gap: scaleSize(8),
+		marginBottom: scaleSize(8),
 	},
 	specItem: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 4,
-	},
-	specText: {
-		fontSize: 12,
+		gap: scaleSize(4),
 	},
 	unlockPill: {
 		flexDirection: "row",
 		alignItems: "center",
-		paddingHorizontal: 6,
-		paddingVertical: 4,
-		borderRadius: 20,
+		paddingHorizontal: scaleSize(6),
+		paddingVertical: scaleSize(4),
+		borderRadius: scaleSize(20),
 		alignSelf: "flex-start",
 	},
 	bottomRow: {
@@ -237,8 +289,14 @@ const styles = StyleSheet.create({
 	unlockRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 2,
+		gap: scaleSize(2),
 		flexShrink: 1,
 		flexWrap: "wrap",
+	},
+	price: {
+		flexShrink: 0,
+		marginLeft: spacing.sm,
+		marginBottom: 0,
+		fontWeight: "600",
 	},
 });
