@@ -1,4 +1,6 @@
-import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+// components/ownerDirect/BuyCoins.tsx
+import { View, StyleSheet } from "react-native";
+import { BottomSheetScrollView, TouchableOpacity } from "@gorhom/bottom-sheet";
 import { Coins } from "lucide-react-native";
 import Title from "../common/typography/Title";
 import BodyText from "../common/typography/BodyText";
@@ -6,7 +8,6 @@ import SubTitle from "../common/typography/SubTitle";
 import { lightColors } from "@/theme/light";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { useUserStore } from "@/stores/userStore";
-import { BottomSheetView } from "@gorhom/bottom-sheet";
 
 interface BuyCoinsProps {
 	onClose: () => void;
@@ -29,13 +30,13 @@ export default function BuyCoins({ onClose }: BuyCoinsProps) {
 		{ title: "200 Coins", subtitle: "฿5.9/coin", value: "฿1199", coins: 200 },
 	];
 
-	const handlePurchase = (coins: number) => {
-		addCoins(coins);
+	const handlePurchase = (coinsAmount: number) => {
+		addCoins(coinsAmount);
 		onClose();
 	};
 
 	return (
-		<BottomSheetView style={styles.container}>
+		<BottomSheetScrollView contentContainerStyle={styles.container}>
 			<View style={styles.header}>
 				<Title>Buy Coins</Title>
 				<View style={styles.balanceRow}>
@@ -43,45 +44,46 @@ export default function BuyCoins({ onClose }: BuyCoinsProps) {
 					<SubTitle> {coins} coins</SubTitle>
 				</View>
 			</View>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				{oneTimePacks.map((item) => (
-					<TouchableOpacity
-						key={item.title}
-						style={[
-							styles.card,
-							{
-								backgroundColor: lightColors.mutedBackgroundWeaker,
-								borderColor: lightColors.mutedBorder,
-							},
-							item.popular && {
-								borderColor: lightColors.brand,
-								backgroundColor: lightColors.brandBG,
-							},
-						]}
-						onPress={() => handlePurchase(item.coins)}
-					>
-						<Coins size={moderateScale(20)} color={lightColors.brand} />
-						<View style={styles.cardInfo}>
-							<View style={styles.cardTitleRow}>
-								<Title>{item.title}</Title>
-								{item.popular && (
-									<View style={styles.popularBadge}>
-										<SubTitle style={{ marginBottom: 0 }}>POPULAR</SubTitle>
-									</View>
-								)}
-							</View>
+
+			{oneTimePacks.map((item) => (
+				<TouchableOpacity
+					key={item.title}
+					style={[
+						styles.card,
+						{
+							backgroundColor: lightColors.mutedBackgroundWeaker,
+							borderColor: lightColors.mutedBorder,
+						},
+						item.popular && {
+							borderColor: lightColors.brand,
+							backgroundColor: lightColors.brandBG,
+						},
+					]}
+					onPress={() => handlePurchase(item.coins)}
+					activeOpacity={0.7}
+				>
+					<Coins size={moderateScale(20)} color={lightColors.brand} />
+					<View style={styles.cardInfo}>
+						<View style={styles.cardTitleRow}>
+							<Title>{item.title}</Title>
+							{item.popular && (
+								<View style={styles.popularBadge}>
+									<SubTitle style={{ marginBottom: 0 }}>POPULAR</SubTitle>
+								</View>
+							)}
 						</View>
-						<SubTitle variant="large">{item.value}</SubTitle>
-					</TouchableOpacity>
-				))}
-			</ScrollView>
-		</BottomSheetView>
+					</View>
+					<SubTitle variant="large">{item.value}</SubTitle>
+				</TouchableOpacity>
+			))}
+		</BottomSheetScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		padding: spacing.lg,
+		// ✅ NO flex:1
 	},
 	header: {
 		alignItems: "center",

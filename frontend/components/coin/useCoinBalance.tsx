@@ -1,3 +1,4 @@
+// components/coin/useCoinBalance.tsx
 import { useRef, useMemo, useCallback } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -11,7 +12,7 @@ import SubTitle from "@/components/common/typography/SubTitle";
 export function useCoinBalance() {
 	const { coins } = useUserStore();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ["40%"], []);
+	const snapPoints = useMemo(() => ["60%"], []);
 
 	const openSheet = useCallback(() => bottomSheetRef.current?.present(), []);
 	const closeSheet = useCallback(() => bottomSheetRef.current?.dismiss(), []);

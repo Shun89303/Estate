@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		marginTop: spacing.sm,
 		paddingVertical: scaleSize(8),
 		borderRadius: scaleSize(20),
 		alignSelf: "flex-start",

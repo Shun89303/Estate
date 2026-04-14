@@ -457,7 +457,7 @@ complete final version of buy business property
 
 <!-- goal objective:  -->
 
-implement new property type
+implement new property type + details page
 i18n language setup
 layout
 styling proper
@@ -475,9 +475,5 @@ buy business locked design
 unlock sheet design
 recently unlocked design
 buy business unlocked card
-
-when recently unlocked has 2 items, inside viewToggleWithCount will appear a new button "Compare"
-If clicked Compare, a third list because inside viewToggleWithCount is a toggle between vertical card list vs map, but with this new Compare button, a third vertical list will appear and show cards and each card can be clicked.
-And for the compare feature to work, user must have at least 2 unlocked cards.
-Maximum 3 cards can be compared, minimum 2 cards can be compared.
-after user selected 2 cards or 3 cards, and after clicking the confirmation Compare button, a bottom sheet modal will pop up showing the data comparison between user selected 2 or 3 cards.
+compare feature initial design
+buy business page first version design complete

@@ -42,7 +42,7 @@ export default function FilterSection({
 	inactiveBorderColor,
 	activeBorderColor,
 }: FilterSectionProps) {
-	const defaultInactiveBg = lightColors.mutedBackground;
+	const defaultInactiveBg = lightColors.mutedBackgroundWeaker;
 	const defaultActiveBg = lightColors.brand;
 	const defaultInactiveText = lightColors.bigTitleText;
 	const defaultActiveText = lightColors.background;
@@ -89,11 +89,11 @@ export default function FilterSection({
 					>
 						<BodyText
 							style={{
+								marginBottom: 0,
 								color:
 									selected === opt
 										? (activeTextColor ?? defaultActiveText)
 										: (inactiveTextColor ?? defaultInactiveText),
-								marginBottom: 0,
 							}}
 						>
 							{opt}

@@ -9,6 +9,8 @@ import {
 	Lock,
 	LockOpen,
 	MapPin,
+	Square,
+	SquareCheckBig,
 	Users,
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
@@ -16,6 +18,14 @@ import { lightColors } from "@/theme/light";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { BuyBusiness } from "@/mock/buyBusiness";
 import ShortlistButton from "../shortlist/ShortlistButton";
+
+interface Props {
+	property: BuyBusiness;
+	isUnlocked: boolean;
+	onPress: () => void;
+	isCompareMode?: boolean;
+	isSelected?: boolean;
+}
 
 const getTypeEmoji = (type: BuyBusiness["type"]) => {
 	switch (type) {
@@ -40,15 +50,22 @@ export default function BuyBusinessCard({
 	property,
 	isUnlocked,
 	onPress,
-}: {
-	property: BuyBusiness;
-	isUnlocked: boolean;
-	onPress: () => void;
-}) {
+	isCompareMode = false,
+	isSelected = false,
+}: Props) {
 	const typeWithEmoji = `${getTypeEmoji(property.type)} ${property.type}`;
 
 	return (
-		<Pressable onPress={onPress} style={styles.card}>
+		<Pressable
+			onPress={onPress}
+			style={[
+				styles.card,
+				{
+					borderWidth: isSelected ? 1 : 0,
+					borderColor: isSelected ? lightColors.brand : "transparent",
+				},
+			]}
+		>
 			<View style={styles.imageContainer}>
 				<Image
 					source={{ uri: property.coverImage }}
@@ -56,7 +73,7 @@ export default function BuyBusinessCard({
 					blurRadius={isUnlocked ? 0 : 10}
 				/>
 				{/* Dark overlay for locked state */}
-				{!isUnlocked && <View style={styles.darkOverlay} />}
+				{(!isUnlocked || isCompareMode) && <View style={styles.darkOverlay} />}
 				{/* Type badge (always visible) */}
 				<View
 					style={[styles.typeBadge, { backgroundColor: lightColors.brand }]}
@@ -72,24 +89,35 @@ export default function BuyBusinessCard({
 					</View>
 				)}
 				{/* Shortlist badge (only when unlocked) */}
-				{isUnlocked && (
-					<View
-						style={[
-							styles.shortListBadge,
-							{ backgroundColor: lightColors.background },
-						]}
-					>
-						<ShortlistButton
-							item={{
-								id: property.id,
-								coverImage: property.coverImage,
-								title: property.title,
-								location: property.location,
-								monthlyProfit: property.monthlyProfit,
-								price: property.price,
-							}}
-						/>
+				{isCompareMode && isUnlocked ? (
+					<View style={[styles.selectionBadge]}>
+						{isSelected ? (
+							<SquareCheckBig
+								size={moderateScale(16)}
+								color={lightColors.brand}
+							/>
+						) : (
+							<Square
+								size={moderateScale(16)}
+								color={lightColors.mutedBackground}
+							/>
+						)}
 					</View>
+				) : (
+					isUnlocked && (
+						<View style={[styles.shortListBadge, { backgroundColor: "#fff" }]}>
+							<ShortlistButton
+								item={{
+									id: property.id,
+									coverImage: property.coverImage,
+									title: property.title,
+									location: property.location,
+									monthlyProfit: property.monthlyProfit,
+									price: property.price,
+								}}
+							/>
+						</View>
+					)
 				)}
 			</View>
 
@@ -298,5 +326,14 @@ const styles = StyleSheet.create({
 		marginLeft: spacing.sm,
 		marginBottom: 0,
 		fontWeight: "600",
+	},
+	selectionBadge: {
+		position: "absolute",
+		top: scaleSize(8),
+		right: scaleSize(8),
+		width: scaleSize(28),
+		height: scaleSize(28),
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
