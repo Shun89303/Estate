@@ -1,21 +1,33 @@
-// components/coin/useCoinBalance.tsx
-import { useRef, useMemo, useCallback } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useRef, useCallback, useState } from "react";
+import { Animated, Pressable, StyleSheet } from "react-native";
 import { Coins } from "lucide-react-native";
 import { lightColors } from "@/theme/light";
 import { useUserStore } from "@/stores/userStore";
-import BuyCoins from "@/components/ownerDirect/BuyCoins";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import SubTitle from "@/components/common/typography/SubTitle";
+import CustomCoinSheet from "./CustomCoinSheet";
 
 export function useCoinBalance() {
 	const { coins } = useUserStore();
-	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ["60%"], []);
+	const [visible, setVisible] = useState(false);
+	const slideAnim = useRef(new Animated.Value(0)).current;
 
-	const openSheet = useCallback(() => bottomSheetRef.current?.present(), []);
-	const closeSheet = useCallback(() => bottomSheetRef.current?.dismiss(), []);
+	const openSheet = useCallback(() => {
+		setVisible(true);
+		Animated.timing(slideAnim, {
+			toValue: 1,
+			duration: 300,
+			useNativeDriver: true,
+		}).start();
+	}, []);
+
+	const closeSheet = useCallback(() => {
+		Animated.timing(slideAnim, {
+			toValue: 0,
+			duration: 300,
+			useNativeDriver: true,
+		}).start(() => setVisible(false));
+	}, []);
 
 	const CoinButton = () => (
 		<Pressable
@@ -38,15 +50,11 @@ export function useCoinBalance() {
 	);
 
 	const CoinBottomSheet = () => (
-		<BottomSheetModal
-			ref={bottomSheetRef}
-			snapPoints={snapPoints}
-			enablePanDownToClose
-			backgroundStyle={{ backgroundColor: lightColors.background }}
-			handleIndicatorStyle={{ backgroundColor: lightColors.bodyText }}
-		>
-			<BuyCoins onClose={closeSheet} />
-		</BottomSheetModal>
+		<CustomCoinSheet
+			visible={visible}
+			onClose={closeSheet}
+			slideAnim={slideAnim}
+		/>
 	);
 
 	return { CoinButton, CoinBottomSheet, openSheet, closeSheet };

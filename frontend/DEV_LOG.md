@@ -455,16 +455,6 @@ Apr-14-2026
 
 complete final version of buy business property
 
-<!-- goal objective:  -->
-
-implement new property type + details page
-i18n language setup
-layout
-styling proper
-different phone, different tablet
-auth gates inside uis
-zustand stores
-
 <!-- Next -->
 
 compare
@@ -477,3 +467,26 @@ recently unlocked design
 buy business unlocked card
 compare feature initial design
 buy business page first version design complete
+
+<!--  -->
+
+Apr-15-2026
+
+<!-- To do -->
+
+wrap up buy business display page, take notes about everything happening in this page and then move on to the buy business details page
+
+<!-- goal objective:  -->
+
+update saved properties new design
+apply reusable components & centralize app's layout + styling & data sanity(zustand stores)
+auth gates(ProtectedPressable) inside UIs to navigate accountless users to login page
+i18n language setup
+animations & UX
+
+<!-- Completed -->
+
+updated unlock bottom sheet, short list and coins to use custom bottom sheet instead of gorhom
+extract compare sheet to separate file
+matched buy business display page design with lovable
+buy business details page

@@ -1,6 +1,6 @@
 // components/ownerDirect/BuyCoins.tsx
-import { View, StyleSheet } from "react-native";
-import { BottomSheetScrollView, TouchableOpacity } from "@gorhom/bottom-sheet";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { Coins } from "lucide-react-native";
 import Title from "../common/typography/Title";
 import BodyText from "../common/typography/BodyText";
@@ -36,7 +36,7 @@ export default function BuyCoins({ onClose }: BuyCoinsProps) {
 	};
 
 	return (
-		<BottomSheetScrollView contentContainerStyle={styles.container}>
+		<ScrollView contentContainerStyle={styles.container}>
 			<View style={styles.header}>
 				<Title>Buy Coins</Title>
 				<View style={styles.balanceRow}>
@@ -76,7 +76,7 @@ export default function BuyCoins({ onClose }: BuyCoinsProps) {
 					<SubTitle variant="large">{item.value}</SubTitle>
 				</TouchableOpacity>
 			))}
-		</BottomSheetScrollView>
+		</ScrollView>
 	);
 }
 

@@ -1,6 +1,8 @@
 import MapView, { Marker, Region } from "react-native-maps";
 import { View, StyleSheet } from "react-native";
-import { scaleSize } from "@/utils/metrics";
+import Title from "@/components/common/typography/Title";
+import { spacing, scaleSize } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
 
 interface MapMarker {
 	id: string | number;
@@ -15,12 +17,14 @@ interface PropertyMapProps {
 	markers: MapMarker[];
 	initialRegion?: Region;
 	style?: object;
+	title?: string; // optional title
 }
 
 export function PropertyMap({
 	markers,
 	initialRegion,
 	style,
+	title,
 }: PropertyMapProps) {
 	const getDefaultRegion = (): Region => {
 		if (markers.length === 0) {
@@ -61,20 +65,27 @@ export function PropertyMap({
 
 	return (
 		<View style={[styles.container, style]}>
-			{/* <MapView style={styles.map} initialRegion={region}>
-				{markers.map((marker) => (
-					<Marker
-						key={marker.id}
-						coordinate={{
-							latitude: marker.latitude,
-							longitude: marker.longitude,
-						}}
-						title={marker.title}
-						description={marker.description}
-						onPress={marker.onPress}
-					/>
-				))}
-			</MapView> */}
+			{title && (
+				<Title variant="small" style={styles.title}>
+					{title}
+				</Title>
+			)}
+			<View style={styles.mapWrapper}>
+				{/* <MapView style={styles.map} initialRegion={region}>
+          {markers.map((marker) => (
+            <Marker
+              key={marker.id}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+              title={marker.title}
+              description={marker.description}
+              onPress={marker.onPress}
+            />
+          ))}
+        </MapView> */}
+			</View>
 		</View>
 	);
 }
@@ -82,7 +93,15 @@ export function PropertyMap({
 const styles = StyleSheet.create({
 	container: {
 		overflow: "hidden",
+		marginBottom: spacing.lg,
+	},
+	title: {
+		marginBottom: spacing.sm,
+	},
+	mapWrapper: {
 		borderRadius: scaleSize(12),
+		overflow: "hidden",
+		height: scaleSize(200),
 	},
 	map: {
 		width: "100%",

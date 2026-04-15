@@ -1,4 +1,5 @@
 import { BuyBusiness } from "@/mock/buyBusiness";
+import formatPriceShort from "@/utils/formatPriceShort";
 
 type RowDefinition = {
 	label: string;
@@ -18,19 +19,19 @@ export const rows: RowDefinition[] = [
 		label: "MONTHLY REVENUE",
 		key: "monthlyRevenue",
 		best: "max",
-		format: (v) => `฿${Number(v).toLocaleString()}`,
+		format: (v) => `฿${formatPriceShort(Number(v))}/mo`,
 	},
 	{
 		label: "MONTHLY PROFIT",
 		key: "monthlyProfit",
 		best: "max",
-		format: (v) => `฿${Number(v).toLocaleString()}`,
+		format: (v) => `฿${formatPriceShort(Number(v))}/mo`,
 	},
 	{
 		label: "EST. ROI",
 		key: "roiEst",
 		best: "max",
-		format: (v) => `${Number(v)}%`,
+		format: (v) => `${Number(v)}%/yr`,
 	},
 	{
 		label: "EMPLOYEES",
@@ -42,13 +43,13 @@ export const rows: RowDefinition[] = [
 		label: "YEARS OPERATING",
 		key: "years",
 		best: "max",
-		format: (v) => v.toString(),
+		format: (v) => v.toString().concat(" yrs"),
 	},
 	{
 		label: "AREA (sqm)",
 		key: "area",
 		best: "max",
-		format: (v) => v.toString(),
+		format: (v) => v.toString().concat(" sqm"),
 	},
 	{ label: "TYPE", key: "type", best: null, format: (v) => v.toString() },
 ];

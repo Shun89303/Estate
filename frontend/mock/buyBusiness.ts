@@ -115,7 +115,7 @@ export const MOCK_BUY_BUSINESS: BuyBusiness[] = [
 		businessContact: {
 			name: "Marco Rossi",
 			profileImage: `${API_BASE_URL}/uploads/owners/owner8.jpg`,
-			phone: "+66891234567",
+			phone: "+66 891234567",
 		},
 		reserveCoins: 50,
 		unlockCoins: 5,
@@ -169,7 +169,7 @@ export const MOCK_BUY_BUSINESS: BuyBusiness[] = [
 		businessContact: {
 			name: "Kittipat S.",
 			profileImage: `${API_BASE_URL}/uploads/owners/owner3.jpg`,
-			phone: "+66987654321",
+			phone: "+66 987654321",
 		},
 		reserveCoins: 30,
 		unlockCoins: 5,
@@ -223,7 +223,7 @@ export const MOCK_BUY_BUSINESS: BuyBusiness[] = [
 		businessContact: {
 			name: "Somchai T.",
 			profileImage: `${API_BASE_URL}/uploads/owners/owner7.jpg`,
-			phone: "+66881234567",
+			phone: "+66 881234567",
 		},
 		reserveCoins: 150,
 		unlockCoins: 5,
@@ -277,7 +277,7 @@ export const MOCK_BUY_BUSINESS: BuyBusiness[] = [
 		businessContact: {
 			name: "Nattaya P.",
 			profileImage: `${API_BASE_URL}/uploads/owners/owner6.jpg`,
-			phone: "+66991234567",
+			phone: "+66 991234567",
 		},
 		reserveCoins: 50,
 		unlockCoins: 5,
@@ -331,7 +331,7 @@ export const MOCK_BUY_BUSINESS: BuyBusiness[] = [
 		businessContact: {
 			name: "Pimchanok L.",
 			profileImage: `${API_BASE_URL}/uploads/owners/owner5.jpg`,
-			phone: "+66861122334",
+			phone: "+66 861122334",
 		},
 		reserveCoins: 70,
 		unlockCoins: 5,
@@ -387,7 +387,7 @@ export const MOCK_BUY_BUSINESS: BuyBusiness[] = [
 		businessContact: {
 			name: "Chalermchai K.",
 			profileImage: `${API_BASE_URL}/uploads/owners/owner4.jpg`,
-			phone: "+66898765432",
+			phone: "+66 898765432",
 		},
 		reserveCoins: 40,
 		unlockCoins: 5,

@@ -42,7 +42,7 @@ export default function SearchBar({
 				containerStyle,
 				{
 					backgroundColor: lightColors.mutedBackgroundWeaker,
-					borderColor: lightColors.border,
+					borderColor: lightColors.mutedBorder,
 				},
 				isFocused && {
 					borderColor: lightColors.quarterWeakBrand,

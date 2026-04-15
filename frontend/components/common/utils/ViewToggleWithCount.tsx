@@ -42,7 +42,7 @@ export default function ViewToggleWithCount({
 							{
 								backgroundColor: isCompareMode
 									? lightColors.brand
-									: lightColors.mutedBackground,
+									: lightColors.mutedBackgroundWeaker,
 							},
 						]}
 						onPress={onComparePress}
@@ -68,7 +68,7 @@ export default function ViewToggleWithCount({
 				<View
 					style={[
 						styles.toggleContainer,
-						{ backgroundColor: lightColors.mutedBackground },
+						{ backgroundColor: lightColors.mutedBackgroundWeaker },
 					]}
 				>
 					<TouchableOpacity

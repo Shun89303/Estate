@@ -1,4 +1,3 @@
-// app/(tabs)/saved.tsx
 import { useState } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

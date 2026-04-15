@@ -1,18 +1,7 @@
-import { useState, useMemo, useRef } from "react";
-import {
-	View,
-	StyleSheet,
-	Pressable,
-	FlatList,
-	TouchableOpacity,
-	Animated,
-	Dimensions,
-	TouchableWithoutFeedback,
-	Image,
-} from "react-native";
+import { useState, useMemo } from "react";
+import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 
 // Reusable components
 import BackButton from "@/components/common/navigation/BackButton";
@@ -30,39 +19,24 @@ import { useUserStore } from "@/stores/userStore";
 import { MOCK_BUY_BUSINESS, BuyBusiness } from "@/mock/buyBusiness";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { lightColors } from "@/theme/light";
-import {
-	ChartColumn,
-	Coins,
-	EyeOff,
-	Lock,
-	LockOpen,
-	GitCompareArrows,
-} from "lucide-react-native";
+import { LockOpen, GitCompareArrows } from "lucide-react-native";
 import BodyText from "@/components/common/typography/BodyText";
 import ClearFiltersButton from "@/components/common/utils/ClearFiltersButton";
 import { useShortlist } from "@/components/shortlist/useShortlist";
-import SubTitle from "@/components/common/typography/SubTitle";
-import formatPriceShort from "@/utils/formatPriceShort";
 import BuyBusinessUnlockedCard from "@/components/buyBusiness/BuyBusinessUnlockedCard";
 import globalStyles from "@/styles/styles";
-import { getBestValue, rows } from "@/components/buyBusiness/compare/utils";
+import { useBuyBusinessStore } from "@/stores/buyBusinessStore";
+import { useCompareSheet } from "@/components/buyBusiness/compare/useCompareSheet";
+import { useUnlockSheet } from "@/components/buyBusiness/unlock/useUnlockSheet";
 
 export default function BuyBusinessPage() {
 	const router = useRouter();
 	// coin ui
-	const {
-		CoinButton,
-		CoinBottomSheet,
-		closeSheet: closeCoin,
-	} = useCoinBalance();
+	const { CoinButton, CoinBottomSheet } = useCoinBalance();
 	// coin store
 	const { coins: coinBalance, deductCoins } = useUserStore();
 	// shortlist ui
-	const {
-		ShortlistButton,
-		ShortlistBottomSheet,
-		closeSheet: closeShortlist,
-	} = useShortlist();
+	const { ShortlistButton, ShortlistBottomSheet } = useShortlist();
 
 	// UI state
 	const [searchQuery, setSearchQuery] = useState("");
@@ -74,52 +48,18 @@ export default function BuyBusinessPage() {
 	// compare mode
 	const [isCompareMode, setCompareMode] = useState(false);
 	const [selectedCompareIds, setSelectedCompareIds] = useState<string[]>([]);
-	const compareSheetRef = useRef<BottomSheetModal>(null);
-	// compare sheet
-	const [showCompareSheet, setShowCompareSheet] = useState(false);
-	const [comparingBusinesses, setComparingBusinesses] = useState<BuyBusiness[]>(
-		[],
-	);
-	const slideAnim = useRef(new Animated.Value(0)).current; // 0 = hidden, 1 = visible
-	const { height: screenHeight } = Dimensions.get("window");
-
-	// compare sheet animation
-	const openCompareSheet = (businesses: BuyBusiness[]) => {
-		setComparingBusinesses(businesses);
-		setShowCompareSheet(true);
-		Animated.timing(slideAnim, {
-			toValue: 1,
-			duration: 300,
-			useNativeDriver: true,
-		}).start();
-	};
-
-	const closeCompareSheet = () => {
-		Animated.timing(slideAnim, {
-			toValue: 0,
-			duration: 300,
-			useNativeDriver: true,
-		}).start(() => setShowCompareSheet(false));
-	};
+	const { open: openCompareSheet, CompareSheet } = useCompareSheet();
 
 	// Unlock state
-	const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
+	const { unlockedIds, unlockBusiness } = useBuyBusinessStore();
 	const unlockedBusinesses = useMemo(() => {
 		return MOCK_BUY_BUSINESS.filter((item) =>
 			unlockedIds.includes(item.uniqueCode),
 		);
 	}, [unlockedIds]);
-	const [selectedProperty, setSelectedProperty] = useState<BuyBusiness | null>(
-		null,
-	);
-	const unlockModalRef = useRef<BottomSheetModal>(null);
-	const snapPoints = useMemo(() => ["70%"], []);
-
-	const closeAllSheets = () => {
-		closeCoin();
-		closeShortlist();
-		unlockModalRef.current?.dismiss();
-	};
+	const { open: openUnlockSheet, UnlockSheet } = useUnlockSheet();
+	// const unlockModalRef = useRef<BottomSheetModal>(null);
+	// const snapPoints = useMemo(() => ["70%"], []);
 
 	// Filter options
 	const typeOptions = [
@@ -199,10 +139,17 @@ export default function BuyBusinessPage() {
 			onPress: () => {
 				const isUnlocked = unlockedIds.includes(item.uniqueCode);
 				if (isUnlocked) {
-					router.push(`/`);
+					router.push(`/property/buyBusiness/${item.id}`);
 				} else {
-					setSelectedProperty(item);
-					unlockModalRef.current?.present();
+					openUnlockSheet(item, coinBalance, () => {
+						const cost = item.unlockCoins;
+						const success = deductCoins(cost);
+						if (success) {
+							unlockBusiness(item.uniqueCode);
+						} else {
+							alert("Not enough coins. Please top up.");
+						}
+					});
 				}
 			},
 		}));
@@ -214,135 +161,25 @@ export default function BuyBusinessPage() {
 		(selectedType !== "All" ? 1 : 0);
 
 	const handleFilterPress = () => {
-		closeAllSheets();
 		setShowFilters((prev) => !prev);
 	};
 
 	const handleCardPress = (item: BuyBusiness) => {
 		const isUnlocked = unlockedIds.includes(item.uniqueCode);
 		if (isUnlocked) {
-			router.push(`/`);
+			router.push(`/property/buyBusiness/${item.id}`);
 		} else {
-			closeAllSheets();
-			setSelectedProperty(item);
-			unlockModalRef.current?.present();
+			openUnlockSheet(item, coinBalance, () => {
+				const cost = item.unlockCoins;
+				const success = deductCoins(cost);
+				if (success) {
+					unlockBusiness(item.uniqueCode);
+				} else {
+					alert("Not enough coins. Please top up.");
+				}
+			});
 		}
 	};
-
-	const handleUnlock = () => {
-		if (!selectedProperty) return;
-		const cost = selectedProperty.unlockCoins;
-		const success = deductCoins(cost);
-		if (success) {
-			setUnlockedIds((prev) => [...prev, selectedProperty.uniqueCode]);
-			unlockModalRef.current?.dismiss();
-		} else {
-			alert("Not enough coins. Please top up.");
-		}
-	};
-
-	// Render the header content for the main FlatList
-	const renderHeader = () => (
-		<>
-			<View style={{ backgroundColor: lightColors.background }}>
-				<SearchBar
-					placeholder="Search businesses for sale..."
-					value={searchQuery}
-					onChangeText={setSearchQuery}
-					containerStyle={styles.searchBar}
-				/>
-			</View>
-
-			{showFilters && (
-				<View style={styles.filtersContainer}>
-					<FilterSection
-						title="LOCATION"
-						options={locationOptions}
-						selected={selectedLocation}
-						onSelect={setSelectedLocation}
-					/>
-					<FilterSection
-						title="ASKING PRICE"
-						options={priceOptions}
-						selected={selectedPrice}
-						onSelect={setSelectedPrice}
-					/>
-				</View>
-			)}
-
-			<View style={{ backgroundColor: lightColors.background }}>
-				{(selectedLocation !== "All" ||
-					selectedPrice !== "Any" ||
-					selectedType !== "All") && (
-					<ClearFiltersButton
-						onPress={() => {
-							setSelectedLocation("All");
-							setSelectedPrice("Any");
-							setSelectedType("All");
-						}}
-					/>
-				)}
-			</View>
-
-			<View style={styles.filtersContainer}>
-				<FilterSection
-					options={typeOptions}
-					selected={selectedType}
-					onSelect={setSelectedType}
-				/>
-			</View>
-
-			<ViewToggleWithCount
-				count={filteredData.length}
-				countLabel="businesses found"
-				viewMode={viewMode}
-				onViewModeChange={(mode) => {
-					if (!isCompareMode) setViewMode(mode);
-				}}
-				showCompare={unlockedBusinesses.length >= 2}
-				isCompareMode={isCompareMode}
-				onComparePress={() => {
-					if (isCompareMode) {
-						setCompareMode(false);
-						setSelectedCompareIds([]);
-					} else {
-						setCompareMode(true);
-						setViewMode("list"); // force list view
-					}
-				}}
-			/>
-
-			{/* Recently Unlocked Section */}
-			{unlockedBusinesses.length > 0 && !isCompareMode && (
-				<View style={styles.recentlyUnlockedSection}>
-					<View style={styles.recentlyUnlockedHeader}>
-						<View style={styles.recentlyUnlockedLeft}>
-							<LockOpen size={moderateScale(20)} color={lightColors.success} />
-							<Title variant="small" style={styles.recentlyUnlockedTitle}>
-								Recently Unlocked
-							</Title>
-						</View>
-						<BodyText variant="small" style={styles.recentlyUnlockedCount}>
-							{unlockedBusinesses.length} unlocked
-						</BodyText>
-					</View>
-					<FlatList
-						horizontal
-						data={unlockedBusinesses}
-						keyExtractor={(item) => item.uniqueCode}
-						renderItem={({ item }) => (
-							<BuyBusinessUnlockedCard
-								property={item}
-								onPress={() => router.push(`/`)}
-							/>
-						)}
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={styles.recentlyUnlockedList}
-					/>
-				</View>
-			)}
-		</>
-	);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -364,6 +201,116 @@ export default function BuyBusinessPage() {
 				</View>
 			</View>
 
+			{/* Fixed Search & Filters (always visible) */}
+			<View style={styles.searchAndFilters}>
+				<View
+					style={{
+						backgroundColor: lightColors.background,
+					}}
+				>
+					<SearchBar
+						placeholder="Search businesses for sale..."
+						value={searchQuery}
+						onChangeText={setSearchQuery}
+						containerStyle={styles.searchBar}
+					/>
+				</View>
+
+				{showFilters && (
+					<View style={styles.filtersContainer}>
+						<FilterSection
+							title="LOCATION"
+							options={locationOptions}
+							selected={selectedLocation}
+							onSelect={setSelectedLocation}
+						/>
+						<FilterSection
+							title="ASKING PRICE"
+							options={priceOptions}
+							selected={selectedPrice}
+							onSelect={setSelectedPrice}
+						/>
+					</View>
+				)}
+
+				<View style={{ backgroundColor: lightColors.background }}>
+					{(selectedLocation !== "All" ||
+						selectedPrice !== "Any" ||
+						selectedType !== "All") && (
+						<ClearFiltersButton
+							onPress={() => {
+								setSelectedLocation("All");
+								setSelectedPrice("Any");
+								setSelectedType("All");
+							}}
+						/>
+					)}
+				</View>
+
+				<View style={styles.filtersContainer}>
+					<FilterSection
+						options={typeOptions}
+						selected={selectedType}
+						onSelect={setSelectedType}
+					/>
+				</View>
+
+				<ViewToggleWithCount
+					count={filteredData.length}
+					countLabel="businesses found"
+					viewMode={viewMode}
+					onViewModeChange={(mode) => {
+						if (!isCompareMode) setViewMode(mode);
+					}}
+					showCompare={unlockedBusinesses.length >= 2}
+					isCompareMode={isCompareMode}
+					onComparePress={() => {
+						if (isCompareMode) {
+							setCompareMode(false);
+							setSelectedCompareIds([]);
+						} else {
+							setCompareMode(true);
+							setViewMode("list");
+						}
+					}}
+				/>
+
+				{/* Recently Unlocked Section (if any) */}
+				{unlockedBusinesses.length > 0 && !isCompareMode && (
+					<View style={styles.recentlyUnlockedSection}>
+						<View style={styles.recentlyUnlockedHeader}>
+							<View style={styles.recentlyUnlockedLeft}>
+								<LockOpen
+									size={moderateScale(20)}
+									color={lightColors.success}
+								/>
+								<Title variant="small" style={styles.recentlyUnlockedTitle}>
+									Recently Unlocked
+								</Title>
+							</View>
+							<BodyText variant="small" style={styles.recentlyUnlockedCount}>
+								{unlockedBusinesses.length} unlocked
+							</BodyText>
+						</View>
+						<FlatList
+							horizontal
+							data={unlockedBusinesses}
+							keyExtractor={(item) => item.uniqueCode}
+							renderItem={({ item }) => (
+								<BuyBusinessUnlockedCard
+									property={item}
+									onPress={() =>
+										router.push(`/property/buyBusiness/${item.id}`)
+									}
+								/>
+							)}
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={styles.recentlyUnlockedList}
+						/>
+					</View>
+				)}
+			</View>
+
 			{!isCompareMode ? (
 				viewMode === "list" ? (
 					<FlatList
@@ -377,7 +324,6 @@ export default function BuyBusinessPage() {
 								isCompareMode={false}
 							/>
 						)}
-						ListHeaderComponent={renderHeader}
 						contentContainerStyle={styles.listContent}
 						ListFooterComponent={
 							viewMode === "list" ? (
@@ -388,7 +334,6 @@ export default function BuyBusinessPage() {
 				) : (
 					<>
 						{/* Show top UI (except main list) above map */}
-						<View style={styles.mapTopContent}>{renderHeader()}</View>
 						<View style={styles.mapContainer}>
 							<PropertyMap markers={markers} />
 						</View>
@@ -407,9 +352,15 @@ export default function BuyBusinessPage() {
 								isUnlocked={isUnlocked}
 								onPress={() => {
 									if (!isUnlocked) {
-										closeAllSheets();
-										setSelectedProperty(item);
-										unlockModalRef.current?.present();
+										openUnlockSheet(item, coinBalance, () => {
+											const cost = item.unlockCoins;
+											const success = deductCoins(cost);
+											if (success) {
+												unlockBusiness(item.uniqueCode);
+											} else {
+												alert("Not enough coins. Please top up.");
+											}
+										});
 									} else {
 										if (isSelected) {
 											setSelectedCompareIds((prev) =>
@@ -432,7 +383,6 @@ export default function BuyBusinessPage() {
 							/>
 						);
 					}}
-					ListHeaderComponent={renderHeader}
 					contentContainerStyle={styles.listContent}
 					ListFooterComponent={<View style={{ height: scaleSize(80) }} />}
 				/>
@@ -497,282 +447,10 @@ export default function BuyBusinessPage() {
 				</View>
 			)}
 
-			<BottomSheetModal
-				ref={unlockModalRef}
-				snapPoints={snapPoints}
-				enablePanDownToClose
-				backgroundStyle={{ backgroundColor: lightColors.background }}
-				handleIndicatorStyle={{ backgroundColor: lightColors.bodyText }}
-			>
-				{selectedProperty && (
-					<BottomSheetView style={styles.sheetContent}>
-						<View style={styles.sheetHeader}>
-							<View style={styles.lockIconContainer}>
-								<Lock size={moderateScale(30)} color={lightColors.brand} />
-							</View>
-							<Title variant="page" style={styles.sheetTitle}>
-								Unlock Business Info
-							</Title>
-							<BodyText variant="normal" style={styles.sheetSubtitle}>
-								{selectedProperty.title}
-							</BodyText>
-						</View>
-
-						<View style={styles.sheetBox}>
-							<View>
-								<View style={styles.financialHeader}>
-									<ChartColumn
-										size={moderateScale(15)}
-										color={lightColors.brand}
-									/>
-									<Title variant="small" style={styles.financialTitle}>
-										Financial Preview
-									</Title>
-								</View>
-								<BodyText variant="normal">Asking Price</BodyText>
-								<BodyText variant="normal">Monthly Revenue</BodyText>
-								<BodyText variant="normal">Monthly Profit</BodyText>
-								<BodyText variant="normal">Est. ROI</BodyText>
-							</View>
-							<View style={styles.financialValues}>
-								<View style={styles.emptySpacer} />
-								<SubTitle variant="normal" style={styles.financialValue}>
-									฿{selectedProperty.price.toLocaleString()}
-								</SubTitle>
-								<SubTitle
-									variant="normal"
-									style={[
-										styles.financialValue,
-										{ color: lightColors.bigTitleText },
-									]}
-								>
-									฿{formatPriceShort(selectedProperty.monthlyRevenue)}/mo
-								</SubTitle>
-								<SubTitle
-									variant="normal"
-									style={[
-										styles.financialValue,
-										{ color: lightColors.success },
-									]}
-								>
-									฿{formatPriceShort(selectedProperty.monthlyProfit)}/mo
-								</SubTitle>
-								<SubTitle variant="normal" style={styles.financialValue}>
-									{selectedProperty.roiEst}% /yr
-								</SubTitle>
-							</View>
-						</View>
-
-						<View style={styles.sheetBox}>
-							<View>
-								<BodyText variant="normal">UNLOCK TO REVEAL</BodyText>
-								<BodyText variant="normal">Full Address</BodyText>
-								<BodyText variant="normal">Owner Contact</BodyText>
-							</View>
-							<View style={styles.revealValues}>
-								<View style={styles.emptySpacer} />
-								<View style={styles.hiddenRow}>
-									<EyeOff
-										size={moderateScale(12)}
-										color={lightColors.bigTitleText}
-									/>
-									<Title variant="small" style={styles.hiddenText}>
-										Hidden
-									</Title>
-								</View>
-								<View style={styles.hiddenRow}>
-									<EyeOff
-										size={moderateScale(12)}
-										color={lightColors.bigTitleText}
-									/>
-									<Title variant="small" style={styles.hiddenText}>
-										Hidden
-									</Title>
-								</View>
-							</View>
-						</View>
-
-						<View style={[styles.sheetBox, styles.sheetBoxTransparent]}>
-							<View>
-								<BodyText variant="normal">Cost</BodyText>
-								<BodyText variant="normal">Your Balance</BodyText>
-							</View>
-							<View style={styles.costValues}>
-								<View style={styles.hiddenRow}>
-									<Coins size={moderateScale(12)} color={lightColors.brand} />
-									<SubTitle variant="normal" style={{ marginBottom: 0 }}>
-										{selectedProperty.unlockCoins} Coins
-									</SubTitle>
-								</View>
-								<View style={styles.hiddenRow}>
-									<Coins size={moderateScale(12)} color={lightColors.brand} />
-									<Title variant="small" style={{ marginBottom: 0 }}>
-										{coinBalance} coins
-									</Title>
-								</View>
-							</View>
-						</View>
-
-						<Pressable
-							style={[styles.unlockBtn, { backgroundColor: lightColors.brand }]}
-							onPress={handleUnlock}
-						>
-							<LockOpen size={moderateScale(12)} color="#fff" />
-							<BodyText variant="normal" style={styles.unlockBtnText}>
-								Unlock for {selectedProperty.unlockCoins} Coins
-							</BodyText>
-						</Pressable>
-					</BottomSheetView>
-				)}
-			</BottomSheetModal>
-
 			<ShortlistBottomSheet />
 			<CoinBottomSheet />
-			{showCompareSheet && (
-				<>
-					{/* Backdrop */}
-					<TouchableWithoutFeedback onPress={closeCompareSheet}>
-						<Animated.View
-							style={[
-								styles.backdrop,
-								{
-									opacity: slideAnim.interpolate({
-										inputRange: [0, 1],
-										outputRange: [0, 0.5],
-									}),
-								},
-							]}
-						/>
-					</TouchableWithoutFeedback>
-
-					{/* Sheet Container */}
-					<Animated.View
-						style={[
-							styles.sheetContainer,
-							{
-								transform: [
-									{
-										translateY: slideAnim.interpolate({
-											inputRange: [0, 1],
-											outputRange: [screenHeight, 0],
-										}),
-									},
-								],
-								height: screenHeight * 0.85,
-							},
-						]}
-					>
-						<View style={styles.sheetHandle} />
-						<FlatList
-							data={rows}
-							keyExtractor={(item) => item.label}
-							renderItem={({ item }) => {
-								const rowValues = comparingBusinesses.map((b) =>
-									item.key === "type"
-										? (b[item.key as keyof BuyBusiness] as string)
-										: (b[item.key as keyof BuyBusiness] as number),
-								);
-								const numericValues = rowValues.filter(
-									(v): v is number => typeof v === "number",
-								);
-								const best = item.best
-									? getBestValue(numericValues, item.best)
-									: null;
-
-								return (
-									<View style={styles.attributeCard}>
-										<BodyText variant="small" style={styles.attributeTitle}>
-											{item.label}
-										</BodyText>
-										<View style={styles.valuesRow}>
-											{rowValues.map((val, idx) => {
-												const numericVal =
-													typeof val === "number"
-														? val
-														: parseFloat(val as string);
-												const isBest =
-													best !== null && item.best && numericVal === best;
-												return (
-													<View key={idx} style={styles.businessColumn}>
-														<BodyText
-															variant="normal"
-															style={[
-																styles.valueText,
-																isBest ? styles.bestValue : null,
-															]}
-														>
-															{item.format(val as string | number)}
-														</BodyText>
-														{isBest && (
-															<BodyText
-																variant="small"
-																style={styles.bestBadge}
-															>
-																Best
-															</BodyText>
-														)}
-													</View>
-												);
-											})}
-										</View>
-									</View>
-								);
-							}}
-							ListHeaderComponent={
-								<>
-									<View style={styles.compareHeader}>
-										<View style={styles.titleContainer}>
-											<GitCompareArrows
-												size={moderateScale(24)}
-												color={lightColors.brand}
-											/>
-											<Title variant="page" style={styles.compareTitle}>
-												Compare Businesses
-											</Title>
-										</View>
-									</View>
-									<View style={styles.headerRow}>
-										{comparingBusinesses.map((biz) => (
-											<View key={biz.uniqueCode} style={styles.businessColumn}>
-												<Image
-													source={{ uri: biz.coverImage }}
-													style={styles.image}
-												/>
-												<Title
-													variant="small"
-													style={styles.businessName}
-													numberOfLines={2}
-												>
-													{biz.title}
-												</Title>
-												<BodyText
-													variant="small"
-													style={styles.businessLocation}
-													numberOfLines={1}
-												>
-													{biz.location}
-												</BodyText>
-											</View>
-										))}
-									</View>
-								</>
-							}
-							ListFooterComponent={
-								<Pressable
-									style={styles.doneButton}
-									onPress={closeCompareSheet}
-								>
-									<Title variant="normal" style={{ marginBottom: 0 }}>
-										Done
-									</Title>
-								</Pressable>
-							}
-							showsVerticalScrollIndicator
-							contentContainerStyle={styles.listContent}
-						/>
-					</Animated.View>
-				</>
-			)}
+			<CompareSheet />
+			<UnlockSheet />
 		</SafeAreaView>
 	);
 }
@@ -818,76 +496,6 @@ const styles = StyleSheet.create({
 		marginBottom: spacing.md,
 		borderRadius: scaleSize(12),
 		overflow: "hidden",
-	},
-	sheetHeader: {
-		alignItems: "center",
-	},
-	lockIconContainer: {
-		backgroundColor: lightColors.brandBG,
-		padding: spacing.lg,
-		borderRadius: scaleSize(99),
-		marginBottom: spacing.sm,
-	},
-	sheetTitle: {
-		marginBottom: spacing.xs,
-	},
-	sheetSubtitle: {
-		textAlign: "center",
-		color: lightColors.bodyText,
-	},
-	sheetBox: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		backgroundColor: lightColors.mutedBackgroundWeaker,
-		padding: spacing.md,
-		borderRadius: scaleSize(10),
-	},
-	sheetBoxTransparent: {
-		backgroundColor: "transparent",
-	},
-	financialHeader: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing.sm,
-	},
-	financialTitle: {
-		marginBottom: 0,
-	},
-	financialValues: {
-		alignItems: "flex-end",
-	},
-	revealValues: {
-		alignItems: "flex-end",
-	},
-	costValues: {
-		alignItems: "flex-end",
-	},
-	emptySpacer: {
-		height: scaleSize(24),
-	},
-	hiddenRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: scaleSize(5),
-	},
-	hiddenText: {
-		marginBottom: 0,
-	},
-	financialValue: {
-		marginBottom: 0,
-	},
-	unlockBtn: {
-		paddingVertical: spacing.md,
-		borderRadius: scaleSize(8),
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		gap: scaleSize(5),
-	},
-	unlockBtnText: {
-		fontWeight: "600",
-		color: "#fff",
-		marginBottom: 0,
 	},
 	recentlyUnlockedSection: {
 		marginTop: spacing.md,
@@ -961,123 +569,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: spacing.md,
 		borderRadius: scaleSize(8),
 	},
-	backdrop: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: "#000",
-	},
-	sheetContainer: {
-		position: "absolute",
-		bottom: 0,
-		left: 0,
-		right: 0,
-		backgroundColor: lightColors.background,
-		borderTopLeftRadius: scaleSize(20),
-		borderTopRightRadius: scaleSize(20),
-		...globalStyles.shadows,
-	},
-	sheetHandle: {
-		width: scaleSize(40),
-		height: scaleSize(4),
-		backgroundColor: lightColors.mutedBorder,
-		borderRadius: scaleSize(2),
-		alignSelf: "center",
-		marginTop: spacing.sm,
-		marginBottom: spacing.md,
-	},
-	sheetContent: {
-		flex: 1,
-		paddingHorizontal: spacing.lg,
-		paddingBottom: spacing.md,
-	},
-	compareHeader: {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-		alignSelf: "flex-start",
-		marginBottom: spacing.md,
-		marginHorizontal: spacing.xl,
-	},
-	titleContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: spacing.sm,
-	},
-	compareTitle: {
-		marginBottom: 0,
-	},
-	attributeCard: {
-		backgroundColor: lightColors.background,
-		borderRadius: scaleSize(12),
-		padding: spacing.md,
-		marginBottom: spacing.md,
-		marginHorizontal: spacing.md,
-		...globalStyles.shadows,
-	},
-	attributeTitle: {
-		fontWeight: "bold",
-		marginBottom: spacing.sm,
-		color: lightColors.bigTitleText,
-		textAlign: "left",
-	},
-	valuesRow: {
-		flexDirection: "row",
-	},
-	valueText: {
-		textAlign: "center",
-		color: lightColors.bigTitleText,
-	},
-	bestValue: {
-		fontWeight: "700",
-		color: lightColors.success,
-	},
-	bestBadge: {
-		textAlign: "center",
-		color: lightColors.success,
-		fontWeight: "600",
-		marginTop: scaleSize(2),
-	},
-	doneButton: {
-		backgroundColor: lightColors.background,
-		paddingVertical: spacing.md,
-		marginHorizontal: spacing.md,
-		borderRadius: scaleSize(8),
-		alignItems: "center",
-		marginVertical: spacing.md,
-		borderWidth: scaleSize(1),
-		borderColor: lightColors.mutedBorder,
-	},
-	headerRow: {
-		flexDirection: "row",
-		marginBottom: spacing.md,
-		paddingBottom: spacing.sm,
-		paddingHorizontal: spacing.md,
-		borderBottomWidth: scaleSize(1),
-		borderBottomColor: lightColors.mutedBorder,
-	},
-	businessColumn: {
-		flex: 1,
-		alignItems: "center",
-		paddingHorizontal: spacing.xs,
-	},
-	image: {
-		width: scaleSize(100),
-		height: scaleSize(80),
-		borderRadius: scaleSize(8),
-		marginBottom: spacing.sm,
-	},
-	businessName: {
-		textAlign: "center",
-		marginBottom: scaleSize(4),
-	},
-	businessLocation: {
-		textAlign: "center",
-		color: lightColors.bodyText,
-	},
 	listContent: {
 		paddingBottom: spacing.xl,
+	},
+	searchAndFilters: {
+		// No flex or fixed height – content determines its size
 	},
 });

@@ -12,7 +12,6 @@ import Title from "@/components/common/typography/Title";
 import BodyText from "@/components/common/typography/BodyText";
 import { Star, StarOff } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { BottomSheetView } from "@gorhom/bottom-sheet";
 import formatPriceShort from "@/utils/formatPriceShort";
 
 interface Props {
@@ -86,7 +85,7 @@ export default function ShortlistBottomSheetContent({ onClose }: Props) {
 	);
 
 	return (
-		<BottomSheetView style={styles.contentContainer}>
+		<View style={styles.contentContainer}>
 			<View style={styles.header}>
 				<View style={styles.titleContainer}>
 					<Star
@@ -111,7 +110,7 @@ export default function ShortlistBottomSheetContent({ onClose }: Props) {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={styles.listContent}
 			/>
-		</BottomSheetView>
+		</View>
 	);
 }
 
