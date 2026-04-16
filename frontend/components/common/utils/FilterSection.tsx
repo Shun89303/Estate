@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
 	},
 	filterBtn: {
 		paddingVertical: scaleSize(6),
-		paddingHorizontal: spacing.sm,
+		paddingHorizontal: spacing.lg,
 		marginRight: spacing.sm,
 	},
 });

@@ -28,7 +28,7 @@ export default function BusinessCard({
 
 	return (
 		<TouchableOpacity
-			onPress={() => router.push(`/property/business/${property.id}`)}
+			onPress={() => router.push(`/property/business/${property.uniqueCode}`)}
 			activeOpacity={0.8}
 			style={[styles.card, { backgroundColor: colors.background }]}
 		>

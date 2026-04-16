@@ -23,6 +23,7 @@ import {
 	Coins,
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
+import { SavedItem } from "@/stores/savedPropertiesStore";
 
 export default function OwnerDetails() {
 	const { id } = useLocalSearchParams();
@@ -32,13 +33,21 @@ export default function OwnerDetails() {
 
 	useEffect(() => {
 		if (!id) return;
-		const found = MOCK_OWNERDIRECT.find(
-			(p) => p.id?.toString() === id.toString(),
-		);
+		const found = MOCK_OWNERDIRECT.find((p) => p.uniqueCode === id);
 		setProperty(found || null);
 	}, [id]);
 
 	if (!property) return <NotFound title="Property Not Found" />;
+
+	const savedItem: SavedItem = {
+		uniqueCode: property.uniqueCode,
+		category: "ownerDirect",
+		coverImage: property.media.cover,
+		title: property.title,
+		location: property.location.address,
+		priceDisplay: `฿${property.price.toLocaleString()}`,
+		price: property.price,
+	};
 
 	return (
 		<SafeAreaView
@@ -49,11 +58,8 @@ export default function OwnerDetails() {
 					cover={property.media.cover}
 					images={property.media.images}
 					videos={property.media.videos}
-					onLike={() => console.log("Like")}
 					onShare={() => console.log("Share")}
-					showBack={true}
-					showLike={true}
-					showShare={true}
+					savedItem={savedItem}
 				/>
 
 				{/* PROPERTY INFO */}
@@ -218,6 +224,7 @@ export default function OwnerDetails() {
 							pathname: "/booking/[id]",
 							params: {
 								id: property.id,
+								uniqueCode: property.uniqueCode,
 								image: property.media.cover,
 								title: property.title,
 								location: property.location.address,

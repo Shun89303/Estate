@@ -30,19 +30,31 @@ import {
 import globalStyles from "@/styles/styles";
 import { formatPrice } from "@/utils/formatPrice";
 import { maskPhoneNumber } from "@/utils/maskPhoneNumber";
+import { SavedItem } from "@/stores/savedPropertiesStore";
 
 export default function RoomRentDetails() {
 	const router = useRouter();
-	const { id } = useLocalSearchParams<{ id: string }>();
-	const [property, setProperty] = useState<RoomRentProperty | undefined>();
+	const { id } = useLocalSearchParams();
+	const [property, setProperty] = useState<RoomRentProperty | null>(null);
 	const colors = useTheme();
 
 	useEffect(() => {
-		const found = MOCK_ROOM_RENT.find((r) => r.id.toString() === id);
-		setProperty(found);
+		if (!id) return;
+		const found = MOCK_ROOM_RENT.find((p) => p.uniqueCode === id);
+		setProperty(found || null);
 	}, [id]);
 
 	if (!property) return <NotFound title="Room Not Found" />;
+
+	const savedItem: SavedItem = {
+		uniqueCode: property.uniqueCode,
+		category: "roomRent",
+		coverImage: property.media.cover,
+		title: property.title,
+		location: property.location.address,
+		priceDisplay: `฿${property.price.rent.toLocaleString()}/mo`,
+		price: property.price.rent,
+	};
 
 	return (
 		<SafeAreaView
@@ -53,8 +65,8 @@ export default function RoomRentDetails() {
 					cover={property.media.cover}
 					images={property.media.images}
 					videos={property.media.videos}
-					onLike={() => console.log("Like")}
 					onShare={() => console.log("Share")}
+					savedItem={savedItem}
 				/>
 
 				{/* PROPERTY INFO */}
@@ -251,6 +263,7 @@ export default function RoomRentDetails() {
 							pathname: "/booking/[id]",
 							params: {
 								id: property.id,
+								uniqueCode: property.uniqueCode,
 								image: property.media.cover,
 								title: property.title,
 								location: property.location.address,

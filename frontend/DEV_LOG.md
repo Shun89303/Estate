@@ -476,17 +476,26 @@ Apr-15-2026
 
 wrap up buy business display page, take notes about everything happening in this page and then move on to the buy business details page
 
-<!-- goal objective:  -->
-
-update saved properties new design
-apply reusable components & centralize app's layout + styling & data sanity(zustand stores)
-auth gates(ProtectedPressable) inside UIs to navigate accountless users to login page
-i18n language setup
-animations & UX
-
 <!-- Completed -->
 
 updated unlock bottom sheet, short list and coins to use custom bottom sheet instead of gorhom
 extract compare sheet to separate file
 matched buy business display page design with lovable
 buy business details page
+
+<!--  -->
+
+Apr-16-2026
+
+<!-- To do -->
+
+Saved Properties page + apply reusable component & centralize app's layout & data sanity
+
+<!-- goal objective:  -->
+
+Implement CTA buttons
+apply reusable components & centralize app's layout + styling & data sanity(zustand stores)
+add disable ability to all 6 properties so that admins can disable an entire property with a click
+auth gates(ProtectedPressable) inside UIs to navigate accountless users to login page
+i18n language setup
+animations & UX

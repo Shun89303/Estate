@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Metric from "@/components/offPlan/Metric";
 import {
 	View,
@@ -35,20 +35,25 @@ import {
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
 import formatPriceShort from "@/utils/formatPriceShort";
+import { SavedItem } from "@/stores/savedPropertiesStore";
+import { parsePriceString } from "@/utils/parsePriceString";
 
 export default function OffPlanDetails() {
 	const router = useRouter();
-	const { id } = useLocalSearchParams<{ id: string }>();
+	const { id } = useLocalSearchParams();
 	const [unitFilter, setUnitFilter] = useState<string>("All");
 	const [activeTab, setActiveTab] = useState<"Units" | "Payment" | "Trust">(
 		"Units",
 	);
 	const [selectedUnit, setSelectedUnit] = useState<UnitType | null>(null);
+	const [property, setProperty] = useState<OffPlanProperty | null>(null);
 	const colors = useTheme();
 
-	const property: OffPlanProperty | undefined = MOCK_OFFPLAN.find(
-		(p) => p.id.toString() === id,
-	);
+	useEffect(() => {
+		if (!id) return;
+		const found = MOCK_OFFPLAN.find((p) => p.uniqueCode === id);
+		setProperty(found || null);
+	}, [id]);
 
 	if (!property) return <NotFound title="Off-Plan Project Not Found" />;
 
@@ -82,6 +87,16 @@ export default function OffPlanDetails() {
 		},
 	};
 
+	const savedItem: SavedItem = {
+		uniqueCode: property.uniqueCode,
+		category: "offPlan",
+		coverImage: property.media.cover,
+		title: property.title,
+		location: property.locationAddress,
+		priceDisplay: `${property.priceRange}`,
+		price: parsePriceString(property.priceRange),
+	};
+
 	return (
 		<SafeAreaView style={[styles.container]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -89,7 +104,6 @@ export default function OffPlanDetails() {
 					cover={property.media.cover}
 					images={property.media.images}
 					videos={property.media.videos}
-					onLike={() => console.log("Like")}
 					onShare={() => console.log("Share")}
 					isOffPlan={true}
 					offPlanData={{
@@ -97,6 +111,7 @@ export default function OffPlanDetails() {
 						title: property.title,
 						developerName: property.developerName,
 					}}
+					savedItem={savedItem}
 				/>
 
 				{/* STATS ROW */}

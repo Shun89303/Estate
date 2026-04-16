@@ -9,16 +9,17 @@ import {
 	TouchableOpacity,
 } from "react-native";
 import { VideoView, useVideoPlayer } from "expo-video";
-import { Heart, Share2, Image as ImageIcon } from "lucide-react-native";
+import { Share2, Image as ImageIcon } from "lucide-react-native";
 import BackButton from "../navigation/BackButton";
 import { useTheme } from "@/hooks/useTheme";
 import { NormalTitle, SmallTitle, BodyText } from "../../atoms/Typography";
+import { SavedItem } from "@/stores/savedPropertiesStore";
+import SaveButton from "@/components/saved/SaveButton";
 
 export interface MediaCarouselProps {
 	cover: string;
 	images: string[];
 	videos: string[];
-	onLike?: () => void;
 	onShare?: () => void;
 	showBack?: boolean;
 	showLike?: boolean;
@@ -31,13 +32,13 @@ export interface MediaCarouselProps {
 		description?: string;
 	};
 	style?: object;
+	savedItem: SavedItem;
 }
 
 export default function MediaCarousel({
 	cover,
 	images,
 	videos,
-	onLike,
 	onShare,
 	showBack = true,
 	showLike = true,
@@ -45,6 +46,7 @@ export default function MediaCarousel({
 	isOffPlan = false,
 	offPlanData,
 	style,
+	savedItem,
 }: MediaCarouselProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
 
@@ -102,9 +104,9 @@ export default function MediaCarousel({
 
 				<View style={styles.rightButtons}>
 					{showLike && (
-						<Pressable onPress={onLike} style={styles.iconButton}>
-							<Heart size={24} color="black" />
-						</Pressable>
+						<View style={styles.iconButton}>
+							<SaveButton savedItem={savedItem} size={24} />
+						</View>
 					)}
 					{showShare && (
 						<Pressable onPress={onShare} style={styles.iconButton}>

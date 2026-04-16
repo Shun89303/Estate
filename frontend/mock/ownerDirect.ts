@@ -67,7 +67,7 @@ export interface Property {
 export const MOCK_OWNERDIRECT: Property[] = [
 	{
 		id: 1,
-		uniqueCode: "PP-C2401",
+		uniqueCode: "PP-OD2401",
 		media: {
 			cover: `${API_BASE_URL}/uploads/buySell/three/threeCover.jpg`,
 			images: [`${API_BASE_URL}/uploads/buySell/three/threeGallery1.jpg`],
@@ -106,7 +106,7 @@ export const MOCK_OWNERDIRECT: Property[] = [
 	},
 	{
 		id: 2,
-		uniqueCode: "PP-H2402",
+		uniqueCode: "PP-OD2402",
 		media: {
 			cover: `${API_BASE_URL}/uploads/buySell/one/oneCover.jpg`,
 			images: [`${API_BASE_URL}/uploads/buySell/one/oneGallery1.jpg`],
@@ -145,7 +145,7 @@ export const MOCK_OWNERDIRECT: Property[] = [
 	},
 	{
 		id: 3,
-		uniqueCode: "PP-T2405",
+		uniqueCode: "PP-OD2403",
 		media: {
 			cover: `${API_BASE_URL}/uploads/buySell/two/twoCover.jpg`,
 			images: [`${API_BASE_URL}/uploads/buySell/two/twoGallery1.jpg`],

@@ -167,7 +167,7 @@ export default function BuyBusinessPage() {
 	const handleCardPress = (item: BuyBusiness) => {
 		const isUnlocked = unlockedIds.includes(item.uniqueCode);
 		if (isUnlocked) {
-			router.push(`/property/buyBusiness/${item.id}`);
+			router.push(`/property/buyBusiness/${item.uniqueCode}`);
 		} else {
 			openUnlockSheet(item, coinBalance, () => {
 				const cost = item.unlockCoins;
@@ -300,7 +300,7 @@ export default function BuyBusinessPage() {
 								<BuyBusinessUnlockedCard
 									property={item}
 									onPress={() =>
-										router.push(`/property/buyBusiness/${item.id}`)
+										router.push(`/property/buyBusiness/${item.uniqueCode}`)
 									}
 								/>
 							)}

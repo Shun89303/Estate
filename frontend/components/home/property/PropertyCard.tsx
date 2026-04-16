@@ -22,7 +22,7 @@ export default function PropertyCard({ property, style }: PropertyCardProps) {
 
 	return (
 		<TouchableOpacity
-			onPress={() => router.push(`/property/buySell/${property.id}`)}
+			onPress={() => router.push(`/property/buySell/${property.uniqueCode}`)}
 			activeOpacity={0.8}
 			style={[styles.card, style]}
 		>

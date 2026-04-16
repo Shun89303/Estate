@@ -33,6 +33,7 @@ import {
 } from "lucide-react-native";
 import { maskPhoneNumber } from "@/utils/maskPhoneNumber";
 import globalStyles from "@/styles/styles";
+import { SavedItem } from "@/stores/savedPropertiesStore";
 
 // Emoji mapping for business types
 const typeEmoji: Record<BusinessPropertyType, string> = {
@@ -46,13 +47,14 @@ const typeEmoji: Record<BusinessPropertyType, string> = {
 
 export default function BusinessDetails() {
 	const router = useRouter();
-	const { id } = useLocalSearchParams<{ id: string }>();
-	const [property, setProperty] = useState<BusinessProperty | undefined>();
+	const { id } = useLocalSearchParams();
+	const [property, setProperty] = useState<BusinessProperty | null>(null);
 	const colors = useTheme();
 
 	useEffect(() => {
-		const found = MOCK_BUSINESS.find((p) => p.id.toString() === id);
-		setProperty(found);
+		if (!id) return;
+		const found = MOCK_BUSINESS.find((p) => p.uniqueCode === id);
+		setProperty(found || null);
 	}, [id]);
 
 	if (!property) return <NotFound title="Business Space Not Found" />;
@@ -64,6 +66,19 @@ export default function BusinessDetails() {
 		.map(([key]) => key);
 	const displayType = `${typeEmoji[property.type]} ${property.type.replace("_", " ")}`;
 
+	const savedItem: SavedItem = {
+		uniqueCode: property.uniqueCode,
+		category: "business",
+		coverImage: property.media.cover,
+		title: property.title,
+		location: property.location.address,
+		priceDisplay:
+			property.pricing.type === "DAILY"
+				? `฿${property.pricing.amount.toLocaleString()}/d`
+				: `฿${property.pricing.amount.toLocaleString()}/mo`,
+		price: property.pricing.amount,
+	};
+
 	return (
 		<SafeAreaView
 			style={[styles.container, { backgroundColor: colors.background }]}
@@ -73,8 +88,8 @@ export default function BusinessDetails() {
 					cover={property.media.cover}
 					images={property.media.photos}
 					videos={property.media.videos}
-					onLike={() => console.log("Like")}
 					onShare={() => console.log("Share")}
+					savedItem={savedItem}
 				/>
 
 				<View style={styles.section}>
@@ -226,6 +241,7 @@ export default function BusinessDetails() {
 							pathname: "/booking/[id]",
 							params: {
 								id: property.id,
+								uniqueCode: property.uniqueCode,
 								image: property.media.cover,
 								title: property.title,
 								location: property.location.address,

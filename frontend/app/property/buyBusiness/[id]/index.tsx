@@ -29,10 +29,18 @@ import TextSection from "@/components/common/utils/TextSection";
 import OwnerContact from "@/components/common/utils/OwnerContact";
 import PropertyCTAButtons from "@/components/common/navigation/PropertyCTAButtons";
 import LocationRow from "@/components/common/utils/LocationRow";
+import { useEffect, useState } from "react";
+import { SavedItem } from "@/stores/savedPropertiesStore";
 
 export default function BuyBusinessDetails() {
-	const { id } = useLocalSearchParams<{ id: string }>();
-	const business = MOCK_BUY_BUSINESS.find((b) => b.id === parseInt(id));
+	const { id } = useLocalSearchParams();
+	const [business, setBusiness] = useState<BuyBusiness | null>(null);
+
+	useEffect(() => {
+		if (!id) return;
+		const found = MOCK_BUY_BUSINESS.find((p) => p.uniqueCode === id);
+		setBusiness(found || null);
+	}, [id]);
 
 	if (!business) {
 		return (
@@ -71,6 +79,16 @@ export default function BuyBusinessDetails() {
 		}
 	};
 
+	const savedItem: SavedItem = {
+		uniqueCode: business.uniqueCode,
+		category: "buyBusiness",
+		coverImage: business.coverImage,
+		title: business.title,
+		location: business.location,
+		priceDisplay: `฿${business.price.toLocaleString()}`,
+		price: business.price,
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -79,9 +97,8 @@ export default function BuyBusinessDetails() {
 					cover={business.coverImage}
 					images={business.images}
 					videos={business.videos || []}
-					showBack={true}
-					showLike={true}
-					showShare={true}
+					onShare={() => console.log("Share")}
+					savedItem={savedItem}
 				/>
 
 				<View style={styles.content}>
