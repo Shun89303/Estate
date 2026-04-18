@@ -1,20 +1,15 @@
 import { Href, useRouter } from "expo-router";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRef, useMemo, useCallback } from "react";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import TopUpCoins from "@/components/profile/TopUpCoins";
+import { useTopUpSheet } from "@/components/profile/useTopUpSheet";
+import { useLogoutSheet } from "@/components/profile/useLogoutSheet";
 import { requireAuth } from "@/utils/requireAuth";
 import { useAuthStore } from "@/stores/authStore";
+import { useCoinStore } from "@/stores/coinStore";
 import BackButton from "@/components/common/navigation/BackButton";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-	SmallTitle,
-} from "@/components/atoms/Typography";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
 import NotificationBell from "@/components/common/utils/NotificationBell";
-import { useTheme } from "@/hooks/useTheme";
 import {
 	ChevronRight,
 	User,
@@ -26,6 +21,11 @@ import {
 	LucideIcon,
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
+import RequireAuth from "@/components/common/security/RequireAuth";
+import { useEffect } from "react";
+import { ImagePicker } from "@/components/common/utils/ImagePicker";
 
 type MenuItem = {
 	id: string;
@@ -37,20 +37,16 @@ type MenuItem = {
 
 export default function Profile() {
 	const router = useRouter();
-	const colors = useTheme();
-	const logout = useAuthStore((s) => s.logout);
-	const bottomSheetRef = useRef<BottomSheet>(null);
-	const logoutSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => ["50%", "70%", "90%"], []);
+	const { user, isGuest, isAuthenticated } = useAuthStore();
+	const { coins, loadUserData } = useCoinStore();
+	const { open: openTopUpSheet, TopUpSheet } = useTopUpSheet();
+	const { open: openLogoutSheet, LogoutSheet } = useLogoutSheet();
 
-	const handleOpenSheet = useCallback(() => {
-		bottomSheetRef.current?.expand();
-	}, []);
-
-	const openLogoutSheet = useCallback(() => {
-		bottomSheetRef.current?.close();
-		logoutSheetRef.current?.expand();
-	}, []);
+	useEffect(() => {
+		if (isAuthenticated && user?.uid) {
+			loadUserData(user.uid);
+		}
+	}, [isAuthenticated, user]);
 
 	const menuItems: MenuItem[] = [
 		{
@@ -76,35 +72,60 @@ export default function Profile() {
 		},
 	];
 
+	const displayName = isAuthenticated
+		? user?.name || "Myanmar User"
+		: isGuest
+			? "Myanmar User"
+			: "Myanmar User";
+	const displayPhone = isAuthenticated
+		? user?.phone || "+95 9 xxx xxx xxx"
+		: isGuest
+			? "+95 9 xxx xxx xxx"
+			: "+95 9 xxx xxx xxx";
+	const profileImage = isAuthenticated ? user?.profileImage : null;
+
 	return (
 		<SafeAreaView
-			style={[styles.container, { backgroundColor: colors.appBackground }]}
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
 		>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				{/* HEADER */}
-				<View style={styles.header}>
-					<View style={styles.leftHeader}>
-						<BackButton />
-						<PageTitle style={{ color: colors.textPrimary }}>Profile</PageTitle>
-					</View>
-					<NotificationBell />
+			{/* Fixed Header */}
+			<View style={styles.header}>
+				<View style={styles.leftHeader}>
+					<BackButton />
+					<Title
+						variant="page"
+						style={{ marginBottom: 0, color: lightColors.bigTitleText }}
+					>
+						Profile
+					</Title>
 				</View>
+				<NotificationBell />
+			</View>
 
+			{/* Scrollable Content */}
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={styles.scrollContent}
+				style={{ flex: 1 }}
+			>
 				{/* PROFILE INFO */}
 				<View style={styles.profileSection}>
-					<View
-						style={[
-							styles.avatarContainer,
-							{ backgroundColor: colors.darkGold },
-						]}
-					>
-						<User size={48} color={colors.primaryGold} />
-					</View>
-					<NormalTitle style={{ marginTop: 8, color: colors.textPrimary }}>
-						Myanmar User
-					</NormalTitle>
-					<BodyText style={{ color: colors.textSecondary, marginTop: 4 }}>
-						+95 9 xxx xxx xxx
+					<ImagePicker
+						imageUri={profileImage}
+						backgroundColor={lightColors.brandBG}
+						iconColor={lightColors.brand}
+						size={100}
+						borderRadius={20}
+						iconSize={48}
+					/>
+					<Title variant="normal" style={styles.name}>
+						{displayName}
+					</Title>
+					<BodyText variant="normal" style={styles.phone}>
+						{displayPhone}
 					</BodyText>
 				</View>
 
@@ -112,42 +133,35 @@ export default function Profile() {
 				<View
 					style={[
 						styles.card,
-						{ backgroundColor: colors.background, ...globalStyles.shadows },
+						{
+							backgroundColor: lightColors.background,
+							...globalStyles.shadows,
+						},
 					]}
 				>
 					<View style={styles.coinRow}>
 						<View style={styles.coinLeft}>
-							<Coins size={32} color={colors.primaryGold} />
+							<Coins size={moderateScale(32)} color={lightColors.brand} />
 							<View>
-								<BodyText
-									style={{ color: colors.textSecondary, marginBottom: 2 }}
-								>
+								<BodyText variant="small" style={styles.coinLabel}>
 									Coin Balance
 								</BodyText>
-								<NormalTitle
-									style={{ fontWeight: "bold", color: colors.primaryGold }}
-								>
-									20
-								</NormalTitle>
+								<Title variant="normal" style={styles.coinAmount}>
+									{coins}
+								</Title>
 							</View>
 						</View>
 						<View style={styles.coinActions}>
-							<TouchableOpacity
-								onPress={() => router.push("/profile/coinHistory")}
-							>
-								<BodyText
-									style={{ color: colors.primaryGray, fontWeight: "600" }}
-								>
+							<RequireAuth onPress={() => router.push("/profile/coinHistory")}>
+								<BodyText variant="small" style={styles.historyText}>
 									History
 								</BodyText>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={handleOpenSheet}>
-								<BodyText
-									style={{ color: colors.primaryGold, fontWeight: "600" }}
-								>
+							</RequireAuth>
+							<RequireAuth onPress={openTopUpSheet}>
+								<BodyText variant="small" style={styles.topUpText}>
 									Top Up →
 								</BodyText>
-							</TouchableOpacity>
+							</RequireAuth>
 						</View>
 					</View>
 				</View>
@@ -157,35 +171,47 @@ export default function Profile() {
 					style={[
 						styles.card,
 						{
-							backgroundColor: colors.darkGold,
+							backgroundColor: lightColors.brandBG,
 							flexDirection: "row",
 							alignItems: "center",
 							justifyContent: "space-between",
-							borderWidth: 1,
-							borderColor: colors.darkerGoldBorder,
+							borderWidth: scaleSize(1),
+							borderColor: lightColors.brandBorder,
 						},
 					]}
 					onPress={() => router.push("/profile/appAd")}
 				>
-					<View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+					<View
+						style={{
+							flexDirection: "row",
+							alignItems: "center",
+							gap: spacing.sm,
+						}}
+					>
 						<View
 							style={[
 								styles.iconCircle,
-								{ backgroundColor: colors.darkerGold },
+								{ backgroundColor: lightColors.brandBorder },
 							]}
 						>
-							<Building2 size={24} color={colors.primaryGold} />
+							<Building2 size={moderateScale(24)} color={lightColors.brand} />
 						</View>
 						<View>
-							<NormalTitle style={{ color: colors.textPrimary }}>
+							<Title
+								variant="normal"
+								style={{ color: lightColors.bigTitleText }}
+							>
 								Are you an Agent or Owner?
-							</NormalTitle>
-							<BodyText style={{ color: colors.textSecondary, marginTop: 2 }}>
+							</Title>
+							<BodyText
+								variant="small"
+								style={{ color: lightColors.bodyText, marginTop: scaleSize(2) }}
+							>
 								Post your property & find buyers
 							</BodyText>
 						</View>
 					</View>
-					<ChevronRight size={20} color={colors.primaryGold} />
+					<ChevronRight size={moderateScale(20)} color={lightColors.brand} />
 				</TouchableOpacity>
 
 				{/* MENU ITEMS */}
@@ -195,7 +221,10 @@ export default function Profile() {
 							key={item.id}
 							style={[
 								styles.menuCard,
-								{ backgroundColor: colors.background, ...globalStyles.shadows },
+								{
+									backgroundColor: lightColors.background,
+									...globalStyles.shadows,
+								},
 							]}
 							onPress={() => {
 								if (item.requiresAuth) {
@@ -209,119 +238,64 @@ export default function Profile() {
 								<View
 									style={[
 										styles.menuIconCircle,
-										{ backgroundColor: colors.secondaryMute },
+										{ backgroundColor: lightColors.mutedBackgroundWeaker },
 									]}
 								>
-									<item.icon size={20} color={colors.primaryGold} />
+									<item.icon
+										size={moderateScale(20)}
+										color={lightColors.brand}
+									/>
 								</View>
-								<SmallTitle
-									style={{ color: colors.textPrimary, marginLeft: 12 }}
-								>
+								<Title variant="small" style={styles.menuLabel}>
 									{item.label}
-								</SmallTitle>
+								</Title>
 							</View>
-							<ChevronRight size={20} color={colors.textSecondary} />
+							<ChevronRight
+								size={moderateScale(20)}
+								color={lightColors.bodyText}
+							/>
 						</TouchableOpacity>
 					))}
 
-					{/* Logout Card (separate with red) */}
+					{/* Logout Card */}
 					<TouchableOpacity
 						style={[
 							styles.menuCard,
-							{ backgroundColor: colors.background, ...globalStyles.shadows },
+							{
+								backgroundColor: lightColors.background,
+								...globalStyles.shadows,
+							},
 						]}
 						onPress={openLogoutSheet}
 					>
-						<View style={styles.menuCardContent}>
+						<View style={[styles.menuCardContent]}>
 							<View
 								style={[
 									styles.menuIconCircle,
-									{ backgroundColor: colors.darkRed },
+									{ backgroundColor: lightColors.dangerBG },
 								]}
 							>
-								<LogOut size={20} color={colors.primaryRed} />
+								<LogOut size={moderateScale(20)} color={lightColors.danger} />
 							</View>
-							<BodyText style={{ color: colors.primaryRed, marginLeft: 12 }}>
+							<BodyText
+								variant="normal"
+								style={{ color: lightColors.danger, marginLeft: spacing.sm }}
+							>
 								Log Out
 							</BodyText>
 						</View>
-						<ChevronRight size={20} color={colors.textSecondary} />
+						<ChevronRight
+							size={moderateScale(20)}
+							color={lightColors.bodyText}
+						/>
 					</TouchableOpacity>
 				</View>
-				{/* BOTTOM SHEETS (unchanged) */}
-				<BottomSheet
-					ref={bottomSheetRef}
-					snapPoints={snapPoints}
-					enablePanDownToClose
-					index={-1}
-				>
-					<BottomSheetView>
-						<TopUpCoins />
-					</BottomSheetView>
-				</BottomSheet>
-				<BottomSheet
-					ref={logoutSheetRef}
-					snapPoints={["30%"]}
-					index={-1}
-					enablePanDownToClose
-				>
-					<BottomSheetView>
-						<View style={styles.logoutSheet}>
-							{/* Centered Logout Icon */}
-							<View
-								style={[
-									styles.logoutIconCircle,
-									{ backgroundColor: colors.darkRed },
-								]}
-							>
-								<LogOut size={32} color={colors.primaryRed} />
-							</View>
-
-							<NormalTitle
-								style={[styles.logoutTitle, { color: colors.textPrimary }]}
-							>
-								Log Out?
-							</NormalTitle>
-
-							<BodyText
-								style={[styles.logoutMessage, { color: colors.textSecondary }]}
-							>
-								Are you sure you want to log out of your account?
-							</BodyText>
-
-							<View style={styles.logoutButtons}>
-								<TouchableOpacity
-									style={[
-										styles.logoutCancel,
-										{
-											backgroundColor: "#fff",
-											borderColor: colors.primaryGray + 50,
-										},
-									]}
-									onPress={() => logoutSheetRef.current?.close()}
-								>
-									<BodyText style={{ color: colors.textPrimary }}>
-										Cancel
-									</BodyText>
-								</TouchableOpacity>
-								<TouchableOpacity
-									style={[
-										styles.logoutConfirm,
-										{ backgroundColor: colors.primaryRed },
-									]}
-									onPress={() => {
-										logoutSheetRef.current?.close();
-										logout();
-										router.push("/auth/login");
-									}}
-								>
-									<BodyText style={{ color: "#fff" }}>Log Out</BodyText>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</BottomSheetView>
-				</BottomSheet>
+				<View style={{ height: scaleSize(80) }} />
 			</ScrollView>
+
+			{/* BOTTOM SHEETS */}
+			<TopUpSheet />
+			<LogoutSheet />
 		</SafeAreaView>
 	);
 }
@@ -329,35 +303,42 @@ export default function Profile() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 16,
-		marginBottom: 55,
 	},
 	header: {
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		marginBottom: 24,
+		paddingHorizontal: spacing.lg,
+		paddingVertical: spacing.sm,
+		backgroundColor: lightColors.background,
+		borderBottomWidth: scaleSize(1),
+		borderBottomColor: lightColors.mutedBorder,
 	},
 	leftHeader: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 12,
+		gap: spacing.sm,
+	},
+	scrollContent: {
+		paddingHorizontal: spacing.lg,
+		paddingTop: spacing.md,
+		paddingBottom: spacing.xl,
 	},
 	profileSection: {
 		alignItems: "center",
-		marginBottom: 24,
+		marginBottom: spacing.lg,
 	},
-	avatarContainer: {
-		width: 100,
-		height: 100,
-		borderRadius: 20,
-		alignItems: "center",
-		justifyContent: "center",
+	name: {
+		marginTop: spacing.sm,
+		marginBottom: 0,
+	},
+	phone: {
+		marginTop: scaleSize(4),
 	},
 	card: {
-		padding: 16,
-		borderRadius: 16,
-		marginBottom: 16,
+		padding: spacing.lg,
+		borderRadius: scaleSize(16),
+		marginBottom: spacing.lg,
 	},
 	coinRow: {
 		flexDirection: "row",
@@ -367,92 +348,96 @@ const styles = StyleSheet.create({
 	coinLeft: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 12,
+		gap: spacing.sm,
+	},
+	coinLabel: {
+		marginBottom: scaleSize(2),
+	},
+	coinAmount: {
+		fontWeight: "bold",
+		color: lightColors.brand,
+		marginBottom: 0,
 	},
 	coinActions: {
 		flexDirection: "row",
-		gap: 16,
+		gap: spacing.lg,
+	},
+	historyText: {
+		color: lightColors.bodyText,
+		fontWeight: "600",
+	},
+	topUpText: {
+		color: lightColors.brand,
+		fontWeight: "600",
 	},
 	iconCircle: {
-		width: 48,
-		height: 48,
-		borderRadius: 15,
+		width: scaleSize(48),
+		height: scaleSize(48),
+		borderRadius: scaleSize(15),
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	menu: {
-		marginTop: 8,
-	},
-	menuItem: {
-		paddingVertical: 16,
-		borderBottomWidth: 1,
-	},
-	menuItemContent: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	logoutSheet: {
-		padding: 20,
-	},
-	logoutButtons: {
-		flexDirection: "row",
-		gap: 12,
-	},
-	logoutCancel: {
-		flex: 1,
-		padding: 12,
-		borderRadius: 8,
-		alignItems: "center",
-		borderWidth: 1,
-	},
-	logoutConfirm: {
-		flex: 1,
-		padding: 12,
-		borderRadius: 8,
-		alignItems: "center",
-	},
 	menuContainer: {
-		marginTop: 8,
-		gap: 12,
+		gap: spacing.lg,
 	},
 	menuCard: {
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		padding: 16,
-		borderRadius: 16,
-		marginBottom: 0, // gap handles spacing
+		padding: spacing.lg,
+		borderRadius: scaleSize(16),
 	},
 	menuCardContent: {
 		flexDirection: "row",
 		alignItems: "center",
 	},
 	menuIconCircle: {
-		width: 40,
-		height: 40,
-		borderRadius: 12,
+		width: scaleSize(40),
+		height: scaleSize(40),
+		borderRadius: scaleSize(12),
 		alignItems: "center",
 		justifyContent: "center",
 	},
+	menuLabel: {
+		marginLeft: spacing.sm,
+		marginBottom: 0,
+	},
 	logoutIconCircle: {
-		width: 64,
-		height: 64,
-		borderRadius: 15,
+		width: scaleSize(64),
+		height: scaleSize(64),
+		borderRadius: scaleSize(15),
 		alignItems: "center",
 		justifyContent: "center",
-		marginBottom: 16,
+		marginBottom: spacing.lg,
 		alignSelf: "center",
 	},
 	logoutTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		marginBottom: 8,
+		marginBottom: spacing.sm,
 		textAlign: "center",
 	},
 	logoutMessage: {
-		fontSize: 14,
 		textAlign: "center",
-		marginBottom: 24,
-		paddingHorizontal: 16,
+		marginBottom: spacing.xl,
+		paddingHorizontal: spacing.lg,
+	},
+	logoutButtons: {
+		flexDirection: "row",
+		gap: spacing.sm,
+	},
+	logoutCancel: {
+		flex: 1,
+		paddingVertical: spacing.md,
+		borderRadius: scaleSize(8),
+		alignItems: "center",
+		borderWidth: scaleSize(1),
+	},
+	logoutConfirm: {
+		flex: 1,
+		paddingVertical: spacing.md,
+		borderRadius: scaleSize(8),
+		alignItems: "center",
+	},
+	logoutSheet: {
+		padding: spacing.lg,
 	},
 });

@@ -11,5 +11,5 @@ export const darkColors = {
 	border: "#717684",
 	mutedBorder: "hsl(225, 15%, 88%)",
 	danger: "hsla(0, 84%, 55%, 1.00)",
-	dangerBackground: "hsla(0, 84%, 55%, 0.1)",
+	dangerBG: "hsla(0, 84%, 55%, 0.1)",
 };

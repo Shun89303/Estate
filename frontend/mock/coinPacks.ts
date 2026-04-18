@@ -4,6 +4,7 @@ export interface OneTimePack {
 	title: string;
 	subtitle: string;
 	value: string;
+	coins: number;
 	popular?: boolean;
 }
 
@@ -12,17 +13,24 @@ export interface Subscription {
 	subtitle: string;
 	value: string;
 	subValue: string;
+	coinsPerMonth: number;
 	icon: LucideIcon;
 	iconColor: string;
 	vip?: boolean;
 }
 
 export const MOCK_ONE_TIME_PACKS: OneTimePack[] = [
-	{ title: "10 Coins", subtitle: "฿9.9/coin", value: "฿99" },
-	{ title: "30 Coins", subtitle: "฿8.3/coin", value: "฿249", popular: true },
-	{ title: "50 Coins", subtitle: "฿7.9/coin", value: "฿399" },
-	{ title: "100 Coins", subtitle: "฿6.9/coin", value: "฿699" },
-	{ title: "200 Coins", subtitle: "฿5.9/coin", value: "฿1199" },
+	{ title: "10 Coins", subtitle: "฿9.9/coin", value: "฿99", coins: 10 },
+	{
+		title: "30 Coins",
+		subtitle: "฿8.3/coin",
+		value: "฿249",
+		coins: 30,
+		popular: true,
+	},
+	{ title: "50 Coins", subtitle: "฿7.9/coin", value: "฿399", coins: 50 },
+	{ title: "100 Coins", subtitle: "฿6.9/coin", value: "฿699", coins: 100 },
+	{ title: "200 Coins", subtitle: "฿5.9/coin", value: "฿1199", coins: 200 },
 ];
 
 export const MOCK_SUBSCRIPTIONS: Subscription[] = [
@@ -31,6 +39,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
 		subtitle: "30 coins/month",
 		value: "฿199/mo",
 		subValue: "Save 20%",
+		coinsPerMonth: 30,
 		icon: Zap,
 		iconColor: "#BF8F5B",
 	},
@@ -39,6 +48,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
 		subtitle: "80 coins/month",
 		value: "฿449/mo",
 		subValue: "Save 35%",
+		coinsPerMonth: 80,
 		icon: Star,
 		iconColor: "#F59E0B",
 	},
@@ -47,6 +57,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
 		subtitle: "200 coins/month",
 		value: "฿899/mo",
 		subValue: "Save 50%",
+		coinsPerMonth: 200,
 		icon: Crown,
 		iconColor: "#9D59EF",
 		vip: true,

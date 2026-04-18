@@ -493,9 +493,70 @@ Saved Properties page + apply reusable component & centralize app's layout & dat
 
 <!-- goal objective:  -->
 
+User profile
 Implement CTA buttons
-apply reusable components & centralize app's layout + styling & data sanity(zustand stores)
+apply reusable components & centralize app's layout + styling & data sanity(zustand stores) (user profile zustand integration) (search page design update)
 add disable ability to all 6 properties so that admins can disable an entire property with a click
 auth gates(ProtectedPressable) inside UIs to navigate accountless users to login page
 i18n language setup
 animations & UX
+
+<!--  -->
+
+Apr-17-2026
+
+<!-- To do -->
+
+implement CTA buttons in property pages + this connected to bookings page + this also connected to coins display logic when not have enough balance + this also connects to authentication(can't access if accountless)
+
+Accountless users case:
+if clicked book consultation button:
+navigate to book consultation booking process(has built in create account within the booking process for this very specific scenario so that users can easily and smoothly experience the app without the need to go to login page):
+asks for phone number + password in step 1:
+other steps are just some other data:
+at the last confirmation step:
+when clicking the confirm button, all the data gathered will be sent to backend + now we got user's phone number + password so can immediately create account for user + make the user logged in:
+book consultation done, user also logged in, process complete
+
+Logged users case:
+if clicked book consultation button:
+since already have user's phone number and password, can skip step 1(could simply fetch user's phone number and password since they might be stored in somewhere either fetch from backend or just take it from token):
+the last confirmation step no longer requires to create account for user since user is already logged in.
+
+<!--  -->
+
+User profile
+
+I want to integrate zustand store so that the user data will persist
+
+need phone number, password, name, email
+
+a user has coin history so that user can track the purchase of coins in the app
+
+currently I have zustand integrated to coin purchase + coin storage so that coin balance will persist but I don't have coin history integrated yet which means my current coin history page just shows static mock data
+
+need to update top up coins design
+
+update edit profile to become functional to user profile and the edited results should become saved and update the design as well(example show latest updated new edited name)
+
+log out should function, leave the app, logged out the user, prompting the user to browse as guest or relogin the app
+
+<!-- Completed -->
+
+updated authStore: added uid(unique way to remember each user, now no longer using phone number as unique number)
+created coinStore: integrated asyncStorage to remember coin + history per user instead of global persist
+created custom bottom sheet for top up + log out to replace gorhom bottom sheet
+currently coin data is now accurate and functional for different users
+currently user data is now accurate and function for different users
+
+next, I shall continue to integrate this store data settings into the remaining profile features to become functional instead of static mock data.
+
+auth, coin zustand stores complete for profile, profile integrated those stores, user data now persist, profile page now showing dynamic user info about phone numebr and name, edit profile now functional. Coin data inside profile page is not 100% complete yet, only + case is completed, - case are not integrated yet as it requires touching the 6 property pages, I will integrate that tomorrow one by one
+
+<!--  -->
+
+Apr-18-2026
+
+<!-- To do -->
+
+implement Reserve CTA button inside all the property details pages except Off-plan

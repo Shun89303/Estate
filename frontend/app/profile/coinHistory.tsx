@@ -1,75 +1,169 @@
 import { View, StyleSheet, FlatList } from "react-native";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowDownCircle, ArrowUpCircle, Coins } from "lucide-react-native";
 import BackButton from "@/components/common/navigation/BackButton";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-} from "@/components/atoms/Typography";
-import { useTheme } from "@/hooks/useTheme";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
 import FilterSection from "@/components/common/utils/FilterSection";
 import EmptyState from "@/components/common/state/EmptyState";
 import globalStyles from "@/styles/styles";
-import { MOCK_COIN_HISTORY } from "@/mock/coinHistory";
+import { useCoinStore, Transaction } from "@/stores/coinStore";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
+
+const FILTER_OPTIONS = [
+	"All",
+	"Top Up",
+	"Room Reserve",
+	"Property Reserve",
+	"Business Reserve",
+	"Unlock",
+	"Refund",
+];
+
+// Helper to format transaction for display
+const formatTransaction = (
+	tx: Transaction,
+): { title: string; type: string; value: string } => {
+	const isPositive = tx.amount > 0;
+	const value = isPositive ? `+${tx.amount}` : `${tx.amount}`;
+	let type = isPositive ? "Top Up" : "Spent"; // fallback
+
+	const note = tx.note?.toLowerCase() || "";
+	if (note.includes("room")) type = "Room Reserve";
+	else if (note.includes("property")) type = "Property Reserve";
+	else if (note.includes("business")) type = "Business Reserve";
+	else if (note.includes("unlock")) type = "Unlock";
+	else if (note.includes("refund")) type = "Refund";
+	// Note: "Spent" is not in filter options; it will only appear under "All"
+
+	return {
+		title: tx.note || (isPositive ? "Coins Purchased" : "Coins Spent"),
+		type,
+		value,
+	};
+};
 
 export default function CoinHistory() {
-	const colors = useTheme();
+	const { coins, history } = useCoinStore();
 	const [activeFilter, setActiveFilter] = useState<string>("All");
 
-	const filterOptions = [
-		"All",
-		"Top Up",
-		"Room Reserve",
-		"Property Reserve",
-		"Business Reserve",
-		"Unlock",
-		"Refund",
-	];
+	const filteredHistory = useMemo(() => {
+		if (activeFilter === "All") return history;
+		return history.filter((tx) => formatTransaction(tx).type === activeFilter);
+	}, [history, activeFilter]);
 
-	const filteredHistory =
-		activeFilter === "All"
-			? MOCK_COIN_HISTORY
-			: MOCK_COIN_HISTORY.filter((h) => h.type === activeFilter);
+	// Calculate totals
+	const totals = useMemo(() => {
+		let earned = 0;
+		let spent = 0;
+		history.forEach((tx) => {
+			if (tx.amount > 0) earned += tx.amount;
+			else spent += Math.abs(tx.amount);
+		});
+		return { earned, spent, balance: coins };
+	}, [history, coins]);
 
 	const mainBoxes = [
 		{
 			icon: ArrowUpCircle,
-			value: "+30",
+			value: `+${totals.earned}`,
 			title: "Earned / Bought",
-			color: colors.primaryGreen,
-			textColor: colors.primaryGray,
-			bgColor: colors.primaryGreen + "20",
-			borderColor: colors.primaryGreen + "50",
+			color: lightColors.success,
+			textColor: lightColors.bodyText,
+			bgColor: lightColors.successBG,
+			borderColor: lightColors.successBorder,
 		},
 		{
 			icon: ArrowDownCircle,
-			value: "-10",
+			value: `-${totals.spent}`,
 			title: "Spent",
-			color: colors.primaryOrange,
-			textColor: colors.primaryGray,
-			bgColor: colors.primaryOrange + "20",
-			borderColor: colors.primaryOrange + "50",
+			color: lightColors.loss,
+			textColor: lightColors.bodyText,
+			bgColor: lightColors.lossBG,
+			borderColor: lightColors.lossBorder,
 		},
 		{
 			icon: Coins,
-			value: "20",
+			value: totals.balance.toString(),
 			title: "Balance",
-			color: colors.primaryGold,
-			textColor: colors.primaryGray,
-			bgColor: colors.primaryGold + "20",
-			borderColor: colors.primaryGold + "50",
+			color: lightColors.brand,
+			textColor: lightColors.bodyText,
+			bgColor: lightColors.brandBG,
+			borderColor: lightColors.brandBorder,
 		},
 	];
 
+	const renderItem = ({ item }: { item: Transaction }) => {
+		const { title, type, value } = formatTransaction(item);
+		const isPositive = item.amount > 0;
+		const date = new Date(item.date).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+		});
+		return (
+			<View style={[styles.card, globalStyles.shadows]}>
+				<View
+					style={[
+						styles.iconCircle,
+						{ backgroundColor: lightColors.mutedBackgroundWeaker },
+					]}
+				>
+					<Coins
+						size={moderateScale(24)}
+						color={isPositive ? lightColors.success : lightColors.brand}
+					/>
+				</View>
+				<View style={styles.cardInfo}>
+					<Title variant="small" style={styles.cardTitle}>
+						{title}
+					</Title>
+					<View style={styles.cardMetaRow}>
+						<BodyText variant="small" style={styles.cardDate}>
+							{date}
+						</BodyText>
+						<View
+							style={[
+								styles.typeBadge,
+								{ backgroundColor: lightColors.brandBG },
+							]}
+						>
+							<BodyText
+								variant="small"
+								style={[styles.typeText, { color: lightColors.brand }]}
+							>
+								{type}
+							</BodyText>
+						</View>
+					</View>
+				</View>
+				<Title
+					variant="small"
+					style={[
+						styles.cardValue,
+						{ color: isPositive ? lightColors.success : lightColors.brand },
+					]}
+				>
+					{value}
+				</Title>
+			</View>
+		);
+	};
+
 	return (
 		<SafeAreaView
-			style={[styles.container, { backgroundColor: colors.background }]}
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
 		>
 			<View style={styles.headerRow}>
 				<BackButton />
-				<PageTitle style={styles.title}>Coin History</PageTitle>
+				<Title variant="page" style={styles.title}>
+					Coin History
+				</Title>
 			</View>
 
 			<View style={styles.boxRow}>
@@ -81,12 +175,16 @@ export default function CoinHistory() {
 							{ backgroundColor: box.bgColor, borderColor: box.borderColor },
 						]}
 					>
-						<box.icon size={24} color={box.color} />
-						<NormalTitle style={[styles.boxValue, { color: box.color }]}>
+						<box.icon size={moderateScale(24)} color={box.color} />
+						<Title
+							variant="small"
+							style={[styles.boxValue, { color: box.color }]}
+						>
 							{box.value}
-						</NormalTitle>
+						</Title>
 						<BodyText
-							style={[styles.boxTitle, { color: box.textColor, opacity: 0.9 }]}
+							variant="small"
+							style={[styles.boxTitle, { color: box.textColor }]}
 						>
 							{box.title}
 						</BodyText>
@@ -95,84 +193,24 @@ export default function CoinHistory() {
 			</View>
 
 			<FilterSection
-				options={filterOptions}
+				options={FILTER_OPTIONS}
 				selected={activeFilter}
 				onSelect={setActiveFilter}
-				activeBgColor={colors.primaryGold}
+				activeBgColor={lightColors.brand}
 				activeTextColor="#fff"
-				inactiveBgColor={colors.primaryGray + "10"}
-				inactiveTextColor={colors.textPrimary}
-				borderRadius={20}
+				inactiveBgColor={lightColors.mutedBackgroundWeaker}
+				inactiveTextColor={lightColors.bigTitleText}
+				borderRadius={scaleSize(20)}
 			/>
 
 			{filteredHistory.length === 0 ? (
-				<EmptyState
-					title="No transactions found"
-					message="Try a different filter"
-					icon={Coins}
-				/>
+				<EmptyState title="No transactions found" message="" icon={Coins} />
 			) : (
 				<FlatList
 					data={filteredHistory}
 					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => {
-						const isPositive = item.value.startsWith("+");
-						return (
-							<View style={[styles.card, globalStyles.shadows]}>
-								{/* Circular icon background */}
-								<View
-									style={[
-										styles.iconCircle,
-										{ backgroundColor: colors.secondaryMute },
-									]}
-								>
-									<Coins
-										size={24}
-										color={
-											isPositive ? colors.primaryGreen : colors.primaryGold
-										}
-									/>
-								</View>
-								<View style={styles.cardInfo}>
-									<NormalTitle style={styles.cardTitle}>
-										{item.title}
-									</NormalTitle>
-									<View style={styles.cardMetaRow}>
-										<BodyText
-											style={[styles.cardDate, { color: colors.textSecondary }]}
-										>
-											{item.date}
-										</BodyText>
-										<View
-											style={[
-												styles.typeBadge,
-												{ backgroundColor: colors.primaryGold + "20" },
-											]}
-										>
-											<BodyText
-												style={[styles.typeText, { color: colors.primaryGold }]}
-											>
-												{item.type}
-											</BodyText>
-										</View>
-									</View>
-								</View>
-								<NormalTitle
-									style={[
-										styles.cardValue,
-										{
-											color: isPositive
-												? colors.primaryGreen
-												: colors.primaryGold,
-										},
-									]}
-								>
-									{item.value}
-								</NormalTitle>
-							</View>
-						);
-					}}
-					contentContainerStyle={{ paddingBottom: 20 }}
+					renderItem={renderItem}
+					contentContainerStyle={styles.listContent}
 					showsVerticalScrollIndicator={false}
 				/>
 			)}
@@ -181,69 +219,66 @@ export default function CoinHistory() {
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 16 },
+	container: { flex: 1, padding: spacing.lg },
 	headerRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 12,
-		marginBottom: 16,
+		gap: spacing.sm,
+		marginBottom: spacing.md,
 	},
 	title: { marginBottom: 0 },
 	boxRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginBottom: 20,
-		gap: 12,
+		marginBottom: spacing.lg,
+		gap: spacing.sm,
 	},
 	box: {
 		flex: 1,
-		paddingVertical: 12,
+		paddingVertical: scaleSize(12),
 		alignItems: "center",
-		borderRadius: 16,
-		borderWidth: 1,
+		borderRadius: scaleSize(16),
+		borderWidth: scaleSize(1),
 	},
 	boxValue: {
-		fontSize: 18,
-		fontWeight: "bold",
-		marginVertical: 4,
+		marginVertical: scaleSize(4),
 	},
 	boxTitle: {
-		fontSize: 12,
 		textAlign: "center",
+	},
+	listContent: {
+		paddingBottom: spacing.xl,
 	},
 	card: {
 		flexDirection: "row",
 		alignItems: "center",
-		padding: 12,
-		borderRadius: 16,
-		marginBottom: 12,
-		backgroundColor: "#fff",
+		padding: spacing.sm,
+		borderRadius: scaleSize(16),
+		marginBottom: spacing.sm,
+		backgroundColor: lightColors.background,
 	},
 	iconCircle: {
-		width: 44,
-		height: 44,
-		borderRadius: 22,
+		width: scaleSize(44),
+		height: scaleSize(44),
+		borderRadius: scaleSize(22),
 		alignItems: "center",
 		justifyContent: "center",
-		marginRight: 12,
+		marginRight: spacing.sm,
 	},
 	cardInfo: { flex: 1 },
-	cardTitle: { fontSize: 14, fontWeight: "600", marginBottom: 2 },
+	cardTitle: { marginBottom: scaleSize(2) },
 	cardMetaRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 8,
+		gap: scaleSize(8),
 		flexWrap: "wrap",
 	},
-	cardDate: { fontSize: 11 },
+	cardDate: { color: lightColors.bodyText },
 	typeBadge: {
-		paddingHorizontal: 8,
-		paddingVertical: 2,
-		borderRadius: 12,
+		paddingHorizontal: scaleSize(8),
+		paddingVertical: scaleSize(2),
+		borderRadius: scaleSize(12),
 	},
-	typeText: {
-		fontSize: 10,
-		fontWeight: "500",
-	},
-	cardValue: { fontSize: 16, fontWeight: "bold" },
+	typeText: { fontWeight: "500" },
+	cardValue: { fontWeight: "bold" },
 });

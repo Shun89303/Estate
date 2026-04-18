@@ -1,118 +1,126 @@
 import { useState } from "react";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-} from "@/components/atoms/Typography";
-import { useTheme } from "@/hooks/useTheme";
 import { Coins } from "lucide-react-native";
 import { MOCK_ONE_TIME_PACKS, MOCK_SUBSCRIPTIONS } from "@/mock/coinPacks";
+import { useAuthStore } from "@/stores/authStore";
+import { useCoinStore } from "@/stores/coinStore";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
+import globalStyles from "@/styles/styles";
 
-export default function TopUpCoins() {
-	const colors = useTheme();
+interface TopUpCoinsProps {
+	onClose: () => void;
+}
+
+export default function TopUpCoins({ onClose }: TopUpCoinsProps) {
+	const { user } = useAuthStore();
+	const { coins, addCoins } = useCoinStore();
 	const [selectedTab, setSelectedTab] = useState<"oneTime" | "subscriptions">(
 		"oneTime",
 	);
 
-	const renderOneTimeCard = (item: any) => (
+	const handlePurchase = (
+		coinsAmount: number,
+		priceDisplay: string,
+		isSubscription?: boolean,
+	) => {
+		if (user?.uid) {
+			const note = isSubscription
+				? `Purchased ${coinsAmount} Coins (${priceDisplay})`
+				: `Purchased ${coinsAmount} Coins (${priceDisplay})`;
+			addCoins(user.uid, coinsAmount, note);
+		}
+		onClose();
+	};
+
+	const renderOneTimeCard = (item: (typeof MOCK_ONE_TIME_PACKS)[0]) => (
 		<TouchableOpacity
 			key={item.title}
 			style={[
 				styles.card,
 				{
-					backgroundColor: colors.primaryGray + "10",
-					borderColor: colors.primaryGray + "50",
+					backgroundColor: lightColors.mutedBackgroundWeaker,
+					borderColor: lightColors.mutedBorder,
 				},
 				item.popular && {
-					borderColor: colors.primaryGold,
-					backgroundColor: colors.primaryGold + "10",
+					borderColor: lightColors.brand,
+					backgroundColor: lightColors.brandBG,
 				},
 			]}
+			onPress={() => handlePurchase(item.coins, item.value, false)}
+			activeOpacity={0.7}
 		>
-			<Coins size={24} color={colors.primaryGold} style={{ marginRight: 12 }} />
-			<View style={{ flex: 1 }}>
+			<Coins size={moderateScale(24)} color={lightColors.brand} />
+			<View style={styles.cardInfo}>
 				<View style={styles.cardTitleRow}>
-					<NormalTitle style={styles.cardTitle}>{item.title}</NormalTitle>
+					<Title variant="small" style={styles.cardTitle}>
+						{item.title}
+					</Title>
 					{item.popular && (
 						<View
 							style={[
 								styles.popularBadge,
-								{ backgroundColor: colors.primaryGold + "10" },
+								{ backgroundColor: lightColors.brandBG },
 							]}
 						>
 							<BodyText
-								style={{
-									color: colors.primaryGold,
-									fontWeight: "600",
-								}}
+								variant="small"
+								style={{ color: lightColors.brand, fontWeight: "600" }}
 							>
 								POPULAR
 							</BodyText>
 						</View>
 					)}
 				</View>
-				<BodyText style={styles.cardSubtitle}>{item.subtitle}</BodyText>
+				<BodyText variant="small" style={styles.cardSubtitle}>
+					{item.subtitle}
+				</BodyText>
 			</View>
-			<NormalTitle
-				style={{
-					fontSize: 14,
-					fontWeight: "bold",
-					color: colors.primaryGold,
-				}}
-			>
+			<Title variant="small" style={styles.cardValue}>
 				{item.value}
-			</NormalTitle>
+			</Title>
 		</TouchableOpacity>
 	);
 
-	const renderSubscriptionCard = (item: any) => (
+	const renderSubscriptionCard = (item: (typeof MOCK_SUBSCRIPTIONS)[0]) => (
 		<TouchableOpacity
 			key={item.title}
 			style={[
 				styles.card,
 				{
-					backgroundColor: colors.primaryGold + 20,
-					borderColor: colors.primaryGold + 50,
+					backgroundColor: lightColors.mutedBackgroundWeaker,
+					borderColor: lightColors.mutedBorder,
 				},
 				item.vip && {
-					backgroundColor: colors.primaryPurple + "20",
-					borderColor: colors.primaryPurple + "80",
+					backgroundColor: lightColors.brandBG,
+					borderColor: lightColors.brand,
 				},
 			]}
+			onPress={() => handlePurchase(item.coinsPerMonth, item.value, true)}
+			activeOpacity={0.7}
 		>
 			<View
-				style={[
-					styles.iconContainer,
-					{ backgroundColor: item.iconColor + "20" },
-				]}
+				style={[styles.iconContainer, { backgroundColor: lightColors.brandBG }]}
 			>
-				<item.icon size={24} color={item.iconColor} />
+				<item.icon size={moderateScale(24)} color={item.iconColor} />
 			</View>
-			<View style={{ flex: 1 }}>
-				<NormalTitle style={styles.cardTitle}>{item.title}</NormalTitle>
-				<BodyText style={styles.cardSubtitle}>{item.subtitle}</BodyText>
+			<View style={styles.cardInfo}>
+				<Title variant="small" style={styles.cardTitle}>
+					{item.title}
+				</Title>
+				<BodyText variant="small" style={styles.cardSubtitle}>
+					{item.subtitle}
+				</BodyText>
 			</View>
-			<View style={{ alignItems: "flex-end" }}>
-				<NormalTitle
-					style={{
-						fontSize: 14,
-						fontWeight: "bold",
-						color: colors.textPrimary,
-					}}
-				>
+			<View style={styles.rightContainer}>
+				<Title variant="small" style={styles.cardValue}>
 					{item.value}
-				</NormalTitle>
-				{item.subValue && (
-					<BodyText
-						style={{
-							fontSize: 11,
-							color: colors.primaryGreen,
-						}}
-					>
-						{item.subValue}
-					</BodyText>
-				)}
+				</Title>
+				<BodyText variant="small" style={styles.subValue}>
+					{item.subValue}
+				</BodyText>
 			</View>
 		</TouchableOpacity>
 	);
@@ -120,18 +128,20 @@ export default function TopUpCoins() {
 	return (
 		<ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 			<View style={styles.header}>
-				<PageTitle style={styles.headerTitle}>Buy Coins</PageTitle>
+				<Title variant="page">Buy Coins</Title>
 				<View style={styles.balanceRow}>
-					<BodyText style={styles.balanceLabel}>Current balance:</BodyText>
+					<BodyText variant="small" style={styles.balanceLabel}>
+						Current balance:
+					</BodyText>
 					<BodyText
-						style={[styles.balanceAmount, { color: colors.primaryGold }]}
+						variant="small"
+						style={[styles.balanceAmount, { color: lightColors.brand }]}
 					>
-						20 coins
+						{coins} coins
 					</BodyText>
 				</View>
 			</View>
 
-			{/* Segmented toggle */}
 			<View style={styles.toggleContainer}>
 				<TouchableOpacity
 					style={[
@@ -141,11 +151,11 @@ export default function TopUpCoins() {
 					onPress={() => setSelectedTab("oneTime")}
 				>
 					<BodyText
-						style={
-							selectedTab === "oneTime"
-								? [styles.toggleText, styles.toggleTextActive]
-								: styles.toggleText
-						}
+						variant="small"
+						style={[
+							styles.toggleText,
+							selectedTab === "oneTime" && styles.toggleTextActive,
+						]}
 					>
 						One-time Packs
 					</BodyText>
@@ -158,114 +168,111 @@ export default function TopUpCoins() {
 					onPress={() => setSelectedTab("subscriptions")}
 				>
 					<BodyText
-						style={
-							selectedTab === "subscriptions"
-								? [styles.toggleText, styles.toggleTextActive]
-								: styles.toggleText
-						}
+						variant="small"
+						style={[
+							styles.toggleText,
+							selectedTab === "subscriptions" && styles.toggleTextActive,
+						]}
 					>
 						Subscriptions
 					</BodyText>
 				</TouchableOpacity>
 			</View>
 
-			{/* Cards */}
 			{selectedTab === "oneTime"
-				? MOCK_ONE_TIME_PACKS.map((item) => renderOneTimeCard(item))
-				: MOCK_SUBSCRIPTIONS.map((item) => renderSubscriptionCard(item))}
+				? MOCK_ONE_TIME_PACKS.map(renderOneTimeCard)
+				: MOCK_SUBSCRIPTIONS.map(renderSubscriptionCard)}
 		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 16,
+		padding: spacing.lg,
 	},
 	header: {
 		alignItems: "center",
-		marginBottom: 24,
+		marginBottom: spacing.xl,
 	},
-	headerTitle: {
-		marginBottom: 4,
+	balanceRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: scaleSize(4),
 	},
-	balanceText: {
-		fontSize: 12,
+	balanceLabel: {
+		color: lightColors.bodyText,
+	},
+	balanceAmount: {
+		fontWeight: "600",
 	},
 	toggleContainer: {
 		flexDirection: "row",
-		backgroundColor: "#f0f0f0",
-		borderRadius: 30,
-		padding: 4,
-		marginBottom: 20,
+		backgroundColor: lightColors.mutedBackground,
+		borderRadius: scaleSize(30),
+		padding: scaleSize(4),
+		marginBottom: spacing.lg,
 	},
 	toggleButton: {
 		flex: 1,
 		alignItems: "center",
-		paddingVertical: 8,
-		borderRadius: 30,
+		paddingVertical: scaleSize(8),
+		borderRadius: scaleSize(30),
 	},
 	toggleButtonActive: {
-		backgroundColor: "#fff",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-		elevation: 1,
+		backgroundColor: lightColors.background,
+		...globalStyles.shadows,
 	},
 	toggleText: {
-		fontSize: 14,
-		fontWeight: "500",
-		color: "#666",
+		color: lightColors.bodyText,
 	},
 	toggleTextActive: {
-		color: "#000",
+		color: lightColors.bigTitleText,
 		fontWeight: "600",
 	},
 	card: {
 		flexDirection: "row",
 		alignItems: "center",
-		padding: 12,
-		borderRadius: 16,
-		borderWidth: 1,
-		marginBottom: 10,
+		padding: spacing.md,
+		borderRadius: scaleSize(16),
+		borderWidth: scaleSize(1),
+		marginBottom: spacing.sm,
+		gap: spacing.sm,
+	},
+	cardInfo: {
+		flex: 1,
 	},
 	cardTitleRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		marginBottom: 2,
+		marginBottom: scaleSize(2),
 	},
 	cardTitle: {
-		fontSize: 14,
 		fontWeight: "600",
 	},
 	popularBadge: {
-		borderRadius: 99,
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-		marginLeft: 8,
+		borderRadius: scaleSize(99),
+		paddingHorizontal: scaleSize(6),
+		paddingVertical: scaleSize(2),
+		marginLeft: spacing.sm,
 	},
 	cardSubtitle: {
-		fontSize: 12,
-		color: "#666",
+		color: lightColors.bodyText,
 	},
-	balanceRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 4,
+	cardValue: {
+		color: lightColors.brand,
+		fontWeight: "bold",
 	},
-	balanceLabel: {
-		fontSize: 12,
+	rightContainer: {
+		alignItems: "flex-end",
 	},
-	balanceAmount: {
-		fontSize: 12,
-		fontWeight: "600",
+	subValue: {
+		color: lightColors.success,
 	},
 	iconContainer: {
-		width: 40,
-		height: 40,
-		borderRadius: 12,
+		width: scaleSize(40),
+		height: scaleSize(40),
+		borderRadius: scaleSize(12),
 		alignItems: "center",
 		justifyContent: "center",
-		marginRight: 12,
 	},
 });

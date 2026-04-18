@@ -17,7 +17,8 @@ interface PropertyMapProps {
 	markers: MapMarker[];
 	initialRegion?: Region;
 	style?: object;
-	title?: string; // optional title
+	title?: string;
+	titleVariant?: "page" | "normal" | "small";
 }
 
 export function PropertyMap({
@@ -25,6 +26,7 @@ export function PropertyMap({
 	initialRegion,
 	style,
 	title,
+	titleVariant = "small",
 }: PropertyMapProps) {
 	const getDefaultRegion = (): Region => {
 		if (markers.length === 0) {
@@ -66,7 +68,7 @@ export function PropertyMap({
 	return (
 		<View style={[styles.container, style]}>
 			{title && (
-				<Title variant="small" style={styles.title}>
+				<Title variant={titleVariant} style={styles.title}>
 					{title}
 				</Title>
 			)}

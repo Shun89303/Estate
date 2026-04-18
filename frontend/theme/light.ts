@@ -13,6 +13,11 @@ export const lightColors = {
 	border: "#717684",
 	mutedBorder: "hsl(225, 15%, 88%)",
 	danger: "hsla(0, 84%, 55%, 1.00)",
-	dangerBackground: "hsla(0, 84%, 55%, 0.1)",
+	dangerBG: "hsla(0, 84%, 55%, 0.1)",
 	success: "#4CA154",
+	successBG: "hsla(142.09, 70.56%, 45.29%, 0.05)",
+	successBorder: "hsla(142.09, 70.56%, 45.29%, 0.2)",
+	loss: "hsla(32.13, 94.62%, 43.73%, 1)",
+	lossBG: "hsla(37.69, 92.13%, 50.2%, 0.050980392156862744)",
+	lossBorder: "hsla(37.69, 92.13%, 50.2%, 0.2)",
 };

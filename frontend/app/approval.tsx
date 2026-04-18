@@ -26,7 +26,7 @@ export default function Approval() {
 					<AnimatedClockIcon
 						size={32}
 						color={lightColors.danger}
-						backgroundColor={lightColors.dangerBackground}
+						backgroundColor={lightColors.dangerBG}
 						duration={10000}
 						containerStyle={{
 							marginBottom: scaleVertical(10),

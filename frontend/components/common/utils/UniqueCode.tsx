@@ -1,13 +1,14 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, TextStyle } from "react-native";
 import BodyText from "@/components/common/typography/BodyText";
 
 interface UniqueCodeProps {
 	code: string;
+	style?: TextStyle;
 }
 
-export default function UniqueCode({ code }: UniqueCodeProps) {
+export default function UniqueCode({ code, style }: UniqueCodeProps) {
 	return (
-		<BodyText variant="normal" style={styles.code}>
+		<BodyText variant="normal" style={[styles.code, style]}>
 			{code}
 		</BodyText>
 	);

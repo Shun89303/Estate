@@ -1,209 +1,168 @@
-import { useRouter } from "expo-router";
-import {
-	View,
-	TextInput,
-	Image,
-	StyleSheet,
-	TouchableOpacity,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
+import { View, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import * as ImagePickerLib from "expo-image-picker";
 import BackButton from "@/components/common/navigation/BackButton";
-import { BodyText, PageTitle } from "@/components/atoms/Typography";
-import { useTheme } from "@/hooks/useTheme";
-import { User, Camera } from "lucide-react-native";
-
-// Mock existing user data
-const mockUser = {
-	name: "Myanmar User",
-	phone: "09123456789",
-	email: "",
-};
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
+import { ImagePicker } from "@/components/common/utils/ImagePicker";
+import { SimpleTextInput } from "@/components/common/dataEntry/SimpleTextInput";
+import NextButton from "@/components/common/navigation/NextButton";
+import { useAuthStore } from "@/stores/authStore";
+import { spacing, scaleSize } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EditProfile() {
 	const router = useRouter();
-	const colors = useTheme();
-
-	const [imageUri, setImageUri] = useState<string | null>(null);
-	const [name, setName] = useState(mockUser?.name || "");
-	const [phone, setPhone] = useState(mockUser?.phone || "");
-	const [email, setEmail] = useState(mockUser?.email || "");
+	const { user, updateUser } = useAuthStore();
+	const [name, setName] = useState(user?.name || "Myanmar User");
+	const [phone, setPhone] = useState(user?.phone || "");
+	const [email, setEmail] = useState(user?.email || "");
+	const [profileImage, setProfileImage] = useState(user?.profileImage || "");
+	const [isLoading, setIsLoading] = useState(false);
 
 	const pickImage = async () => {
-		const result = await ImagePicker.launchImageLibraryAsync({
+		const result = await ImagePickerLib.launchImageLibraryAsync({
 			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [1, 1],
-			quality: 1,
+			quality: 0.7,
 		});
-
 		if (!result.canceled) {
-			setImageUri(result.assets[0].uri);
+			setProfileImage(result.assets[0].uri);
+		}
+	};
+
+	const handleSave = async () => {
+		setIsLoading(true);
+		try {
+			updateUser({ name: name.trim(), email: email.trim(), profileImage });
+
+			if (user && phone !== user.phone) {
+				await AsyncStorage.removeItem(`@phone_uid_${user.phone}`);
+				await AsyncStorage.setItem(
+					`@phone_uid_${phone}`,
+					JSON.stringify({ uid: user.uid }),
+				);
+			}
+
+			Alert.alert("Success", "Profile updated", [
+				{ text: "OK", onPress: () => router.back() },
+			]);
+		} catch (error) {
+			Alert.alert("Error", "Failed to update profile");
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
 	return (
 		<SafeAreaView
-			style={[styles.container, { backgroundColor: colors.background }]}
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
 		>
 			<View style={styles.headerRow}>
 				<BackButton />
-				<PageTitle style={styles.header}>Edit Profile</PageTitle>
+				<Title variant="page" style={styles.header}>
+					Edit Profile
+				</Title>
 			</View>
 
-			{/* Profile Image with camera overlay */}
-			<TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-				{imageUri ? (
-					<Image source={{ uri: imageUri }} style={styles.profileImage} />
-				) : (
-					<View
-						style={[
-							styles.placeholder,
-							{ backgroundColor: colors.primaryGold + 20 },
-						]}
-					>
-						<User size={38} color={colors.primaryGold} />
-					</View>
-				)}
-				<View
-					style={[
-						styles.cameraIconContainer,
-						{ backgroundColor: colors.primaryGold },
-					]}
-				>
-					<Camera size={16} color="#fff" />
-				</View>
-			</TouchableOpacity>
+			{/* Profile Image */}
+			<View
+				style={{
+					paddingVertical: spacing.md,
+				}}
+			>
+				<ImagePicker
+					imageUri={profileImage}
+					onPress={pickImage}
+					backgroundColor={lightColors.brandBG}
+					iconColor={lightColors.brand}
+					showCameraOverlay={true}
+					size={100}
+					borderRadius={15}
+					iconSize={38}
+					cameraOverlayColor={lightColors.brand}
+				/>
+			</View>
 
-			{/* Inputs */}
-			<View style={styles.inputGroup}>
-				<BodyText style={[styles.label, { color: colors.textPrimary }]}>
-					Full Name
-				</BodyText>
-				<TextInput
-					style={[
-						styles.input,
-						{ borderColor: colors.border, color: colors.textPrimary },
-					]}
+			{/* Full Name */}
+			<View
+				style={[
+					styles.inputGroup,
+					{
+						marginTop: spacing.sm,
+					},
+				]}
+			>
+				<Title variant="small">Full Name</Title>
+				<SimpleTextInput
+					placeholder="Enter your full name"
 					value={name}
 					onChangeText={setName}
-					placeholder="Enter your full name"
-					placeholderTextColor={colors.textSecondary}
 				/>
 			</View>
 
+			{/* Phone Number */}
 			<View style={styles.inputGroup}>
-				<BodyText style={[styles.label, { color: colors.textPrimary }]}>
-					Phone Number
-				</BodyText>
-				<TextInput
-					style={[
-						styles.input,
-						{ borderColor: colors.border, color: colors.textPrimary },
-					]}
+				<Title variant="small">Phone Number</Title>
+				<SimpleTextInput
+					placeholder="Enter your phone number"
 					value={phone}
 					onChangeText={setPhone}
-					placeholder="Enter your phone number"
 					keyboardType="phone-pad"
-					placeholderTextColor={colors.textSecondary}
 				/>
 			</View>
 
+			{/* Email (optional) */}
 			<View style={styles.inputGroup}>
-				<BodyText style={[styles.label, { color: colors.textPrimary }]}>
-					Email (optional)
-				</BodyText>
-				<TextInput
-					style={[
-						styles.input,
-						{ borderColor: colors.border, color: colors.textPrimary },
-					]}
+				<Title variant="small">Email (optional)</Title>
+				<SimpleTextInput
+					placeholder="Enter your email"
 					value={email}
 					onChangeText={setEmail}
-					placeholder="Enter your email"
 					keyboardType="email-address"
-					placeholderTextColor={colors.textSecondary}
 				/>
 			</View>
 
-			{/* Save Changes */}
-			<TouchableOpacity
-				style={[styles.saveButton, { backgroundColor: colors.primaryGold }]}
-				onPress={() => router.push("/(tabs)/profile")}
-			>
-				<BodyText style={styles.saveText}>Save Changes</BodyText>
-			</TouchableOpacity>
+			{/* Save Button */}
+			<View style={styles.saveButtonWrapper}>
+				<NextButton
+					onPress={handleSave}
+					title={isLoading ? "Saving..." : "Save Changes"}
+					disabled={isLoading}
+					variant="primary"
+				/>
+			</View>
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 16,
-	},
+	container: { flex: 1 },
 	headerRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 12,
-		marginBottom: 24,
+		gap: spacing.sm,
+		marginBottom: spacing.xl,
+		backgroundColor: lightColors.background,
+		width: "100%",
+		paddingHorizontal: spacing.sm,
+		paddingVertical: spacing.md,
 	},
-	header: {
-		marginBottom: 0,
-	},
-	imagePicker: {
-		alignSelf: "center",
-		marginBottom: 24,
-		position: "relative",
-	},
-	profileImage: {
-		width: 100,
-		height: 100,
-		borderRadius: 15,
-	},
-	placeholder: {
-		width: 100,
-		height: 100,
-		borderRadius: 15,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	cameraIconContainer: {
-		position: "absolute",
-		bottom: -5,
-		right: -5,
-		width: 32,
-		height: 32,
-		borderRadius: 10,
-		justifyContent: "center",
-		alignItems: "center",
-		borderWidth: 2,
-		borderColor: "#fff",
-	},
+	header: { marginBottom: 0 },
 	inputGroup: {
-		marginBottom: 16,
+		marginBottom: spacing.md,
+		paddingHorizontal: spacing.lg,
+		paddingBottom: spacing.md,
 	},
-	label: {
-		fontSize: 12,
-		marginBottom: 4,
-	},
-	input: {
-		borderWidth: 1,
-		borderRadius: 8,
-		paddingHorizontal: 12,
-		paddingVertical: 8,
-		fontSize: 14,
-	},
-	saveButton: {
-		paddingVertical: 12,
-		borderRadius: 15,
-		marginTop: 24,
-		alignItems: "center",
-	},
-	saveText: {
-		color: "#fff",
-		fontSize: 14,
-		fontWeight: "600",
+	saveButtonWrapper: {
+		marginTop: spacing.xl,
+		paddingHorizontal: spacing.lg,
 	},
 });

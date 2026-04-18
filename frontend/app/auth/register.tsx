@@ -1,18 +1,20 @@
 import { useState } from "react";
 import {
 	View,
-	Text,
 	TextInput,
-	TouchableOpacity,
 	StyleSheet,
 	Alert,
-	ActivityIndicator,
 	KeyboardAvoidingView,
 	Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/authStore";
+import Title from "@/components/common/typography/Title";
+import NextButton from "@/components/common/navigation/NextButton";
+import SkipButton from "@/components/common/navigation/SkipButton";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
 
 export default function RegisterScreen() {
 	const [phone, setPhone] = useState("");
@@ -39,17 +41,25 @@ export default function RegisterScreen() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<SafeAreaView
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
+		>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				style={styles.keyboardView}
 			>
 				<View style={styles.form}>
-					<Text style={styles.title}>Create Account</Text>
+					<Title variant="page" style={styles.title}>
+						Create Account
+					</Title>
 
 					<TextInput
 						style={styles.input}
 						placeholder="Phone Number"
+						placeholderTextColor={lightColors.bodyText}
 						value={phone}
 						onChangeText={setPhone}
 						keyboardType="phone-pad"
@@ -59,6 +69,7 @@ export default function RegisterScreen() {
 					<TextInput
 						style={styles.input}
 						placeholder="Password"
+						placeholderTextColor={lightColors.bodyText}
 						value={password}
 						onChangeText={setPassword}
 						secureTextEntry
@@ -67,26 +78,23 @@ export default function RegisterScreen() {
 					<TextInput
 						style={styles.input}
 						placeholder="Confirm Password"
+						placeholderTextColor={lightColors.bodyText}
 						value={confirmPassword}
 						onChangeText={setConfirmPassword}
 						secureTextEntry
 					/>
 
-					<TouchableOpacity
-						style={styles.button}
+					<NextButton
 						onPress={handleRegister}
+						title="Register"
 						disabled={isLoading}
-					>
-						{isLoading ? (
-							<ActivityIndicator color="#fff" />
-						) : (
-							<Text style={styles.buttonText}>Register</Text>
-						)}
-					</TouchableOpacity>
+						variant="primary"
+					/>
 
-					<TouchableOpacity onPress={() => router.push("/auth/login")}>
-						<Text style={styles.link}>Already have an account? Login</Text>
-					</TouchableOpacity>
+					<SkipButton
+						onPress={() => router.push("/auth/login")}
+						title="Already have an account? Login"
+					/>
 				</View>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
@@ -94,28 +102,17 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: "#fff" },
+	container: { flex: 1 },
 	keyboardView: { flex: 1, justifyContent: "center" },
-	form: { paddingHorizontal: 20, gap: 16 },
-	title: {
-		fontSize: 28,
-		fontWeight: "bold",
-		textAlign: "center",
-		marginBottom: 24,
-	},
+	form: { paddingHorizontal: spacing.lg, gap: spacing.md },
+	title: { textAlign: "center", marginBottom: spacing.md },
 	input: {
-		borderWidth: 1,
-		borderColor: "#ccc",
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 16,
+		borderWidth: scaleSize(1),
+		borderColor: lightColors.mutedBorder,
+		borderRadius: scaleSize(8),
+		padding: spacing.md,
+		fontSize: moderateScale(16),
+		color: lightColors.bigTitleText,
+		backgroundColor: lightColors.background,
 	},
-	button: {
-		backgroundColor: "#2c6e9e",
-		padding: 14,
-		borderRadius: 8,
-		alignItems: "center",
-	},
-	buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
-	link: { textAlign: "center", marginTop: 12, color: "#2c6e9e", fontSize: 14 },
 });

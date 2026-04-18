@@ -20,7 +20,6 @@ import {
 	CircleCheckBig,
 	CircleAlert,
 	Coins,
-	Calendar,
 	MapPin,
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";

@@ -1,28 +1,31 @@
 import {
 	View,
-	StyleSheet,
-	Animated,
 	TouchableWithoutFeedback,
+	Animated,
+	StyleSheet,
 	Dimensions,
 } from "react-native";
-import { lightColors } from "@/theme/light";
 import { spacing, scaleSize } from "@/utils/metrics";
-import BuyCoins from "@/components/ownerDirect/BuyCoins";
+import { lightColors } from "@/theme/light";
 import globalStyles from "@/styles/styles";
 
 const { height: screenHeight } = Dimensions.get("window");
 
-interface CustomCoinSheetProps {
+interface CustomBottomSheetProps {
 	visible: boolean;
 	onClose: () => void;
 	slideAnim: Animated.Value;
+	children: React.ReactNode;
+	height?: number; // percentage of screen height (0-1)
 }
 
-export default function CustomCoinSheet({
+export default function CustomBottomSheet({
 	visible,
 	onClose,
 	slideAnim,
-}: CustomCoinSheetProps) {
+	children,
+	height = 0.85,
+}: CustomBottomSheetProps) {
 	if (!visible) return null;
 
 	return (
@@ -55,12 +58,12 @@ export default function CustomCoinSheet({
 								}),
 							},
 						],
-						height: screenHeight * 0.55,
+						height: screenHeight * height,
 					},
 				]}
 			>
 				<View style={styles.sheetHandle} />
-				<BuyCoins onClose={onClose} />
+				{children}
 			</Animated.View>
 		</>
 	);
@@ -93,18 +96,5 @@ const styles = StyleSheet.create({
 		alignSelf: "center",
 		marginTop: spacing.sm,
 		marginBottom: spacing.md,
-	},
-	header: {
-		flexDirection: "row",
-		justifyContent: "flex-end",
-		alignItems: "center",
-		paddingHorizontal: spacing.lg,
-		marginBottom: spacing.md,
-	},
-	headerTitle: {
-		marginBottom: 0,
-	},
-	closeButton: {
-		padding: spacing.sm,
 	},
 });

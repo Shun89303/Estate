@@ -15,9 +15,9 @@ interface ImagePickerProps {
 	iconColor: string;
 	dashedBorder?: boolean;
 	showCameraOverlay?: boolean;
-	size?: number; // base design size (will be scaled)
-	borderRadius?: number; // base design radius (will be scaled)
-	iconSize?: number; // base design icon size (will be moderately scaled)
+	size?: number;
+	borderRadius?: number;
+	iconSize?: number;
 	cameraOverlayColor?: string;
 }
 
@@ -28,12 +28,11 @@ export function ImagePicker({
 	iconColor,
 	dashedBorder = false,
 	showCameraOverlay = false,
-	size = 100, // base design value
-	borderRadius = 15, // base design value
-	iconSize = 38, // base design value
+	size = 100,
+	borderRadius = 15,
+	iconSize = 38,
 	cameraOverlayColor,
 }: ImagePickerProps) {
-	// Scale all dimensions
 	const scaledSize = scaleSize(size);
 	const scaledRadius = scaleSize(borderRadius);
 	const scaledIconSize = moderateScale(iconSize);
@@ -51,7 +50,7 @@ export function ImagePicker({
 		backgroundColor,
 		justifyContent: "center",
 		alignItems: "center",
-		overflow: "hidden",
+		overflow: "visible",
 		position: "relative",
 		alignSelf: "center",
 	};
@@ -81,7 +80,6 @@ export function ImagePicker({
 							height: scaledOverlaySize,
 							borderRadius: scaledOverlayRadius,
 							backgroundColor: overlayColor,
-							borderWidth: scaledBorderWidth,
 						},
 					]}
 				>
@@ -108,6 +106,5 @@ const styles = StyleSheet.create({
 		right: -scaleSize(5),
 		justifyContent: "center",
 		alignItems: "center",
-		borderColor: "#fff",
 	},
 });
