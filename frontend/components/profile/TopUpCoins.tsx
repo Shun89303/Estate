@@ -30,7 +30,7 @@ export default function TopUpCoins({ onClose }: TopUpCoinsProps) {
 			const note = isSubscription
 				? `Purchased ${coinsAmount} Coins (${priceDisplay})`
 				: `Purchased ${coinsAmount} Coins (${priceDisplay})`;
-			addCoins(user.uid, coinsAmount, note);
+			addCoins(user.uid, coinsAmount, "Top Up", note);
 		}
 		onClose();
 	};

@@ -1,35 +1,30 @@
 import { useEffect, useState } from "react";
-import { View, ScrollView, Image, StyleSheet, Pressable } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
-import { PropertyMap } from "@/components/common/utils/PropertyMap";
 import MediaCarousel from "@/components/common/utils/MediaCarousel";
+import { PropertyMap } from "@/components/common/utils/PropertyMap";
 import NotFound from "@/components/common/state/NotFound";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-	SmallTitle,
-} from "@/components/atoms/Typography";
-import { useTheme } from "@/hooks/useTheme";
-import {
-	BedDouble,
-	Bath,
-	Maximize,
-	Layers,
-	MapPin,
-	MessageCircle,
-	Coins,
-} from "lucide-react-native";
-import globalStyles from "@/styles/styles";
+import Badge from "@/components/common/utils/Badge";
+import UniqueCode from "@/components/common/utils/UniqueCode";
+import LocationRow from "@/components/common/utils/LocationRow";
+import ChipList from "@/components/common/utils/ChipList";
+import TextSection from "@/components/common/utils/TextSection";
+import OwnerContact from "@/components/common/utils/OwnerContact";
+import PropertyCTAButtons from "@/components/common/navigation/PropertyCTAButtons";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
 import { SavedItem } from "@/stores/savedPropertiesStore";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
+import globalStyles from "@/styles/styles";
+import { BedDouble, Bath, Maximize, Layers } from "lucide-react-native";
 
 export default function OwnerDetails() {
 	const { id } = useLocalSearchParams();
 	const [property, setProperty] = useState<Property | null>(null);
 	const router = useRouter();
-	const colors = useTheme();
 
 	useEffect(() => {
 		if (!id) return;
@@ -49,11 +44,18 @@ export default function OwnerDetails() {
 		price: property.price,
 	};
 
+	const activeFeatures = Object.entries(property.features)
+		.filter(([_, val]) => val === true)
+		.map(([key]) => key);
+
 	return (
 		<SafeAreaView
-			style={[styles.container, { backgroundColor: colors.background }]}
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
 		>
-			<ScrollView>
+			<ScrollView showsVerticalScrollIndicator={false}>
 				<MediaCarousel
 					cover={property.media.cover}
 					images={property.media.images}
@@ -62,102 +64,94 @@ export default function OwnerDetails() {
 					savedItem={savedItem}
 				/>
 
-				{/* PROPERTY INFO */}
-				<View style={styles.section}>
-					<PageTitle
-						style={{ marginBottom: 0, fontSize: 20, color: colors.textPrimary }}
-					>
+				<View style={styles.content}>
+					{/* Price */}
+					<Title variant="page" style={styles.price}>
 						฿{property.price.toLocaleString()}
-					</PageTitle>
+					</Title>
 
+					{/* Info row: type badge + unique code */}
 					<View style={styles.infoRow}>
-						<View
-							style={[
-								styles.typePill,
-								{ backgroundColor: colors.secondaryMute },
-							]}
-						>
-							<SmallTitle style={{ color: colors.primaryGold }}>
-								{property.type}
-							</SmallTitle>
-						</View>
-						<BodyText
-							style={{ color: colors.textSecondary, marginLeft: "auto" }}
-						>
-							{property.uniqueCode}
-						</BodyText>
+						<Badge
+							label={property.type}
+							backgroundColor={lightColors.brandBG}
+							color={lightColors.brand}
+							textVariant="small"
+						/>
+						<UniqueCode
+							code={property.uniqueCode}
+							style={styles.uniqueCodeRight}
+						/>
 					</View>
 
-					<NormalTitle style={styles.title}>{property.title}</NormalTitle>
+					<Title variant="normal" style={styles.title}>
+						{property.title}
+					</Title>
+					<LocationRow location={property.location.address} />
 
-					<View style={styles.locationRow}>
-						<MapPin size={14} color={colors.primaryGold} />
-						<BodyText style={styles.address}>
-							{property.location.address}
-						</BodyText>
-					</View>
-
+					{/* Specs row (unchanged) */}
 					<View style={styles.specsRow}>
 						<View style={styles.specColumn}>
-							<BedDouble size={20} color={colors.primaryGold} />
-							<NormalTitle style={styles.specValue}>
+							<BedDouble size={moderateScale(20)} color={lightColors.brand} />
+							<Title variant="normal" style={styles.specValue}>
 								{property.bedrooms}
-							</NormalTitle>
-							<BodyText style={styles.specLabel}>Bedrooms</BodyText>
+							</Title>
+							<BodyText variant="small" style={styles.specLabel}>
+								Bedrooms
+							</BodyText>
 						</View>
 						<View style={styles.specColumn}>
-							<Bath size={20} color={colors.primaryGold} />
-							<NormalTitle style={styles.specValue}>
+							<Bath size={moderateScale(20)} color={lightColors.brand} />
+							<Title variant="normal" style={styles.specValue}>
 								{property.bathrooms}
-							</NormalTitle>
-							<BodyText style={styles.specLabel}>Bathrooms</BodyText>
+							</Title>
+							<BodyText variant="small" style={styles.specLabel}>
+								Bathrooms
+							</BodyText>
 						</View>
 						<View style={styles.specColumn}>
-							<Maximize size={20} color={colors.primaryGold} />
-							<NormalTitle style={styles.specValue}>
+							<Maximize size={moderateScale(20)} color={lightColors.brand} />
+							<Title variant="normal" style={styles.specValue}>
 								{property.areaSqm}
-							</NormalTitle>
-							<BodyText style={styles.specLabel}>Area (m²)</BodyText>
+							</Title>
+							<BodyText variant="small" style={styles.specLabel}>
+								Area (m²)
+							</BodyText>
 						</View>
 						<View style={styles.specColumn}>
-							<Layers size={20} color={colors.primaryGold} />
-							<NormalTitle style={styles.specValue}>
+							<Layers size={moderateScale(20)} color={lightColors.brand} />
+							<Title variant="normal" style={styles.specValue}>
 								{property.floor}
-							</NormalTitle>
-							<BodyText style={styles.specLabel}>Floor</BodyText>
+							</Title>
+							<BodyText variant="small" style={styles.specLabel}>
+								Floor
+							</BodyText>
 						</View>
 					</View>
-				</View>
 
-				{/* FEATURES */}
-				{Object.keys(property.features).length > 0 && (
-					<View style={styles.section}>
-						<NormalTitle style={styles.sectionTitle}>Features</NormalTitle>
-						<View style={styles.featuresGrid}>
-							{Object.entries(property.features).map(
-								([key, val]) =>
-									val && (
-										<View key={key} style={styles.featureItem}>
-											<BodyText>{key}</BodyText>
-										</View>
-									),
-							)}
-						</View>
-					</View>
-				)}
+					{/* Features */}
+					{activeFeatures.length > 0 && (
+						<ChipList
+							title="Features"
+							items={activeFeatures}
+							direction="row"
+							textColor={lightColors.bigTitleText}
+							backgroundColor={lightColors.mutedBackgroundWeaker}
+						/>
+					)}
 
-				{/* ABOUT */}
-				{property.description && (
-					<View style={styles.section}>
-						<NormalTitle style={styles.sectionTitle}>About</NormalTitle>
-						<BodyText>{property.description}</BodyText>
-					</View>
-				)}
+					{/* About */}
+					{property.description && (
+						<TextSection
+							title="About"
+							description={property.description}
+							titleVariant="small"
+						/>
+					)}
 
-				{/* MAP */}
-				<View style={styles.section}>
-					<NormalTitle style={styles.sectionTitle}>Location</NormalTitle>
+					{/* Map */}
 					<PropertyMap
+						title="Location"
 						markers={[
 							{
 								id: property.id,
@@ -167,172 +161,105 @@ export default function OwnerDetails() {
 								description: property.location.address,
 							},
 						]}
-						style={{ height: 200 }}
 					/>
-				</View>
 
-				{/* OWNER BOX */}
-				<View style={[styles.ownerBox, { backgroundColor: "#fff" }]}>
-					<NormalTitle style={styles.sectionTitle}>Property Owner</NormalTitle>
-					<View style={styles.ownerRow}>
-						{property.owner.image && (
-							<Image
-								source={{ uri: property.owner.image }}
-								style={styles.ownerImage}
-							/>
-						)}
-						<View style={styles.ownerInfo}>
-							<NormalTitle style={styles.ownerName}>
-								{property.owner.name}
-							</NormalTitle>
-							<BodyText>{property.owner.phone}</BodyText>
-						</View>
+					{/* Owner Contact */}
+					<OwnerContact
+						name={property.owner.name}
+						phone={property.owner.phone}
+						profileImage={property.owner.image || ""}
+					/>
+
+					{/* Consultation Fee Box (kept as is) */}
+					<View
+						style={[
+							styles.feeBox,
+							{
+								backgroundColor: lightColors.brandBG,
+								borderColor: lightColors.brandBorder,
+							},
+						]}
+					>
+						<Title variant="small" style={{ color: lightColors.bodyText }}>
+							Owner Consultation Fee
+						</Title>
+						<Title variant="page" style={{ color: lightColors.danger }}>
+							{property.owner.consultationFee.toLocaleString()} MMK
+						</Title>
+						<BodyText variant="small" style={styles.freeConsultText}>
+							✦ Free consultation — Limited Offer
+						</BodyText>
 					</View>
 				</View>
-
-				{/* CONSULTATION FEE BOX */}
-				<View
-					style={[
-						styles.feeBox,
-						{ backgroundColor: colors.surface, borderColor: colors.border },
-					]}
-				>
-					<NormalTitle style={styles.feeTitle}>
-						Owner Consultation Fee
-					</NormalTitle>
-					<PageTitle style={styles.feeAmount}>
-						{property.owner.consultationFee.toLocaleString()} MMK
-					</PageTitle>
-					<BodyText style={styles.freeConsultText}>
-						✦ Free consultation — Limited Offer
-					</BodyText>
-				</View>
 			</ScrollView>
-			{/* CTA BUTTONS */}
-			<View style={styles.ctaRow}>
-				<Pressable
-					style={[
-						styles.ctaButton,
-						{
-							backgroundColor: "#fff",
-							borderColor: colors.border,
-							borderWidth: 1,
+
+			{/* CTA Buttons */}
+			<PropertyCTAButtons
+				propertyTitle={property.title}
+				reserveCoins={property.reserveCoins}
+				reserveCategory="Property Reserve"
+				onConsultationPress={() =>
+					router.push({
+						pathname: "/booking/[id]",
+						params: {
+							id: property.id,
+							uniqueCode: property.uniqueCode,
+							image: property.media.cover,
+							title: property.title,
+							location: property.location.address,
+							bedrooms: property.bedrooms,
+							price: property.price,
 						},
-					]}
-					onPress={() =>
-						router.push({
-							pathname: "/booking/[id]",
-							params: {
-								id: property.id,
-								uniqueCode: property.uniqueCode,
-								image: property.media.cover,
-								title: property.title,
-								location: property.location.address,
-								bedrooms: property.bedrooms,
-								price: property.price,
-							},
-						})
-					}
-				>
-					<MessageCircle size={18} color={colors.textPrimary} />
-					<BodyText style={{ color: colors.textPrimary }}>
-						Consultation
-					</BodyText>
-				</Pressable>
-				<Pressable
-					style={[styles.ctaButton, { backgroundColor: colors.primaryGold }]}
-				>
-					<Coins size={18} color="#fff" />
-					<BodyText style={styles.ctaText}>
-						Reserve {property.reserveCoins} Coins
-					</BodyText>
-				</Pressable>
-			</View>
+					})
+				}
+				onReserveSuccess={() => console.log("Reserved", property.title)}
+			/>
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: { flex: 1 },
-	section: { marginTop: 24, paddingHorizontal: 16 },
-	sectionTitle: { fontWeight: "bold", fontSize: 18, marginBottom: 12 },
+	content: {
+		paddingHorizontal: spacing.lg,
+		paddingBottom: spacing.xl,
+		gap: spacing.lg,
+	},
+	price: { marginBottom: 0 },
 	infoRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		flexWrap: "wrap",
-		gap: 8,
-		marginVertical: 8,
+		justifyContent: "space-between",
+		marginVertical: spacing.sm,
 	},
-	typePill: {
-		paddingHorizontal: 10,
-		paddingVertical: 4,
-		borderRadius: 20,
-		alignSelf: "flex-start",
-	},
-	title: { marginVertical: 4, lineHeight: 24 },
-	locationRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 6,
-		marginBottom: 12,
-	},
-	address: { fontSize: 14, flexShrink: 1 },
+	uniqueCodeRight: { marginLeft: "auto" },
+	title: { marginVertical: spacing.xs, lineHeight: moderateScale(24) },
 	specsRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginVertical: 16,
-		gap: 10,
+		marginVertical: spacing.md,
+		gap: spacing.sm,
 	},
 	specColumn: {
 		alignItems: "center",
 		flex: 1,
-		gap: 4,
-		backgroundColor: "#fff",
-		paddingVertical: 10,
-		borderRadius: 10,
+		gap: scaleSize(4),
+		backgroundColor: lightColors.background,
+		paddingVertical: spacing.sm,
+		borderRadius: scaleSize(10),
 		...globalStyles.shadows,
 	},
-	specValue: { fontSize: 16, fontWeight: "bold" },
-	specLabel: { fontSize: 12, color: "#666" },
-	featuresGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-	featureItem: { backgroundColor: "#eee", padding: 6, borderRadius: 6 },
-	ownerBox: {
-		marginTop: 24,
-		marginHorizontal: 16,
-		padding: 16,
-		borderRadius: 16,
-		...globalStyles.shadows,
+	specValue: {
+		fontSize: moderateScale(16),
+		fontWeight: "bold",
+		marginBottom: 0,
 	},
-	ownerRow: { flexDirection: "row", gap: 12, alignItems: "center" },
-	ownerImage: { width: 60, height: 60, borderRadius: 12 },
-	ownerInfo: { flex: 1 },
-	ownerName: { fontWeight: "600", marginBottom: 2 },
+	specLabel: { fontSize: moderateScale(12), color: lightColors.bodyText },
 	feeBox: {
-		marginTop: 16,
-		marginHorizontal: 16,
-		padding: 20,
-		borderRadius: 16,
-		borderWidth: 1,
+		padding: spacing.lg,
+		borderRadius: scaleSize(16),
+		borderWidth: scaleSize(1),
 		alignItems: "center",
 	},
-	feeTitle: { fontWeight: "600", marginBottom: 4 },
-	feeAmount: { fontSize: 20, fontWeight: "bold", marginVertical: 8 },
-	freeConsultText: { fontSize: 12, textAlign: "center", color: "#666" },
-	ctaRow: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		padding: 16,
-		gap: 12,
-		marginTop: 8,
-	},
-	ctaButton: {
-		flex: 1,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		paddingVertical: 14,
-		borderRadius: 15,
-		gap: 8,
-	},
-	ctaText: { color: "#fff", fontWeight: "600", fontSize: 14 },
+	freeConsultText: { textAlign: "center", color: lightColors.success },
 });

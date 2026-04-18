@@ -24,7 +24,6 @@ import globalStyles from "@/styles/styles";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { lightColors } from "@/theme/light";
 import RequireAuth from "@/components/common/security/RequireAuth";
-import { useEffect } from "react";
 import { ImagePicker } from "@/components/common/utils/ImagePicker";
 
 type MenuItem = {
@@ -38,15 +37,9 @@ type MenuItem = {
 export default function Profile() {
 	const router = useRouter();
 	const { user, isGuest, isAuthenticated } = useAuthStore();
-	const { coins, loadUserData } = useCoinStore();
+	const { coins } = useCoinStore();
 	const { open: openTopUpSheet, TopUpSheet } = useTopUpSheet();
 	const { open: openLogoutSheet, LogoutSheet } = useLogoutSheet();
-
-	useEffect(() => {
-		if (isAuthenticated && user?.uid) {
-			loadUserData(user.uid);
-		}
-	}, [isAuthenticated, user]);
 
 	const menuItems: MenuItem[] = [
 		{

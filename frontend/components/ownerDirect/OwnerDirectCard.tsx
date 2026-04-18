@@ -1,6 +1,6 @@
 import { useTheme } from "@/hooks/useTheme";
 import { Property } from "@/mock/ownerDirect";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { BodyText, NormalTitle, SmallTitle } from "../atoms/Typography";
 import {
 	Bath,
@@ -12,6 +12,7 @@ import {
 	Maximize,
 } from "lucide-react-native";
 import globalStyles from "@/styles/styles";
+import RequireAuth from "../common/security/RequireAuth";
 
 export default function OwnerDirectCard({
 	property,
@@ -25,7 +26,7 @@ export default function OwnerDirectCard({
 	const colors = useTheme();
 
 	return (
-		<Pressable onPress={onPress} style={styles.card}>
+		<RequireAuth onPress={onPress} style={styles.card}>
 			{/* Left: Square Image with OWNER badge */}
 			<View style={styles.imageContainer}>
 				<Image source={{ uri: property.media.cover }} style={styles.image} />
@@ -131,7 +132,7 @@ export default function OwnerDirectCard({
 					</NormalTitle>
 				</View>
 			</View>
-		</Pressable>
+		</RequireAuth>
 	);
 }
 

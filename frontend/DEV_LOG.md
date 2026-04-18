@@ -560,3 +560,73 @@ Apr-18-2026
 <!-- To do -->
 
 implement Reserve CTA button inside all the property details pages except Off-plan
+
+click reserve CTA:
+a custom bottom sheet shows up:
+there is cancel button, if coin balance enough(confirm button) else quick top up button + top up coins button:
+click quick top up / top up coins:
+a custom bottom sheet shows up:
+shows coin top up options:
+click the coin option to purchase coins or click Back button or X icon to close the bottom sheet
+
+desired outcome:
+if user reserves a property, the coin amount should be deducted from user's coin balance which is from coinStore zustand store.
+if user top up coins, coin balance should react
+
+<!-- Completed -->
+
+implemented Reserve CTA inside: Buy/Sell, Room Rent, Owner Direct, Business, Buy Business.
+
+coin history(filter now functional: meaning all filter options data are now correct stored from either coin top up or coin deduction or unlocking a locked property or reserving a property + specific property type reserve data can also now be filtered correctly )
+
+Saved Properties - persist per user(now saved properties is not global persist but persists per user)
+
+<!-- Next -->
+
+Saved Properties - Persist per user
+
+<!-- Remaining -->
+
+Home page clean up(fixing ui spacing layouts and styling): less important
+Customer Review page clean up(fixing ui spacing layouts and styling): less important
+Contents page's bookmark feature zustand integration so that each user's bookmarked contents can persist: important
+Contents details page clean up(apply reusables + fix ui spacing layouts and styling): less important
+
+Search page clean up(apply reusables + fix ui spacing layouts and styling): less important
+
+Saved properties store update to persist only per user: important
+
+Bookings page zustand integration(integrate zustand stores for single source of truth for user booked consultations and user reserved reservations instead of using static mock data): important
+To initiate bookings page zustand integration: require consultation CTA function or else user can't book consulation and resulting in not having consultations data for bookings page to render: important
+To initiate bookings page zustand integration: reserve requires zustand integration(currently we already have reserve CTA functional but we don't have a reserves zustand store to save user reserved reservations, resulting in bookings page not being able to render user reserved reservations due to won't have data): important
+
+Profile page clean up(apply reusables + fix ui spacing layouts and styling): less important
+
+🟠 Daily Report
+
+Progress Report for [18/4/2026] 9:00AM – 5:00PM – Sai Sai Naing Linn Oo
+——————————————————
+
+[Completed]
+implemented Reserve CTA inside: Buy/Sell, Room Rent, Owner Direct, Business, Buy Business.
+
+coin history(filter now functional: meaning all filter options data are now correct stored from either coin top up or coin deduction or unlocking a locked property or reserving a property + specific property type reserve data can also now be filtered correctly )
+
+Saved Properties - persist per user(now saved properties is not global persist but persists per user)
+
+[Next Plan]
+Contents Bookmark Feature – Zustand Store integration
+Consultation CTA – Make Functional
+Bookings Page – Zustand Integration (Consultations & Reservations)
+Reserve CTA – Zustand Integration (Save Reservation to Store)
+
+Home Page – UI & Spacing Cleanup
+Customer Review Page – UI Cleanup
+Contents Details Page – Apply Reusables & Spacing
+Search Page – Apply Reusables & Spacing
+Profile Page – Apply Reusables & Spacing
+
+add disable ability to all 6 properties (admin can disable entire listings)
+auth gates (ProtectedPressable) to navigate accountless users to login
+i18n language setup
+animations + UX

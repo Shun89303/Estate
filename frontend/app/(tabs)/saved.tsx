@@ -18,8 +18,11 @@ import { Heart, ArrowUpDown } from "lucide-react-native";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { lightColors } from "@/theme/light";
 import globalStyles from "@/styles/styles";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function SavedPropertiesScreen() {
+	const { user } = useAuthStore();
+	const uid = user?.uid;
 	const { items, removeSaved } = useSavedPropertiesStore();
 	const [selectedTypeFilter, setSelectedTypeFilter] = useState("All");
 	const [selectedSortFilter, setSelectedSortFilter] =
@@ -91,8 +94,8 @@ export default function SavedPropertiesScreen() {
 		return sorted;
 	}, [items, selectedTypeFilter, selectedSortFilter]);
 
-	const handleDelete = (uniqueCode: string) => {
-		removeSaved(uniqueCode);
+	const handleDelete = async (uniqueCode: string) => {
+		if (uid) await removeSaved(uniqueCode, uid);
 	};
 
 	const handleShare = (property: any) => {

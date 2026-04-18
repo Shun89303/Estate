@@ -244,11 +244,14 @@ export default function BuyBusinessDetails() {
 
 			{/* Fixed Bottom CTA Buttons */}
 			<PropertyCTAButtons
+				propertyTitle={business.title}
 				reserveCoins={business.reserveCoins}
+				reserveCategory="Business Reserve"
 				onConsultationPress={() => alert("Booking a Consultation")}
-				onReservePress={() =>
-					alert(`Reserved with ${business.reserveCoins} coins`)
-				}
+				onReserveSuccess={() => {
+					// Optional: show success message or perform additional actions
+					console.log("Reserved", business.title);
+				}}
 			/>
 		</SafeAreaView>
 	);

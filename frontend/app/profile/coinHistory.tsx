@@ -22,36 +22,13 @@ const FILTER_OPTIONS = [
 	"Refund",
 ];
 
-// Helper to format transaction for display
-const formatTransaction = (
-	tx: Transaction,
-): { title: string; type: string; value: string } => {
-	const isPositive = tx.amount > 0;
-	const value = isPositive ? `+${tx.amount}` : `${tx.amount}`;
-	let type = isPositive ? "Top Up" : "Spent"; // fallback
-
-	const note = tx.note?.toLowerCase() || "";
-	if (note.includes("room")) type = "Room Reserve";
-	else if (note.includes("property")) type = "Property Reserve";
-	else if (note.includes("business")) type = "Business Reserve";
-	else if (note.includes("unlock")) type = "Unlock";
-	else if (note.includes("refund")) type = "Refund";
-	// Note: "Spent" is not in filter options; it will only appear under "All"
-
-	return {
-		title: tx.note || (isPositive ? "Coins Purchased" : "Coins Spent"),
-		type,
-		value,
-	};
-};
-
 export default function CoinHistory() {
 	const { coins, history } = useCoinStore();
 	const [activeFilter, setActiveFilter] = useState<string>("All");
 
 	const filteredHistory = useMemo(() => {
 		if (activeFilter === "All") return history;
-		return history.filter((tx) => formatTransaction(tx).type === activeFilter);
+		return history.filter((tx) => tx.category === activeFilter);
 	}, [history, activeFilter]);
 
 	// Calculate totals
@@ -96,13 +73,17 @@ export default function CoinHistory() {
 	];
 
 	const renderItem = ({ item }: { item: Transaction }) => {
-		const { title, type, value } = formatTransaction(item);
 		const isPositive = item.amount > 0;
+		const value = isPositive ? `+${item.amount}` : `${item.amount}`;
 		const date = new Date(item.date).toLocaleDateString("en-US", {
 			year: "numeric",
 			month: "short",
 			day: "numeric",
 		});
+		// Use note as title if available, otherwise fallback
+		const displayTitle =
+			item.note || (isPositive ? "Coins Purchased" : "Coins Spent");
+
 		return (
 			<View style={[styles.card, globalStyles.shadows]}>
 				<View
@@ -118,7 +99,7 @@ export default function CoinHistory() {
 				</View>
 				<View style={styles.cardInfo}>
 					<Title variant="small" style={styles.cardTitle}>
-						{title}
+						{displayTitle}
 					</Title>
 					<View style={styles.cardMetaRow}>
 						<BodyText variant="small" style={styles.cardDate}>
@@ -134,7 +115,7 @@ export default function CoinHistory() {
 								variant="small"
 								style={[styles.typeText, { color: lightColors.brand }]}
 							>
-								{type}
+								{item.category}
 							</BodyText>
 						</View>
 					</View>

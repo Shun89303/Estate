@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type PropertyCategory =
@@ -22,32 +21,50 @@ export interface SavedItem {
 
 interface SavedPropertiesState {
 	items: SavedItem[];
-	addSaved: (item: SavedItem) => void;
-	removeSaved: (uniqueCode: string) => void;
+	loadUserData: (uid: string) => Promise<void>;
+	addSaved: (item: SavedItem, uid: string) => Promise<void>;
+	removeSaved: (uniqueCode: string, uid: string) => Promise<void>;
 	isSaved: (uniqueCode: string) => boolean;
-	clearAll: () => void;
+	clearUserData: () => void;
 }
 
-export const useSavedPropertiesStore = create<SavedPropertiesState>()(
-	persist(
-		(set, get) => ({
-			items: [],
-			addSaved: (item) => {
-				const { items } = get();
-				if (!items.some((i) => i.uniqueCode === item.uniqueCode)) {
-					set({ items: [...items, item] });
-				}
-			},
-			removeSaved: (uniqueCode) => {
-				set({ items: get().items.filter((i) => i.uniqueCode !== uniqueCode) });
-			},
-			isSaved: (uniqueCode) =>
-				get().items.some((i) => i.uniqueCode === uniqueCode),
-			clearAll: () => set({ items: [] }),
-		}),
-		{
-			name: "@saved-properties",
-			storage: createJSONStorage(() => AsyncStorage),
+const getStorageKey = (uid: string) => `@saved-properties_${uid}`;
+
+export const useSavedPropertiesStore = create<SavedPropertiesState>(
+	(set, get) => ({
+		items: [],
+
+		loadUserData: async (uid: string) => {
+			try {
+				const stored = await AsyncStorage.getItem(getStorageKey(uid));
+				set({ items: stored ? JSON.parse(stored) : [] });
+			} catch (error) {
+				console.error("Failed to load saved properties", error);
+				set({ items: [] });
+			}
 		},
-	),
+
+		addSaved: async (item: SavedItem, uid: string) => {
+			const { items } = get();
+			if (items.some((i) => i.uniqueCode === item.uniqueCode)) return;
+			const newItems = [...items, item];
+			set({ items: newItems });
+			await AsyncStorage.setItem(getStorageKey(uid), JSON.stringify(newItems));
+		},
+
+		removeSaved: async (uniqueCode: string, uid: string) => {
+			const { items } = get();
+			const newItems = items.filter((i) => i.uniqueCode !== uniqueCode);
+			set({ items: newItems });
+			await AsyncStorage.setItem(getStorageKey(uid), JSON.stringify(newItems));
+		},
+
+		isSaved: (uniqueCode: string) => {
+			return get().items.some((i) => i.uniqueCode === uniqueCode);
+		},
+
+		clearUserData: () => {
+			set({ items: [] });
+		},
+	}),
 );

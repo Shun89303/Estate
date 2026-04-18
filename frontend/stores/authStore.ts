@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCoinStore } from "./coinStore";
+import { useSavedPropertiesStore } from "./savedPropertiesStore";
 
 const secureStorage = {
 	getItem: async (key: string) => await SecureStore.getItemAsync(key),
@@ -91,6 +92,7 @@ export const useAuthStore = create<AuthState>()(
 					});
 					// Load coin data using uid
 					await useCoinStore.getState().loadUserData(uid);
+					await useSavedPropertiesStore.getState().loadUserData(uid);
 				} catch (error) {
 					set({ isLoading: false });
 					throw error;
@@ -117,6 +119,7 @@ export const useAuthStore = create<AuthState>()(
 						isLoading: false,
 					});
 					await useCoinStore.getState().loadUserData(uid);
+					await useSavedPropertiesStore.getState().loadUserData(uid);
 				} catch (error) {
 					set({ isLoading: false });
 					throw error;
@@ -133,6 +136,7 @@ export const useAuthStore = create<AuthState>()(
 					isLoading: false,
 				});
 				useCoinStore.getState().clearUserData();
+				useSavedPropertiesStore.getState().clearUserData();
 			},
 
 			updateUser: (updates) => {

@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-	View,
-	Image,
-	ScrollView,
-	TouchableOpacity,
-	StyleSheet,
-} from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -13,29 +7,24 @@ import {
 	BusinessProperty,
 	BusinessPropertyType,
 } from "@/mock/business";
-import { PropertyMap } from "@/components/common/utils/PropertyMap";
 import MediaCarousel from "@/components/common/utils/MediaCarousel";
+import { PropertyMap } from "@/components/common/utils/PropertyMap";
 import NotFound from "@/components/common/state/NotFound";
-import {
-	BodyText,
-	NormalTitle,
-	PageTitle,
-	SmallTitle,
-} from "@/components/atoms/Typography";
-import { useTheme } from "@/hooks/useTheme";
-import {
-	MapPin,
-	Maximize,
-	Users,
-	Calendar,
-	MessageCircle,
-	Coins,
-} from "lucide-react-native";
-import { maskPhoneNumber } from "@/utils/maskPhoneNumber";
-import globalStyles from "@/styles/styles";
+import Badge from "@/components/common/utils/Badge";
+import UniqueCode from "@/components/common/utils/UniqueCode";
+import LocationRow from "@/components/common/utils/LocationRow";
+import ChipList from "@/components/common/utils/ChipList";
+import TextSection from "@/components/common/utils/TextSection";
+import OwnerContact from "@/components/common/utils/OwnerContact";
+import PropertyCTAButtons from "@/components/common/navigation/PropertyCTAButtons";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
 import { SavedItem } from "@/stores/savedPropertiesStore";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { lightColors } from "@/theme/light";
+import globalStyles from "@/styles/styles";
+import { Maximize, Users, Calendar } from "lucide-react-native";
 
-// Emoji mapping for business types
 const typeEmoji: Record<BusinessPropertyType, string> = {
 	OFFICE: "🏢",
 	CO_WORKING: "💻",
@@ -49,7 +38,6 @@ export default function BusinessDetails() {
 	const router = useRouter();
 	const { id } = useLocalSearchParams();
 	const [property, setProperty] = useState<BusinessProperty | null>(null);
-	const colors = useTheme();
 
 	useEffect(() => {
 		if (!id) return;
@@ -81,9 +69,12 @@ export default function BusinessDetails() {
 
 	return (
 		<SafeAreaView
-			style={[styles.container, { backgroundColor: colors.background }]}
+			style={[
+				styles.container,
+				{ backgroundColor: lightColors.entireAppBackground },
+			]}
 		>
-			<ScrollView>
+			<ScrollView showsVerticalScrollIndicator={false}>
 				<MediaCarousel
 					cover={property.media.cover}
 					images={property.media.photos}
@@ -92,265 +83,156 @@ export default function BusinessDetails() {
 					savedItem={savedItem}
 				/>
 
-				<View style={styles.section}>
-					<View style={styles.infoRow}>
-						<View
-							style={[
-								styles.typePill,
-								{ backgroundColor: colors.secondaryMute },
-							]}
-						>
-							<SmallTitle style={{ color: colors.primaryGold }}>
-								{displayType}
-							</SmallTitle>
-						</View>
-						<BodyText
-							style={{ color: colors.textSecondary, marginLeft: "auto" }}
-						>
-							{property.uniqueCode}
-						</BodyText>
+				<View style={styles.content}>
+					{/* Header row: badge + unique code */}
+					<View style={styles.headerRow}>
+						<Badge
+							label={displayType}
+							backgroundColor={lightColors.brandBG}
+							color={lightColors.brand}
+							textVariant="small"
+						/>
+						<UniqueCode
+							code={property.uniqueCode}
+							style={styles.uniqueCodeRight}
+						/>
 					</View>
 
-					<NormalTitle style={styles.title}>{property.title}</NormalTitle>
+					<Title variant="normal">{property.title}</Title>
+					<LocationRow location={property.location.address} />
 
-					<View style={styles.locationRow}>
-						<MapPin size={14} color={colors.primaryGold} />
-						<BodyText style={styles.location}>
-							{property.location.address}
-						</BodyText>
-					</View>
-
-					{/* Single white container box */}
-					<View style={[styles.detailsBox, { backgroundColor: "#fff" }]}>
-						{/* Price */}
-						<PageTitle
-							style={{
-								marginBottom: 8,
-								fontSize: 24,
-								color: colors.primaryGold,
-							}}
-						>
+					{/* Single white container box (kept as is) */}
+					<View
+						style={[
+							styles.detailsBox,
+							{
+								backgroundColor: lightColors.background,
+								...globalStyles.shadows,
+							},
+						]}
+					>
+						<Title variant="page" style={styles.price}>
 							{formattedPrice}
-						</PageTitle>
-
-						{/* Specs row (area, capacity, min lease) */}
+						</Title>
 						<View style={styles.specsRow}>
 							<View style={styles.specItem}>
-								<Maximize size={16} color={colors.primaryGray} />
-								<BodyText>{property.areaSqm} sqm</BodyText>
+								<Maximize
+									size={moderateScale(16)}
+									color={lightColors.bodyText}
+								/>
+								<BodyText variant="small">{property.areaSqm} sqm</BodyText>
 							</View>
 							<View style={styles.specItem}>
-								<Users size={16} color={colors.primaryGray} />
-								<BodyText>{property.capacity} capacity</BodyText>
+								<Users size={moderateScale(16)} color={lightColors.bodyText} />
+								<BodyText variant="small">
+									{property.capacity} capacity
+								</BodyText>
 							</View>
 							<View style={styles.specItem}>
-								<Calendar size={16} color={colors.primaryGray} />
-								<BodyText>{property.minLeaseMonths} mo min</BodyText>
+								<Calendar
+									size={moderateScale(16)}
+									color={lightColors.bodyText}
+								/>
+								<BodyText variant="small">
+									{property.minLeaseMonths} mo min
+								</BodyText>
 							</View>
 						</View>
-
-						{/* Deposit & min lease text */}
-						<View style={styles.depositRow}>
-							<NormalTitle
-								style={{
-									fontWeight: "600",
-									color: colors.primaryGray,
-								}}
-							>
-								Deposit: ฿{property.pricing.deposit.toLocaleString()}
-							</NormalTitle>
-						</View>
+						<BodyText variant="normal" style={styles.deposit}>
+							Deposit: ฿{property.pricing.deposit.toLocaleString()}
+						</BodyText>
 					</View>
 
-					{/* Amenities as pills (horizontal) */}
+					{/* Amenities */}
 					{amenitiesList.length > 0 && (
-						<View style={styles.amenitiesSection}>
-							<NormalTitle style={styles.infoTitle}>Amenities</NormalTitle>
-							<View style={styles.amenitiesRow}>
-								{amenitiesList.map((item, idx) => (
-									<View
-										key={idx}
-										style={[
-											styles.amenityPill,
-											{ backgroundColor: colors.secondaryMute },
-										]}
-									>
-										<BodyText style={{ color: colors.textPrimary }}>
-											{item}
-										</BodyText>
-									</View>
-								))}
-							</View>
-						</View>
+						<ChipList
+							title="Amenities"
+							items={amenitiesList}
+							direction="row"
+							textColor={lightColors.bigTitleText}
+							backgroundColor={lightColors.mutedBackgroundWeaker}
+						/>
 					)}
 
 					{/* About */}
 					{property.about && (
-						<View style={styles.simpleBox}>
-							<NormalTitle style={styles.infoTitle}>About</NormalTitle>
-							<BodyText>{property.about}</BodyText>
-						</View>
+						<TextSection
+							title="About"
+							description={property.about}
+							titleVariant="small"
+						/>
 					)}
 
 					{/* Map */}
-					<View style={styles.simpleBox}>
-						<NormalTitle style={styles.infoTitle}>Location</NormalTitle>
-						<PropertyMap
-							markers={[
-								{
-									id: property.id,
-									latitude: property.location.latitude,
-									longitude: property.location.longitude,
-									title: property.title,
-									description: property.location.address,
-								},
-							]}
-							style={{ height: 200 }}
-						/>
-					</View>
+					<PropertyMap
+						title="Location"
+						markers={[
+							{
+								id: property.id,
+								latitude: property.location.latitude,
+								longitude: property.location.longitude,
+								title: property.title,
+								description: property.location.address,
+							},
+						]}
+					/>
 
 					{/* Contact Agent */}
-					<View style={[styles.agentBox, { backgroundColor: "#fff" }]}>
-						<Image
-							source={{ uri: property.contact.profileImage }}
-							style={styles.agentImage}
-						/>
-						<View style={styles.agentInfo}>
-							<NormalTitle style={styles.agentName}>
-								{property.contact.name}
-							</NormalTitle>
-							<BodyText>{maskPhoneNumber(property.contact.phone)}</BodyText>
-						</View>
-					</View>
+					<OwnerContact
+						name={property.contact.name}
+						phone={property.contact.phone}
+						profileImage={property.contact.profileImage}
+					/>
 				</View>
 			</ScrollView>
 
 			{/* Bottom CTA */}
-			<View style={styles.ctaRow}>
-				<TouchableOpacity
-					style={[
-						styles.ctaBtn,
-						{
-							backgroundColor: "#fff",
-							borderColor: colors.primaryGray + 50,
-							borderWidth: 1,
+			<PropertyCTAButtons
+				propertyTitle={property.title}
+				reserveCoins={property.reserveCoins}
+				reserveCategory="Business Reserve"
+				onConsultationPress={() =>
+					router.push({
+						pathname: "/booking/[id]",
+						params: {
+							id: property.id,
+							uniqueCode: property.uniqueCode,
+							image: property.media.cover,
+							title: property.title,
+							location: property.location.address,
+							bedrooms: 0,
+							price: 0,
 						},
-					]}
-					onPress={() =>
-						router.push({
-							pathname: "/booking/[id]",
-							params: {
-								id: property.id,
-								uniqueCode: property.uniqueCode,
-								image: property.media.cover,
-								title: property.title,
-								location: property.location.address,
-								bedrooms: 0,
-								price: 0,
-							},
-						})
-					}
-				>
-					<MessageCircle size={18} color={colors.textPrimary} />
-					<BodyText style={{ color: colors.textPrimary }}>
-						Consultation
-					</BodyText>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={[styles.ctaBtn, { backgroundColor: colors.primaryGold }]}
-				>
-					<Coins size={18} color="#fff" />
-					<BodyText style={{ color: "#fff" }}>
-						Reserve {property.reserveCoins} Coins
-					</BodyText>
-				</TouchableOpacity>
-			</View>
+					})
+				}
+				onReserveSuccess={() => console.log("Reserved", property.title)}
+			/>
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: { flex: 1 },
-	section: { paddingHorizontal: 16, paddingVertical: 8, gap: 16 },
-	infoRow: {
+	content: {
+		paddingHorizontal: spacing.lg,
+		paddingBottom: spacing.xl,
+		gap: spacing.lg,
+	},
+	headerRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		flexWrap: "wrap",
-		gap: 8,
+		justifyContent: "space-between",
+		marginTop: spacing.md,
 	},
-	typePill: {
-		paddingHorizontal: 10,
-		paddingVertical: 4,
-		borderRadius: 20,
-		alignSelf: "flex-start",
-	},
-	title: { marginVertical: 4, lineHeight: 24 },
-	locationRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 6,
-		marginBottom: 8,
-	},
-	location: { fontSize: 14, flexShrink: 1 },
-	detailsBox: {
-		padding: 16,
-		borderRadius: 16,
-		marginVertical: 8,
-		...globalStyles.shadows,
-	},
+	uniqueCodeRight: { marginLeft: "auto" },
+	detailsBox: { padding: spacing.md, borderRadius: scaleSize(16) },
+	price: { marginBottom: spacing.sm, color: lightColors.brand },
 	specsRow: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		gap: 16,
-		marginBottom: 12,
+		gap: spacing.md,
+		marginBottom: spacing.sm,
 	},
-	specItem: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 6,
-	},
-	depositRow: {
-		marginTop: 4,
-	},
-	amenitiesSection: { gap: 8 },
-	amenitiesRow: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: 8,
-	},
-	amenityPill: {
-		paddingHorizontal: 12,
-		paddingVertical: 6,
-		borderRadius: 20,
-	},
-	infoTitle: { fontWeight: "600", fontSize: 18, marginBottom: 4 },
-	simpleBox: { gap: 8 },
-	agentBox: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 12,
-		padding: 16,
-		borderRadius: 16,
-		marginVertical: 8,
-		...globalStyles.shadows,
-	},
-	agentImage: { width: 60, height: 60, borderRadius: 12 },
-	agentInfo: { flex: 1 },
-	agentName: { fontWeight: "600", marginBottom: 2 },
-	ctaRow: {
-		flexDirection: "row",
-		padding: 16,
-		gap: 12,
-		borderTopWidth: 1,
-		borderColor: "#eee",
-	},
-	ctaBtn: {
-		flex: 1,
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		paddingVertical: 12,
-		borderRadius: 15,
-		gap: 8,
-	},
+	specItem: { flexDirection: "row", alignItems: "center", gap: scaleSize(6) },
+	deposit: { marginTop: scaleSize(2) },
 });

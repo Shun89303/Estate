@@ -1,14 +1,15 @@
 import { useRef, useCallback, useState } from "react";
-import { Animated, Pressable, StyleSheet } from "react-native";
+import { Animated, StyleSheet } from "react-native";
 import { Coins } from "lucide-react-native";
 import { lightColors } from "@/theme/light";
-import { useUserStore } from "@/stores/userStore";
+import { useCoinStore } from "@/stores/coinStore";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import SubTitle from "@/components/common/typography/SubTitle";
 import CustomCoinSheet from "./CustomCoinSheet";
+import RequireAuth from "@/components/common/security/RequireAuth";
 
 export function useCoinBalance() {
-	const { coins } = useUserStore();
+	const { coins } = useCoinStore();
 	const [visible, setVisible] = useState(false);
 	const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -30,7 +31,9 @@ export function useCoinBalance() {
 	}, []);
 
 	const CoinButton = () => (
-		<Pressable
+		<RequireAuth
+			onPress={openSheet}
+			message="Please log in to view your coin balance and top up."
 			style={[
 				styles.coinButton,
 				{
@@ -40,13 +43,14 @@ export function useCoinBalance() {
 					borderColor: lightColors.brand,
 				},
 			]}
-			onPress={openSheet}
 		>
-			<Coins size={moderateScale(20)} color={lightColors.brand} />
-			<SubTitle style={{ marginLeft: spacing.xs, marginBottom: 0 }}>
-				{coins}
-			</SubTitle>
-		</Pressable>
+			<>
+				<Coins size={moderateScale(20)} color={lightColors.brand} />
+				<SubTitle style={{ marginLeft: spacing.xs, marginBottom: 0 }}>
+					{coins}
+				</SubTitle>
+			</>
+		</RequireAuth>
 	);
 
 	const CoinBottomSheet = () => (

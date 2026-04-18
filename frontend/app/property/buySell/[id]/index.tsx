@@ -237,7 +237,9 @@ export default function BuySellDetails() {
 
 			{/* CTA BUTTONS */}
 			<PropertyCTAButtons
+				propertyTitle={property.title}
 				reserveCoins={property.reserveCoins}
+				reserveCategory="Property Reserve"
 				onConsultationPress={() =>
 					router.push({
 						pathname: "/booking/[id]",
@@ -254,9 +256,9 @@ export default function BuySellDetails() {
 						},
 					})
 				}
-				onReservePress={() =>
-					alert(`Reserve with ${property.reserveCoins} coins`)
-				}
+				onReserveSuccess={() => {
+					// optional: show a success toast or refresh
+				}}
 			/>
 		</SafeAreaView>
 	);

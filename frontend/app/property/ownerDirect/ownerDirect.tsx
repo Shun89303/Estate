@@ -1,267 +1,266 @@
-import { useRouter } from "expo-router";
+import { useState, useRef } from "react";
 import {
 	View,
-	Pressable,
 	ScrollView,
 	StyleSheet,
 	FlatList,
+	Pressable,
+	Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { MOCK_OWNERDIRECT, Property } from "@/mock/ownerDirect";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { useRef, useMemo, useState } from "react";
 import BackButton from "@/components/common/navigation/BackButton";
-import { BodyText, PageTitle, SmallTitle } from "@/components/atoms/Typography";
+import Title from "@/components/common/typography/Title";
+import BodyText from "@/components/common/typography/BodyText";
 import { Coins, EyeOff, Lock, LockOpen, Sparkles } from "lucide-react-native";
-import { useTheme } from "@/hooks/useTheme";
+import { lightColors } from "@/theme/light";
+import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
+import { useCoinStore } from "@/stores/coinStore";
+import { useAuthStore } from "@/stores/authStore";
+import { useCoinBalance } from "@/components/coin/useCoinBalance";
 import OwnerDirectCard from "@/components/ownerDirect/OwnerDirectCard";
 import EmptyState from "@/components/common/state/EmptyState";
-import { useUserStore } from "@/stores/userStore";
-import { useCoinBalance } from "@/components/coin/useCoinBalance";
+import CustomBottomSheet from "@/components/common/utils/CustomBottomSheet";
 
 export default function OwnerDirect() {
 	const router = useRouter();
-	const colors = useTheme();
-	const { coins: coinBalance, deductCoins } = useUserStore();
+	const { user } = useAuthStore();
+	const { coins: coinBalance, deductCoins } = useCoinStore();
 	const { CoinButton, CoinBottomSheet } = useCoinBalance();
 
-	// selected property
 	const [selectedProperty, setSelectedProperty] = useState<Property | null>(
 		null,
 	);
-	// array of unlocked ids
 	const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
+	const [showUnlockSheet, setShowUnlockSheet] = useState(false);
+	const slideAnim = useRef(new Animated.Value(0)).current;
 
-	// unlock property logic
-	const handleUnlock = () => {
-		if (!selectedProperty) return;
+	const openUnlockSheet = (property: Property) => {
+		setSelectedProperty(property);
+		setShowUnlockSheet(true);
+		Animated.timing(slideAnim, {
+			toValue: 1,
+			duration: 300,
+			useNativeDriver: true,
+		}).start();
+	};
+
+	const closeUnlockSheet = () => {
+		Animated.timing(slideAnim, {
+			toValue: 0,
+			duration: 300,
+			useNativeDriver: true,
+		}).start(() => {
+			setShowUnlockSheet(false);
+			setSelectedProperty(null);
+		});
+	};
+
+	const handleUnlock = async () => {
+		if (!selectedProperty || !user?.uid) return;
 		const cost = selectedProperty.unlockCoins;
-		const success = deductCoins(cost); // ✅ use store deduct
+		const success = await deductCoins(
+			user.uid,
+			cost,
+			"Unlock",
+			`Unlocked: ${selectedProperty.title}`,
+		);
 		if (success) {
 			setUnlockedIds((prev) => [...prev, selectedProperty.id]);
-			bottomSheetRef.current?.close();
+			closeUnlockSheet();
 		} else {
 			alert("Not enough coins. Please top up.");
 		}
 	};
-
-	const bottomSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => ["40%"], []);
 
 	const handleCardPress = (item: Property) => {
 		const isUnlocked = unlockedIds.includes(item.id);
 		if (isUnlocked) {
 			router.push(`/property/ownerDirect/${item.uniqueCode}`);
 		} else {
-			setSelectedProperty(item);
-			bottomSheetRef.current?.expand();
+			openUnlockSheet(item);
 		}
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			{/* HEADER */}
+		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
-				<View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+				<View style={styles.headerLeft}>
 					<BackButton />
-					<PageTitle>Owner Direct</PageTitle>
+					<Title variant="page" style={styles.headerTitle}>
+						Owner Direct
+					</Title>
 				</View>
 				<CoinButton />
 			</View>
 
-			<ScrollView contentContainerStyle={{ padding: 16 }}>
-				{/* INFO BOX */}
+			<ScrollView contentContainerStyle={styles.scrollContent}>
 				<View
 					style={[
 						styles.infoBox,
 						{
-							backgroundColor: colors.darkGold,
-							borderWidth: 1,
-							borderColor: colors.primaryGold,
+							backgroundColor: lightColors.brandBG,
+							borderColor: lightColors.brandBorder,
 						},
 					]}
 				>
-					<Sparkles size={18} color={colors.primaryGold} />
+					<Sparkles size={moderateScale(18)} color={lightColors.brand} />
 					<View style={{ flex: 1 }}>
-						<SmallTitle>For Agents Only</SmallTitle>
-						<BodyText>
+						<Title variant="small">For Agents Only</Title>
+						<BodyText variant="small">
 							Unlock owner contact info using coins. No commission sharing —
 							deal directly with owners.
 						</BodyText>
 					</View>
 				</View>
 
-				{/* CARDS LIST */}
 				<FlatList
 					scrollEnabled={false}
 					data={MOCK_OWNERDIRECT}
 					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item }) => {
-						const isUnlocked = unlockedIds.includes(item.id);
-						return (
-							<OwnerDirectCard
-								key={item.id}
-								property={item}
-								isUnlocked={isUnlocked}
-								onPress={() => handleCardPress(item)}
-							/>
-						);
-					}}
+					renderItem={({ item }) => (
+						<OwnerDirectCard
+							property={item}
+							isUnlocked={unlockedIds.includes(item.id)}
+							onPress={() => handleCardPress(item)}
+						/>
+					)}
 					ListEmptyComponent={<EmptyState title="No properties found" />}
 				/>
 			</ScrollView>
 
-			{/* UNLOCK BOTTOM SHEET */}
-			<BottomSheet
-				ref={bottomSheetRef}
-				index={-1}
-				snapPoints={snapPoints}
-				enablePanDownToClose
+			{/* Unlock Bottom Sheet */}
+			<CustomBottomSheet
+				visible={showUnlockSheet}
+				onClose={closeUnlockSheet}
+				slideAnim={slideAnim}
+				height={0.55}
 			>
 				{selectedProperty && (
-					<BottomSheetView style={styles.sheetContent}>
+					<View style={styles.sheetContent}>
 						<View style={{ alignItems: "center" }}>
-							<View
-								style={{
-									backgroundColor: colors.secondaryGold,
-									padding: 10,
-									borderRadius: 99,
-								}}
-							>
-								<Lock size={30} color={colors.primaryGold} />
+							<View style={styles.lockIconContainer}>
+								<Lock size={moderateScale(30)} color={lightColors.brand} />
 							</View>
-							<SmallTitle style={styles.sheetTitle}>
+							<Title variant="page" style={styles.sheetTitle}>
 								Unlock Owner Info
-							</SmallTitle>
-							<BodyText style={styles.sheetSubtitle}>
+							</Title>
+							<BodyText variant="normal" style={styles.sheetSubtitle}>
 								{selectedProperty.title}
 							</BodyText>
 						</View>
 
 						<View style={styles.sheetBox}>
 							<View>
-								<BodyText>Owner Name</BodyText>
-								<BodyText>Phone Number</BodyText>
+								<BodyText variant="small">Owner Name</BodyText>
+								<BodyText variant="small">Phone Number</BodyText>
 							</View>
 							<View style={{ alignItems: "flex-end" }}>
 								<View style={styles.hiddenRow}>
-									<EyeOff size={12} color={colors.textPrimary} />
-									<BodyText>Hidden</BodyText>
+									<EyeOff
+										size={moderateScale(12)}
+										color={lightColors.bodyText}
+									/>
+									<BodyText variant="small">Hidden</BodyText>
 								</View>
 								<View style={styles.hiddenRow}>
-									<EyeOff size={12} color={colors.textPrimary} />
-									<BodyText>Hidden</BodyText>
+									<EyeOff
+										size={moderateScale(12)}
+										color={lightColors.bodyText}
+									/>
+									<BodyText variant="small">Hidden</BodyText>
 								</View>
 							</View>
 						</View>
 
-						<View
-							style={[
-								styles.sheetBox,
-								{
-									backgroundColor: "transparent",
-								},
-							]}
-						>
+						<View style={[styles.sheetBox, styles.sheetBoxTransparent]}>
 							<View>
-								<BodyText>Cost</BodyText>
-								<BodyText>Your Balance</BodyText>
+								<BodyText variant="small">Cost</BodyText>
+								<BodyText variant="small">Your Balance</BodyText>
 							</View>
 							<View style={{ alignItems: "flex-end" }}>
 								<View style={styles.hiddenRow}>
-									<Coins size={12} color={colors.primaryGold} />
+									<Coins size={moderateScale(12)} color={lightColors.brand} />
 									<BodyText
-										style={{
-											color: colors.primaryGold,
-										}}
+										variant="small"
+										style={{ color: lightColors.brand }}
 									>
 										{selectedProperty.unlockCoins} Coins
 									</BodyText>
 								</View>
 								<View style={styles.hiddenRow}>
-									<Coins size={12} color={colors.primaryGold} />
-									<BodyText>{coinBalance} coins</BodyText>
+									<Coins size={moderateScale(12)} color={lightColors.brand} />
+									<BodyText variant="small">{coinBalance} coins</BodyText>
 								</View>
 							</View>
 						</View>
 
 						<Pressable
-							style={[
-								styles.unlockBtn,
-								{
-									backgroundColor: colors.primaryGold,
-								},
-							]}
+							style={[styles.unlockBtn, { backgroundColor: lightColors.brand }]}
 							onPress={handleUnlock}
 						>
-							<LockOpen size={12} color={"#fff"} />
-							<BodyText style={{ fontWeight: "600", color: "#fff" }}>
+							<LockOpen size={moderateScale(12)} color="#fff" />
+							<BodyText variant="normal" style={styles.unlockBtnText}>
 								Unlock for {selectedProperty.unlockCoins} Coins
 							</BodyText>
 						</Pressable>
-					</BottomSheetView>
+					</View>
 				)}
-			</BottomSheet>
+			</CustomBottomSheet>
+
 			<CoinBottomSheet />
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
+	container: { flex: 1, backgroundColor: lightColors.entireAppBackground },
 	header: {
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		padding: 16,
+		paddingHorizontal: spacing.lg,
+		paddingVertical: spacing.sm,
+		backgroundColor: lightColors.background,
 	},
-	coins: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
+	headerLeft: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+	headerTitle: { marginBottom: 0 },
+	scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
 	infoBox: {
 		flexDirection: "row",
-		gap: 8,
-		padding: 12,
-		borderRadius: 10,
-		marginBottom: 16,
+		gap: spacing.sm,
+		padding: spacing.md,
+		borderRadius: scaleSize(10),
+		marginBottom: spacing.lg,
+		borderWidth: scaleSize(1),
 	},
-	sheetContent: {
-		padding: 16,
-		gap: 12,
+	sheetContent: { padding: spacing.lg, gap: spacing.md },
+	lockIconContainer: {
+		backgroundColor: lightColors.brandBG,
+		padding: spacing.lg,
+		borderRadius: scaleSize(99),
+		marginBottom: spacing.sm,
 	},
-	sheetTitle: {
-		fontWeight: "600",
-		fontSize: 16,
-		marginBottom: 2,
-	},
-	sheetSubtitle: {
-		fontSize: 12,
-		color: "#666",
-	},
+	sheetTitle: { marginBottom: spacing.xs },
+	sheetSubtitle: { textAlign: "center", color: lightColors.bodyText },
 	sheetBox: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		backgroundColor: "#f1f1f1",
-		padding: 12,
-		borderRadius: 10,
+		backgroundColor: lightColors.mutedBackgroundWeaker,
+		padding: spacing.md,
+		marginVertical: spacing.md,
+		borderRadius: scaleSize(10),
 	},
-	hiddenRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 5,
-	},
+	sheetBoxTransparent: { backgroundColor: "transparent" },
+	hiddenRow: { flexDirection: "row", alignItems: "center", gap: scaleSize(5) },
 	unlockBtn: {
-		marginTop: 8,
-		padding: 12,
-		borderRadius: 8,
+		paddingVertical: spacing.md,
+		borderRadius: scaleSize(8),
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		gap: 5,
+		gap: scaleSize(5),
 	},
-
-	subtitle: {
-		color: "#666",
-		fontSize: 12,
-	},
+	unlockBtnText: { fontWeight: "600", color: "#fff", marginBottom: 0 },
 });

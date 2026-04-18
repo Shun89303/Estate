@@ -1,10 +1,20 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export type TransactionCategory =
+	| "Top Up"
+	| "Room Reserve"
+	| "Property Reserve"
+	| "Business Reserve"
+	| "Unlock"
+	| "Refund"
+	| "Spent";
+
 export interface Transaction {
 	id: string;
 	amount: number;
 	type: "purchase" | "spent";
+	category: TransactionCategory;
 	date: string;
 	note?: string;
 }
@@ -13,8 +23,18 @@ interface CoinState {
 	coins: number;
 	history: Transaction[];
 	loadUserData: (uid: string) => Promise<void>;
-	addCoins: (uid: string, amount: number, note?: string) => Promise<void>;
-	deductCoins: (uid: string, amount: number, note?: string) => Promise<boolean>;
+	addCoins: (
+		uid: string,
+		amount: number,
+		category: TransactionCategory,
+		note?: string,
+	) => Promise<void>;
+	deductCoins: (
+		uid: string,
+		amount: number,
+		category: TransactionCategory,
+		note?: string,
+	) => Promise<boolean>;
 	clearUserData: () => void;
 }
 
@@ -39,13 +59,19 @@ export const useCoinStore = create<CoinState>((set, get) => ({
 		}
 	},
 
-	addCoins: async (uid: string, amount: number, note?: string) => {
+	addCoins: async (
+		uid: string,
+		amount: number,
+		category: TransactionCategory,
+		note?: string,
+	) => {
 		const { coins, history } = get();
 		const newCoins = coins + amount;
 		const newTransaction: Transaction = {
 			id: Date.now().toString(),
 			amount,
 			type: "purchase",
+			category,
 			date: new Date().toISOString(),
 			note: note || `Purchased ${amount} coins`,
 		};
@@ -55,7 +81,12 @@ export const useCoinStore = create<CoinState>((set, get) => ({
 		await AsyncStorage.setItem(getHistoryKey(uid), JSON.stringify(newHistory));
 	},
 
-	deductCoins: async (uid: string, amount: number, note?: string) => {
+	deductCoins: async (
+		uid: string,
+		amount: number,
+		category: TransactionCategory,
+		note?: string,
+	) => {
 		const { coins, history } = get();
 		if (coins < amount) return false;
 		const newCoins = coins - amount;
@@ -63,6 +94,7 @@ export const useCoinStore = create<CoinState>((set, get) => ({
 			id: Date.now().toString(),
 			amount: -amount,
 			type: "spent",
+			category,
 			date: new Date().toISOString(),
 			note: note || `Spent ${amount} coins`,
 		};

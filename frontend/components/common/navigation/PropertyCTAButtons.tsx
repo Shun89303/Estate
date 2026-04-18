@@ -1,13 +1,18 @@
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from "react-native";
+import { View, StyleSheet, ViewStyle } from "react-native";
 import { MessageCircle, Coins } from "lucide-react-native";
 import BodyText from "@/components/common/typography/BodyText";
+import RequireAuth from "@/components/common/security/RequireAuth";
+import { useReserveSheet } from "@/components/reserve/useReserveSheet";
+import { useQuickTopUpSheet } from "@/components/reserve/useQuickTopUpSheet";
+import { TransactionCategory } from "@/stores/coinStore";
 import { spacing, scaleSize, moderateScale } from "@/utils/metrics";
 import { lightColors } from "@/theme/light";
 
 interface PropertyCTAButtonsProps {
+	propertyTitle: string;
 	reserveCoins: number;
+	reserveCategory: TransactionCategory;
 	onConsultationPress: () => void;
-	onReservePress: () => void;
 	containerStyle?: ViewStyle;
 	consultButtonStyle?: ViewStyle;
 	reserveButtonStyle?: ViewStyle;
@@ -15,12 +20,14 @@ interface PropertyCTAButtonsProps {
 	reserveIconColor?: string;
 	consultTextColor?: string;
 	reserveTextColor?: string;
+	onReserveSuccess?: () => void;
 }
 
 export default function PropertyCTAButtons({
+	propertyTitle,
 	reserveCoins,
+	reserveCategory,
 	onConsultationPress,
-	onReservePress,
 	containerStyle,
 	consultButtonStyle,
 	reserveButtonStyle,
@@ -28,34 +35,61 @@ export default function PropertyCTAButtons({
 	reserveIconColor = "#fff",
 	consultTextColor = lightColors.bigTitleText,
 	reserveTextColor = lightColors.background,
+	onReserveSuccess,
 }: PropertyCTAButtonsProps) {
+	const { open: openQuickTopUpSheet, QuickTopUpSheet } = useQuickTopUpSheet();
+	const { open: openReserveSheet, ReserveSheet } = useReserveSheet({
+		onQuickTopUp: openQuickTopUpSheet,
+	});
+
+	const handleReserve = () => {
+		openReserveSheet({
+			propertyTitle,
+			cost: reserveCoins,
+			category: reserveCategory,
+			onSuccess: () => {
+				onReserveSuccess?.();
+			},
+		});
+	};
+
 	return (
-		<View style={[styles.container, containerStyle]}>
-			<TouchableOpacity
-				style={[styles.button, styles.consultButton, consultButtonStyle]}
-				onPress={onConsultationPress}
-			>
-				<MessageCircle size={moderateScale(18)} color={consultIconColor} />
-				<BodyText
-					variant="normal"
-					style={[styles.consultText, { color: consultTextColor }]}
+		<>
+			<View style={[styles.container, containerStyle]}>
+				<RequireAuth
+					onPress={onConsultationPress}
+					message="Please log in to book a consultation."
+					style={[styles.button, styles.consultButton, consultButtonStyle]}
 				>
-					Consultation
-				</BodyText>
-			</TouchableOpacity>
-			<TouchableOpacity
-				style={[styles.button, styles.reserveButton, reserveButtonStyle]}
-				onPress={onReservePress}
-			>
-				<Coins size={moderateScale(18)} color={reserveIconColor} />
-				<BodyText
-					variant="normal"
-					style={[styles.reserveText, { color: reserveTextColor }]}
+					<>
+						<MessageCircle size={moderateScale(18)} color={consultIconColor} />
+						<BodyText
+							variant="normal"
+							style={[styles.consultText, { color: consultTextColor }]}
+						>
+							Consultation
+						</BodyText>
+					</>
+				</RequireAuth>
+				<RequireAuth
+					onPress={handleReserve}
+					message="Please log in to reserve this property."
+					style={[styles.button, styles.reserveButton, reserveButtonStyle]}
 				>
-					Reserve {reserveCoins} Coins
-				</BodyText>
-			</TouchableOpacity>
-		</View>
+					<>
+						<Coins size={moderateScale(18)} color={reserveIconColor} />
+						<BodyText
+							variant="normal"
+							style={[styles.reserveText, { color: reserveTextColor }]}
+						>
+							Reserve {reserveCoins} Coins
+						</BodyText>
+					</>
+				</RequireAuth>
+			</View>
+			<ReserveSheet />
+			<QuickTopUpSheet />
+		</>
 	);
 }
 
